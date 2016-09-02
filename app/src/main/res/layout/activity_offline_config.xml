@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:id="@+id/root"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/back"
+                android:orientation="vertical"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:theme="@style/AppTheme.AppBarOverlay"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
+
+    </android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+        android:layout_marginTop="@dimen/config_top_margin"
+        android:padding="@dimen/game_config_general_padding_small"
+        android:id="@+id/players_number_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar"
+        android:orientation="vertical">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingLeft="@dimen/game_config_icon_side_padding_side_small"
+            android:paddingRight="@dimen/game_config_icon_side_padding_side"
+            android:paddingStart="@dimen/game_config_icon_side_padding_side_small"
+            android:paddingEnd="@dimen/game_config_icon_side_padding_side">
+
+            <TextView
+                android:id="@+id/players_number_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/players_number_value"
+                android:layout_toStartOf="@+id/players_number_value"
+                android:gravity="start"
+                android:text="@string/players_number_label"
+                android:textColor="@color/white"
+                android:textSize="@dimen/config_text_size"/>
+
+            <TextView
+                android:id="@+id/players_number_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/num_players_value_side_margin"
+                android:layout_marginRight="@dimen/num_players_value_side_margin"
+                android:layout_toStartOf="@+id/num_players_icon"
+                android:layout_toLeftOf="@+id/num_players_icon"
+                android:gravity="center"
+                android:textColor="@color/colorAccent"
+                android:textSize="@dimen/config_text_size_large"
+                android:textStyle="bold"
+                tools:text="1"/>
+
+            <ImageView
+                android:id="@+id/num_players_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/manicon2"/>
+
+        </RelativeLayout>
+
+        <SeekBar
+            android:id="@+id/seekBar_players"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/seek_bar_padding"
+            android:paddingBottom="@dimen/seek_bar_padding"
+            android:paddingRight="@dimen/seek_thumb_offset"
+            android:paddingLeft="@dimen/seek_thumb_offset"
+            android:splitTrack="false"
+            android:max="5"
+            android:progress="1"
+            android:progressDrawable="@drawable/seek"
+            android:thumb="@drawable/thumb"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/num_players_value_side_margin"
+            android:paddingRight="@dimen/num_players_value_side_margin">
+
+            <TextView
+                android:id="@+id/players_number_value_min"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/num_players_value_side_margin"
+                android:layout_marginRight="@dimen/num_players_value_side_margin"
+                android:gravity="center"
+                android:text="@string/players_min"
+                android:textColor="@color/colorAccent"
+                android:textSize="@dimen/config_text_size_large"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/players_number_value_max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/num_players_value_side_margin"
+                android:layout_marginRight="@dimen/num_players_value_side_margin"
+                android:gravity="center"
+                android:text="@string/players_max"
+                android:textColor="@color/colorAccent"
+                android:textSize="@dimen/config_text_size_large"
+                android:textStyle="bold"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:padding="@dimen/game_config_general_padding_small"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/players_number_bar"
+        android:orientation="vertical">
+
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingLeft="@dimen/game_config_icon_side_padding_side_small"
+            android:paddingRight="@dimen/game_config_icon_side_padding_side"
+            android:paddingStart="@dimen/game_config_icon_side_padding_side_small"
+            android:paddingEnd="@dimen/game_config_icon_side_padding_side">
+
+            <TextView
+                android:id="@+id/bet_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@+id/bet_value"
+                android:layout_toStartOf="@+id/bet_value"
+                android:gravity="start"
+                android:text="@string/bet_number_label"
+                android:textColor="@color/white"
+                android:textSize="@dimen/config_text_size"/>
+
+            <TextView
+                android:id="@+id/bet_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/num_players_value_side_margin"
+                android:layout_marginRight="@dimen/num_players_value_side_margin"
+                android:layout_toStartOf="@+id/coin"
+                android:layout_toLeftOf="@+id/coin"
+                android:gravity="center"
+                android:textColor="@color/colorAccentDark"
+                android:textSize="@dimen/config_text_size_large"
+                android:textStyle="bold"
+                tools:text="1"/>
+
+            <ImageView
+                android:id="@+id/coin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/coin"/>
+
+        </RelativeLayout>
+
+        <SeekBar
+            android:id="@+id/seekBar_bet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/seek_bar_padding"
+            android:paddingBottom="@dimen/seek_bar_padding"
+            android:paddingRight="@dimen/seek_thumb_offset"
+            android:paddingLeft="@dimen/seek_thumb_offset"
+            android:max="10"
+            android:splitTrack="false"
+            android:progress="1"
+            android:progressDrawable="@drawable/seek"
+            android:thumb="@drawable/thumb"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/num_players_value_side_margin"
+            android:paddingRight="@dimen/num_players_value_side_margin">
+
+            <TextView
+                android:id="@+id/bet_value_min"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/num_players_value_side_margin"
+                android:layout_marginRight="@dimen/num_players_value_side_margin"
+                android:gravity="center"
+                android:text="@string/bet_min"
+                android:textColor="@color/colorAccent"
+                android:textSize="@dimen/config_text_size_large"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/bet_value_max"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/num_players_value_side_margin"
+                android:layout_marginRight="@dimen/num_players_value_side_margin"
+                android:gravity="center"
+                android:text="@string/bet_max"
+                android:textColor="@color/colorAccent"
+                android:textSize="@dimen/config_text_size_large"
+                android:textStyle="bold"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/start_game_button"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/start_game_button"
+        android:gravity="center"
+        android:text="@string/start_game_title"
+        android:textColor="@color/white"
+        android:textSize="@dimen/config_text_size"
+        android:textStyle="bold|italic"/>
+
+</RelativeLayout>

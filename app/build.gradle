@@ -1,8 +1,14 @@
 apply plugin: 'com.android.application'
-
+apply plugin: 'android-apt'
+apply plugin: 'me.tatarka.retrolambda'
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
+
+    dexOptions {
+        maxProcessCount 2
+        javaMaxHeapSize "2g"
+    }
 
     defaultConfig {
         applicationId "com.valevich.game"
@@ -17,10 +23,53 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
+
+//DbFlow
+def dbflow_version = "3.0.0-beta6"
+
+//RxJava
+final rxJavaVer = '1.1.5'
+final rxAndroidVer = '1.2.0'
+
+//Rest
+final okHttpVer = '3.3.1'
+final retrofitVer = '2.1.0'
+final gsonVer = '2.6.2'
+
+//Developer
+final stethoVer = '1.3.1'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.0.0'
+    compile 'com.android.support:design:24.0.0'
+    compile 'com.android.support:recyclerview-v7:24.0.0'
+    compile 'com.android.support:support-v4:24.0.0'
+    compile 'com.android.support:cardview-v7:24.0.0'
+    apt "org.androidannotations:androidannotations:4.0.0"
+    compile "org.androidannotations:androidannotations-api:4.0.0"
+    apt "com.github.Raizlabs.DBFlow:dbflow-processor:${dbflow_version}"
+    compile "com.github.Raizlabs.DBFlow:dbflow-core:${dbflow_version}"
+    compile "com.github.Raizlabs.DBFlow:dbflow:${dbflow_version}"
+    compile "io.reactivex:rxjava:$rxJavaVer"
+    compile "io.reactivex:rxandroid:$rxAndroidVer"
+    compile "com.squareup.okhttp3:okhttp:$okHttpVer"
+    compile "com.squareup.okhttp3:logging-interceptor:$okHttpVer"
+    compile "com.squareup.retrofit2:retrofit:$retrofitVer"
+    compile "com.squareup.retrofit2:adapter-rxjava:$retrofitVer"
+    compile "com.squareup.retrofit2:converter-gson:$retrofitVer"
+    compile "com.google.code.gson:gson:$gsonVer"
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.squareup:otto:1.3.8'
+    apt "org.androidannotations:otto:4.0.0"
+    compile 'com.jakewharton.timber:timber:4.1.2'
+    compile "com.facebook.stetho:stetho:$stethoVer"
+    compile "com.facebook.stetho:stetho-okhttp3:$stethoVer"
+//    compile 'com.trello:rxlifecycle-components:0.7.0'
 }

@@ -2,10 +2,42 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="OptionStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/round_option</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/secondary_text_size</item>
+        <item name="android:textStyle">bold|italic</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_marginBottom">@dimen/option_bottom_margin</item>
+        <item name="android:layout_marginLeft">@dimen/option_side_margin</item>
+        <item name="android:layout_marginRight">@dimen/option_side_margin</item>
+    </style>
+
+    <style name="ButtonStyle" parent="OptionStyle">
+        <item name="android:background">@drawable/round_button</item>
+        <item name="android:layout_height">@dimen/button_height</item>
+        <item name="android:layout_marginBottom">@dimen/button_bottom_margin</item>
+        <item name="android:layout_marginLeft">@dimen/button_side_margin</item>
+        <item name="android:layout_marginRight">@dimen/button_side_margin</item>
+        <item name="android:textSize">@dimen/primary_text_size</item>
     </style>
 
 </resources>

@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">Game</string>
+    <string name="round_length">25</string>
+    <string name="start_score">0</string>
+    <string name="tour_label_text">Тур</string>
+    <string name="question_label_text">Вопрос</string>
+    <string name="network_unavailbale_message">Сеть недоступна</string>
+    <string name="enter_title_text">Вход</string>
+    <string name="offline">Игра Offline</string>
+    <string name="online">Игра Online</string>
+    <string name="players_number_label">Количество игроков:</string>
+    <string name="players_min">1</string>
+    <string name="players_max">5</string>
+    <string name="start_game_title">Создать игру</string>
+    <string name="bet_number_label">Размер ставки:</string>
+    <string name="bet_min">1</string>
+    <string name="bet_max">10</string>
+    <string name="set_players_count_msg">Укажите количество игроков!</string>
+    <string name="set_bet_msg">Укажите ставку!</string>
 </resources>
