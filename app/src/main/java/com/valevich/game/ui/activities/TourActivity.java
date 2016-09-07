@@ -1,10 +1,12 @@
 package com.valevich.game.ui.activities;
 
-import android.os.CountDownTimer;
+import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -24,12 +26,18 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.ViewsById;
 import org.androidannotations.annotations.res.StringRes;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
+import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -52,6 +60,12 @@ public class TourActivity extends AppCompatActivity {
             R.id.enemy_answer_indicator_fifth})
     List<TextView> mEnemyAnswerIndicators;
 
+    @ViewsById({R.id.option_one_percent,
+            R.id.option_two_percent,
+            R.id.option_three_percent,
+            R.id.option_four_percent})
+    List<TextView> mOptionPercents;
+
     @ViewsById({R.id.enemy_name_first,
             R.id.enemy_name_second,
             R.id.enemy_name_third,
@@ -64,6 +78,7 @@ public class TourActivity extends AppCompatActivity {
             R.id.option_three,
             R.id.option_four})
     List<TextView> mOptionLabels;
+
 
     @ViewsById({R.id.area_option_one,
             R.id.area_option_two,
@@ -95,6 +110,9 @@ public class TourActivity extends AppCompatActivity {
     @ViewById(R.id.category)
     TextView mCategoryLabel;
 
+    @ViewById(R.id.question_area)
+    FrameLayout mQuestionArea;
+
     @ViewById(R.id.question_label)
     TextView mQuestionLabel;
 
@@ -121,90 +139,196 @@ public class TourActivity extends AppCompatActivity {
 
     private int[] mNeededEnemiesPositions;
 
-    private int mTimeLeft = 25;
+    private SparseBooleanArray mUsedHints = new SparseBooleanArray();
 
-    private int mCurrentQuestion = 1;
+    List<List<Integer>> mAnswersRatios = new ArrayList<>();
+
+    private int mCurrentMillisecond = 0;
+
+    private int mPreBoostProgress;
+
+    private int mCurrentQuestionNumber = 1;
 
     private int mCurrentTour = 1;
 
     private int mEnemiesAnsweredCount = 0;
 
-    private boolean mIsBoostStarted;
-
     private TextView mUserOptionLabel;
 
-    private int mRightAnswerPosition;// TODO: 31.08.2016 assign
+    private int mRightAnswerPosition;
 
-    private static CountDownTimer mTimer;
+    private Question mCurrentQuestion;
 
     private List<Player> mEnemies;
 
-    private List<Question> mQuestions;
+    private Player mUser;
 
     private Subscription mSubscription;
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (mQuestions == null) {
-            mSubscription = Question
-                    .getQuestions(ConstantsManager.MAX_QUESTIONS_COUNT)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(questions -> {
-                        mQuestions = questions;
-                        bindData();
-                        startTimer();
-                    });
-        }
+        startQuestion();
     }
 
     @Override
     protected void onStop() {
+        resetQuestion(isLastQuestion());
+        if (mSubscription != null && !mSubscription.isUnsubscribed())
+            mSubscription.unsubscribe();
         super.onStop();
-        if (mSubscription != null && !mSubscription.isUnsubscribed()) mSubscription.unsubscribe();
     }
 
     @AfterExtras
     void setEnemies() {
         mEnemies = Player.get(enemiesCount);
+        mUser = Player.getUser();
     }
 
     @AfterViews
     void setUpViews() {
         setUpEnemiesBar();
         setUpOptions();
-        setUpSupportingLabels();
     }
 
-    private void bindData() {
-        Question question = mQuestions.remove(
-                ConstantsManager.ROUND_QUESTIONS_COUNT * (mCurrentTour - 1)
-                        + mCurrentQuestion - 1);
+    private void setUpDefaultRatio() {
+        for (TextView percent : mOptionPercents) {
+            percent.setText("0%");
+        }
+    }
 
+    private void bindData(Question question) {
+        if (question == null) throw new RuntimeException("No more questions");
+        Timber.d("bindData");
+        setUpDefaultRatio();
+        setAnswersRatioCombinations();
+        setUpSupportingLabels();
+        setUpTimer();
+
+        mCurrentQuestion = question;
         List<Integer> positions = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
         Collections.shuffle(positions);
-        String[] answers = question.getFormattedAnswers();
+        String[] answers = mCurrentQuestion.getFormattedAnswers();
         for (int i = 0; i < mOptionLabels.size() - 1; i++) {
             TextView option = mOptionLabels.get(positions.remove(0));
             option.setText(answers[i]);
         }
 
         mRightAnswerPosition = positions.remove(0);
+
+        for(Player enemy : mEnemies) {
+            enemy.setAnswer(mRightAnswerPosition);
+        }
+
         TextView rightOption = mOptionLabels.get(mRightAnswerPosition);
-        rightOption.setText(question.getRightAnswer());
+        rightOption.setText(mCurrentQuestion.getRightAnswer());
 
-        mCategoryLabel.setText(question.getThemeQuest());
+        mCategoryLabel.setText(mCurrentQuestion.getThemeQuest());
 
-        String mediaPath = question.getMediaPath();
+        String mediaPath = mCurrentQuestion.getMediaPath();
         if (mediaPath != null) {
-            Glide.with(this).load(mediaPath).crossFade().into(mQuestionImage);
-            mQuestionLabelBottom.setText(question.getTextQuest());
+            int cornerRadius = (int) (12 / Resources.getSystem().getDisplayMetrics().density);
+            Glide.with(this)
+                    .load(getFilesDir() + File.separator + mediaPath).crossFade()
+                    .bitmapTransform(new RoundedCornersTransformation(this, cornerRadius, 0))
+                    .into(mQuestionImage);
+            mQuestionImage.setVisibility(View.VISIBLE);
+            mQuestionLabelBottom.setText(mCurrentQuestion.getTextQuest());
             mQuestionLabelBottom.setVisibility(View.VISIBLE);
         } else {
-            mQuestionLabel.setText(question.getTextQuest());
+            mQuestionLabel.setText(mCurrentQuestion.getTextQuest());
             mQuestionLabel.setVisibility(View.VISIBLE);
         }
+        showQuestion();
+    }
+
+    private void setUpHints() {
+        if (!mUsedHints.get(0)) mHints.get(0).setOnClickListener(view -> showRightAnswerHint());
+        if (!mUsedHints.get(1)) mHints.get(1).setOnClickListener(view -> showAudienceHelpHint());
+        if (!mUsedHints.get(2)) mHints.get(2).setOnClickListener(view -> showFiftyFiftyHint());
+    }
+
+    private void setUpTimer() {
+        mTimerLabel.setText(String.valueOf(ConstantsManager.ROUND_LENGTH/1000));
+    }
+
+    private void showQuestion() {
+        Animation slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
+        slideDownAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                showOptions();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        toggleQuestion(slideDownAnimation, View.VISIBLE);
+    }
+
+    private void disableHints() {
+        for (ImageView hint : mHints) {
+            hint.setOnClickListener(null);
+        }
+    }
+
+    private void hideQuestion() {
+
+        Animation slideUpQuestionAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_up_fast);
+
+        List<Integer> visibleOptions = getVisibleOptions(mOptionLabels);
+        List<Animation> slideUps = new ArrayList<>(visibleOptions.size());
+        for (int i = 0; i < visibleOptions.size(); i++) {
+            slideUps.add(AnimationUtils.loadAnimation(this, R.anim.slide_up_fast));
+        }
+
+        for (int i = 0; i < slideUps.size() - 1; i++) {
+            Animation slideUp = slideUps.get(i);
+            final int visibleOption = i;
+            slideUp.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    toggleOption(visibleOptions.get(visibleOption + 1), slideUps.get(visibleOption + 1), View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+        }
+
+
+        slideUpQuestionAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                toggleOption(visibleOptions.get(0), slideUps.get(0), View.INVISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        toggleQuestion(slideUpQuestionAnimation, View.INVISIBLE);
     }
 
     private void setUpOptions() {
@@ -213,20 +337,123 @@ public class TourActivity extends AppCompatActivity {
         }
     }
 
-    private void acceptAnswer(TextView option) {
-        mUserOptionLabel = option;
-        mUserOptionLabel.setBackgroundResource(R.drawable.selected_answer);
-        blockOptions();
+    private void showOptions() {
+        Animation slideDownAnimationOne = AnimationUtils.loadAnimation(this, R.anim.slide_down_fast);
+        Animation slideDownAnimationTwo = AnimationUtils.loadAnimation(this, R.anim.slide_down_fast);
+        Animation slideDownAnimationThree = AnimationUtils.loadAnimation(this, R.anim.slide_down_fast);
+        Animation slideDownAnimationFour = AnimationUtils.loadAnimation(this, R.anim.slide_down_fast);
+        slideDownAnimationOne.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                toggleOption(1, slideDownAnimationTwo, View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        slideDownAnimationTwo.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                toggleOption(2, slideDownAnimationThree, View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        slideDownAnimationThree.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                toggleOption(3, slideDownAnimationFour, View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        slideDownAnimationFour.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                setUpHints();
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        toggleOption(0, slideDownAnimationOne, View.VISIBLE);
     }
 
-    private void onPlayersAnswered() {
-
-        if (mUserOptionLabel != null && !isUserAnswerCorrect()) {
-            mUserOptionLabel.setBackgroundResource(R.drawable.wrong_answer);
+    private void toggleQuestion(Animation animation, int visibility) {
+        if (visibility == View.INVISIBLE) {
+            mQuestionArea.startAnimation(animation);
+            mQuestionArea.setVisibility(visibility);
+        } else {
+            mQuestionArea.setVisibility(visibility);
+            mQuestionArea.startAnimation(animation);
         }
+    }
 
-        TextView rightOption = mOptionLabels.get(mRightAnswerPosition);
-        rightOption.setBackgroundResource(R.drawable.right_answer);
+    private void toggleOption(int position, Animation animation, int visibility) {
+        TextView option = mOptionLabels.get(position);
+        option.setVisibility(visibility);
+        option.startAnimation(animation);
+    }
+
+    private void acceptAnswer(TextView option) {
+
+        mUser.setAnswerTime(mCurrentMillisecond);
+
+        mUserOptionLabel = option;
+
+        blockOptions();
+        disableHints();
+
+        showRightAnswer();
+        if (!isUserAnswerCorrect()) {
+            showWrongAnswer();
+            return;
+        }
+        mUser.addRightAnswer();
+        mUser.addPoints((ConstantsManager.ROUND_LENGTH - mUser.getAnswerTime())/100);
+        mScoreLabel.setText(String.valueOf(mUser.getTotalScore()));
+    }
+
+    private Observable<Boolean> onPlayersAnswered(boolean b) {
+
+        mTimerView.setProgress(0);
+        mTimerLabel.setText("0");
+
+        if (!hasUserAnswered()) {
+            disableHints();
+            blockOptions();
+            showRightAnswer();
+        }
 
         for (int i = 0; i < enemiesCount; i++) {
             Player enemy = mEnemies.get(i);
@@ -236,18 +463,105 @@ public class TourActivity extends AppCompatActivity {
                     ? R.drawable.green
                     : R.drawable.red);
         }
+
+        return Observable.just(b);
+    }
+
+    private Observable<Boolean> resetQuestion(boolean isLast) {
+
+        hidePercentage();
+        hideQuestion();
+
+        if(mCurrentQuestion != null) {
+            mCurrentQuestion.setIsPlayed(1);
+            mCurrentQuestion.update();
+        }
+
+        for (Player enemy : mEnemies) {
+            if(enemy.getAnswerOption() == mRightAnswerPosition) {
+                enemy.addPoints((ConstantsManager.ROUND_LENGTH - enemy.getAnswerTime())/100);
+                enemy.addRightAnswer();
+            }
+        }
+
+        mAnswersRatios.clear();
+
+        for (TextView option : mOptionLabels) {
+            option.setText("");
+            option.setClickable(true);
+            option.setBackgroundResource(R.drawable.round_option);
+        }
+
+        mQuestionLabel.setText("");
+        mCategoryLabel.setText("");
+
+        for (int i = 0; i < enemiesCount; i++) {
+            TextView indicator = mEnemyAnswerIndicators.get(mNeededEnemiesPositions[i]);
+            indicator.setBackgroundResource(R.drawable.status_new);
+            indicator.setText("");
+            indicator.setVisibility(View.GONE);
+        }
+
+        mQuestionImage.setVisibility(View.GONE);
+        mQuestionLabelBottom.setVisibility(View.GONE);
+        mQuestionLabel.setVisibility(View.GONE);
+
+        mCurrentMillisecond = 0;
+        mUser.setAnswerTime(0);
+
+        mEnemiesAnsweredCount = 0;
+        mUserOptionLabel = null;
+
+        return Observable.just(isLast);
+    }
+
+    private void resetRound() {
+
+        mCurrentQuestionNumber = 1;
+        mCurrentTour++;
+
+        List<Player> players = new ArrayList<>(mEnemies.size());
+        players.add(new Player(mUser));
+        for(Player enemy:mEnemies) {
+            Player player = new Player(enemy);
+            players.add(player);
+        }
+        Collections.sort(players, (player1, player2) -> player2.getTotalScore() - player1.getTotalScore());
+        Player[] pls = new Player[players.size()];
+        pls = players.toArray(pls);
+
+        for(Player enemy:mEnemies) {
+            enemy.setLastRoundScore(0);
+            enemy.setLastRoundAnswersCount(0);
+        }
+
+        ResultsActivity_.intent(this).parcelablePlayers(pls).tourNumber(mCurrentTour-1).start();
+
+    }
+
+    private void showRightAnswer() {
+        TextView rightOption = mOptionLabels.get(mRightAnswerPosition);
+        rightOption.setBackgroundResource(R.drawable.right_answer);
+    }
+
+    private void showWrongAnswer() {
+        mUserOptionLabel.setBackgroundResource(R.drawable.wrong_answer);
     }
 
     private boolean isUserAnswerCorrect() {
         return mUserOptionLabel
                 .getText()
                 .toString()
-                .equals(mQuestions.get(mCurrentQuestion).getRightAnswer());
+                .equals(mCurrentQuestion.getRightAnswer());
+    }
+
+    private boolean isLastQuestion() {
+        return mCurrentQuestionNumber > 7;
     }
 
     private void setUpSupportingLabels() {
         mTourNumberLabel.setText(String.format(Locale.getDefault(), "%s %d", mDefaultTourText, mCurrentTour));
-        mQuestionNumberLabel.setText(String.format(Locale.getDefault(), "%s %d", mDefaultQuestionText, mCurrentQuestion));
+        mQuestionNumberLabel.setText(String.format(Locale.getDefault(), "%s %d", mDefaultQuestionText, mCurrentQuestionNumber));
     }
 
     private void setUpEnemiesBar() {
@@ -294,89 +608,74 @@ public class TourActivity extends AppCompatActivity {
         mEnemiesBar.startAnimation(slideDownAnimation);
     }
 
-    private void startTimer() {
-        Timber.d("Timer started");
-        mTimer = new CountDownTimer(ConstantsManager.ROUND_LENGTH, ConstantsManager.COUNTDOWN_INTERVAL_NORMAL) {
-            @Override
-            public void onTick(long leftTimeInMilliseconds) {
-                if(!mIsBoostStarted) {
-                    long leftInSeconds = leftTimeInMilliseconds / 1000;
-                    Timber.d("%d", ConstantsManager.ROUND_LENGTH - (int) leftTimeInMilliseconds);
-                    mTimerView.setProgress(ConstantsManager.ROUND_LENGTH - (int) leftTimeInMilliseconds);
-                    if (mTimeLeft - leftInSeconds > 1) {
-                        checkIfPlayersAnswered();
-                        mTimerLabel.setText(String.valueOf(leftInSeconds + 1));
-                        mTimeLeft--;
-                    }
-                }
-
-            }
-
-            @Override
-            public void onFinish() {
-                mTimerView.setProgress(ConstantsManager.ROUND_LENGTH);
-                mTimerLabel.setText("0");
-                checkIfPlayersAnswered();
-            }
-        }.start();
-
-    }
-
-    private void speedUpTimer() {
-        Timber.d("Timer boosted");
-        mTimer.cancel();
-        int currentProgress = mTimerView.getProgress();
-        int timeLeft = mTimeLeft * 1000 / ConstantsManager.SPEED_BOOST;
-        mTimer = new CountDownTimer(
-                timeLeft,
-                ConstantsManager.COUNTDOWN_INTERVAL_BOOST) {
-            @Override
-            public void onTick(long leftTimeInMilliseconds) {
-                long leftInSeconds = leftTimeInMilliseconds / 1000;
-                int progress = (timeLeft - (int) leftTimeInMilliseconds) * ConstantsManager.SPEED_BOOST + currentProgress;
-                Timber.d("%d",progress);
-                mTimerView.setProgress(progress);
-                if (mTimeLeft - leftInSeconds > 1) {
-                    mTimerLabel.setText(String.valueOf(leftInSeconds + 1));
-                    mTimeLeft--;
-                }
-            }
-
-            @Override
-            public void onFinish() {
-                mTimerView.setProgress(ConstantsManager.ROUND_LENGTH);
-                mTimerLabel.setText("0");
-                onPlayersAnswered();
-            }
-        }.start();
-    }
-
-    private void checkIfPlayersAnswered() {
-        if (!mIsBoostStarted) {
-            if (!hasEnemiesAnswered()) {
-                checkIfEnemiesAnswered();
-            } else if (hasUserAnswered()) {
-                mIsBoostStarted = true;
-                speedUpTimer();
-            } else if (!isTimeLeft()) {
-                onPlayersAnswered();
-            }
+    private Observable<Boolean> onTick(long lap) {
+        Timber.d("onTick");
+        int progress = (int) ((lap + 1) * ConstantsManager.COUNTDOWN_INTERVAL_NORMAL);
+        mTimerView.setProgress(progress);
+        if (progress % 1000 == 0) {
+            mTimerLabel.setText(String.valueOf((ConstantsManager.ROUND_LENGTH - progress)/1000));
         }
+        mCurrentMillisecond = progress;
+        mPreBoostProgress = mCurrentMillisecond;
+        if (!hasEnemiesAnswered()) checkIfEnemiesAnswered(ConstantsManager.COUNTDOWN_INTERVAL_NORMAL);
+        return Observable.just(hasUserAnswered());
+    }
 
+    private Observable<Boolean> onBoost(long lap) {
+        Timber.d("onBoost");
+        int progress = (int) ((lap + 1) * ConstantsManager.COUNTDOWN_INTERVAL_BOOST) * ConstantsManager.SPEED_BOOST;
+        mTimerView.setProgress(mPreBoostProgress + progress);
+        mTimerLabel.setText(String.valueOf((ConstantsManager.ROUND_LENGTH - (mPreBoostProgress + progress))/1000));
+        mCurrentMillisecond = mPreBoostProgress + progress;
+        if (!hasEnemiesAnswered()) checkIfEnemiesAnswered(ConstantsManager.COUNTDOWN_INTERVAL_BOOST * ConstantsManager.SPEED_BOOST);
+        return Observable.just(isTimeLeft());
     }
 
     private boolean isTimeLeft() {
-        return mTimeLeft > 0;
+        return mCurrentMillisecond < ConstantsManager.ROUND_LENGTH;
     }
 
-    private void checkIfEnemiesAnswered() {
+
+    private void checkIfEnemiesAnswered(int interval) {
         for (int i = 0; i < enemiesCount; i++) {
             Player enemy = mEnemies.get(i);
-            if (enemy.getAnswerTime() == ConstantsManager.ROUND_LENGTH / 1000 - mTimeLeft) {
+            if (enemy.getAnswerTime()/interval == mCurrentMillisecond/interval){
                 TextView indicator = mEnemyAnswerIndicators.get(mNeededEnemiesPositions[i]);
                 indicator.setText(String.valueOf(++mEnemiesAnsweredCount));
                 indicator.setVisibility(View.VISIBLE);
+
+                updateAnswersRatio();
             }
+        }
+    }
+
+    private void updateAnswersRatio() {
+        int size = mAnswersRatios.size();
+        if (size != 0) {
+            List<Integer> ratios = mAnswersRatios.remove(0);
+            for (int i = 0; i < mOptionPercents.size(); i++) {
+                TextView percent = mOptionPercents.get(i);
+                percent.setText(String.format(Locale.getDefault(), "%d%s", ratios.get(i), "%"));
+            }
+        }
+    }
+
+    private void setAnswersRatioCombinations() {
+        List<Integer> startRatio = new ArrayList<>(Arrays.asList(0, 0, 0, 0));
+        List<Player> copyEnemies = new ArrayList<>(mEnemies);
+        Collections.sort(copyEnemies);
+        for (int k = 0; k < copyEnemies.size(); k++) {
+            Player enemy = copyEnemies.get(k);
+            int enemyOption = enemy.getAnswerOption();
+            startRatio.set(enemyOption, startRatio.get(enemyOption) + 1);
+
+            List<Integer> outRatio = new ArrayList<>();
+            for (int i = 0; i < startRatio.size(); i++) {
+                outRatio.add((startRatio.get(i)  * 100 / (k + 1)));
+            }
+
+            mAnswersRatios.add(outRatio);
+
         }
     }
 
@@ -392,6 +691,120 @@ public class TourActivity extends AppCompatActivity {
         for (TextView option : mOptionLabels) {
             option.setClickable(false);
         }
+    }
+
+    private void showRightAnswerHint() {
+        ImageView hint = mHints.get(0);
+        hint.setClickable(false);
+        mUsedHints.append(0, true);
+        hint.setImageResource(R.drawable.right2);
+        Animation slideOutLeft = AnimationUtils.loadAnimation(this, R.anim.slide_out_left);
+        Animation slideOutRight = AnimationUtils.loadAnimation(this, R.anim.slide_out_right);
+        List<TextView> options = new ArrayList<>();
+        options.addAll(mOptionLabels);
+        options.remove(mRightAnswerPosition);
+        List<Integer> visibleOptions = getVisibleOptions(options);
+        for (int i = 0; i < visibleOptions.size(); i++) {
+            TextView option = options.get(visibleOptions.get(i));
+            option.startAnimation(i == 0 ? slideOutLeft : slideOutRight);
+            option.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void showAudienceHelpHint() {
+        if (getVisibleOptions(mOptionLabels).size() > 1) {
+            ImageView hint = mHints.get(1);
+            hint.setClickable(false);
+            mUsedHints.append(1, true);
+            hint.setImageResource(R.drawable.zal2);
+            showPercentage();
+        }
+    }
+
+    private void showPercentage() {
+        Animation slideInRight = AnimationUtils.loadAnimation(this, R.anim.slide_in_right);
+        for (TextView percent : mOptionPercents) {
+            percent.setVisibility(View.VISIBLE);
+            percent.startAnimation(slideInRight);
+        }
+    }
+
+    private void hidePercentage() {
+        if(mOptionPercents.get(0).getVisibility() == View.VISIBLE) {
+            Animation slideOutLeft = AnimationUtils.loadAnimation(this, R.anim.slide_out_right);
+            for (TextView percent : mOptionPercents) {
+                percent.startAnimation(slideOutLeft);
+                percent.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private void showFiftyFiftyHint() {
+        Timber.d("onClick");
+        if (getVisibleOptions(mOptionLabels).size() > 1) {
+            ImageView hint = mHints.get(2);
+            hint.setClickable(false);
+            mUsedHints.append(2, true);
+            hint.setImageResource(R.drawable.fifty_fifty_second);
+            Animation slideOutLeft = AnimationUtils.loadAnimation(this, R.anim.slide_out_left);
+            Animation slideOutRight = AnimationUtils.loadAnimation(this, R.anim.slide_out_right);
+            List<TextView> options = new ArrayList<>();
+            options.addAll(mOptionLabels);
+            options.remove(mRightAnswerPosition);
+            options.remove(new Random().nextInt(3));
+            for (int i = 0; i < options.size(); i++) {
+                TextView option = options.get(i);
+                option.startAnimation(i == 0 ? slideOutLeft : slideOutRight);
+                option.setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+    private void startQuestion() {
+        mSubscription = getQuestionCycle()
+                .subscribe(isLast -> Timber.d("isLast"),
+                        throwable -> Timber.d(throwable.getLocalizedMessage()),
+                        () -> {
+                            if (mCurrentQuestionNumber == ConstantsManager.ROUND_QUESTIONS_COUNT) {
+                                resetRound();
+                            } else {
+                                mCurrentQuestionNumber++;
+                                startQuestion();
+                            }
+                        });
+    }
+
+    private Observable<Boolean> getQuestionCycle() {
+        return Question.getQuestion()
+                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .doOnNext(this::bindData).delay(2, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread())
+                .flatMap(questions1 -> Observable
+                        .interval(ConstantsManager.COUNTDOWN_INTERVAL_NORMAL, TimeUnit.MILLISECONDS))
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMap(this::onTick)
+                .takeWhile(userAnswered -> !userAnswered && isTimeLeft())
+                .concatWith(Observable
+                        .interval(ConstantsManager.COUNTDOWN_INTERVAL_BOOST, TimeUnit.MILLISECONDS)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .flatMap(this::onBoost))
+                .takeWhile(timeLeft -> isTimeLeft())
+                .concatWith(Observable
+                        .just(true)
+                        .flatMap(this::onPlayersAnswered)
+                        .delay(2, TimeUnit.SECONDS)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .flatMap(this::resetQuestion)
+                        .delay(1, TimeUnit.SECONDS)
+                        .observeOn(AndroidSchedulers.mainThread()));
+    }
+
+    private List<Integer> getVisibleOptions(List<TextView> options) {
+        List<Integer> visibleOptions = new ArrayList<>();
+        for (int i = 0; i < options.size(); i++) {
+            TextView option = options.get(i);
+            if (option.getVisibility() == View.VISIBLE) visibleOptions.add(i);
+        }
+        return visibleOptions;
     }
 
 }

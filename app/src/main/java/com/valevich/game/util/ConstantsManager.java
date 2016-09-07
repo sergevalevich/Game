@@ -15,8 +15,12 @@ public interface ConstantsManager {
     int ROUND_LENGTH = 25000;//25 seconds
     int COUNTDOWN_INTERVAL_NORMAL = 50;//millis
     int COUNTDOWN_INTERVAL_BOOST = 25;
-    int SPEED_BOOST = 25;
+    int SPEED_BOOST = 7;
 
     int MAX_QUESTIONS_COUNT = 21;
     int ROUND_QUESTIONS_COUNT = 7;
+
+    String DEFAULT_USER_NAME = "Новичок";
+
+    String UPDATE_QUESTIONS_JOB_TAG = "job_demo_tag";
 }

@@ -42,90 +42,64 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/players_number_value"
-                android:layout_toStartOf="@+id/players_number_value"
                 android:gravity="start"
                 android:text="@string/players_number_label"
                 android:textColor="@color/white"
                 android:textSize="@dimen/config_text_size"/>
 
-            <TextView
-                android:id="@+id/players_number_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="@dimen/num_players_value_side_margin"
-                android:layout_marginRight="@dimen/num_players_value_side_margin"
-                android:layout_toStartOf="@+id/num_players_icon"
-                android:layout_toLeftOf="@+id/num_players_icon"
-                android:gravity="center"
-                android:textColor="@color/colorAccent"
-                android:textSize="@dimen/config_text_size_large"
-                android:textStyle="bold"
-                tools:text="1"/>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/players_number_bar_people"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/game_config_icon_side_padding_side_small"
+            android:paddingRight="@dimen/game_config_icon_side_padding_side_small"
+            android:paddingStart="@dimen/game_config_icon_side_padding_side_small"
+            android:paddingEnd="@dimen/game_config_icon_side_padding_side_small"
+            android:paddingTop="@dimen/items_bar_padding"
+            android:paddingBottom="@dimen/items_bar_padding">
 
             <ImageView
-                android:id="@+id/num_players_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:src="@drawable/manicon2"/>
+                android:id="@+id/man_one"
+                android:layout_weight="1"
+                android:src="@drawable/manicongrey"
+                android:layout_width="@dimen/man_num_icon"
+                android:layout_height="@dimen/man_num_icon"/>
 
-        </RelativeLayout>
 
-        <SeekBar
-            android:id="@+id/seekBar_players"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/seek_bar_padding"
-            android:paddingBottom="@dimen/seek_bar_padding"
-            android:paddingRight="@dimen/seek_thumb_offset"
-            android:paddingLeft="@dimen/seek_thumb_offset"
-            android:splitTrack="false"
-            android:max="5"
-            android:progress="1"
-            android:progressDrawable="@drawable/seek"
-            android:thumb="@drawable/thumb"/>
+            <ImageView
+                android:id="@+id/man_two"
+                android:layout_weight="1"
+                android:src="@drawable/manicongrey"
+                android:layout_width="@dimen/man_num_icon"
+                android:layout_height="@dimen/man_num_icon"/>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/num_players_value_side_margin"
-            android:paddingRight="@dimen/num_players_value_side_margin">
+            <ImageView
+                android:id="@+id/man_three"
+                android:layout_weight="1"
+                android:src="@drawable/manicongrey"
+                android:layout_width="@dimen/man_num_icon"
+                android:layout_height="@dimen/man_num_icon"/>
 
-            <TextView
-                android:id="@+id/players_number_value_min"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="@dimen/num_players_value_side_margin"
-                android:layout_marginRight="@dimen/num_players_value_side_margin"
-                android:gravity="center"
-                android:text="@string/players_min"
-                android:textColor="@color/colorAccent"
-                android:textSize="@dimen/config_text_size_large"
-                android:textStyle="bold"/>
 
-            <TextView
-                android:id="@+id/players_number_value_max"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="@dimen/num_players_value_side_margin"
-                android:layout_marginRight="@dimen/num_players_value_side_margin"
-                android:gravity="center"
-                android:text="@string/players_max"
-                android:textColor="@color/colorAccent"
-                android:textSize="@dimen/config_text_size_large"
-                android:textStyle="bold"/>
+            <ImageView
+                android:id="@+id/man_four"
+                android:layout_weight="1"
+                android:layout_width="@dimen/man_num_icon"
+                android:layout_height="@dimen/man_num_icon"
+                android:src="@drawable/manicongrey"/>
 
-        </RelativeLayout>
+            <ImageView
+                android:id="@+id/man_five"
+                android:layout_weight="1"
+                android:layout_width="@dimen/man_num_icon"
+                android:layout_height="@dimen/man_num_icon"
+                android:src="@drawable/manicongrey"/>
+
+
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -151,90 +125,66 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_toLeftOf="@+id/bet_value"
-                android:layout_toStartOf="@+id/bet_value"
                 android:gravity="start"
                 android:text="@string/bet_number_label"
                 android:textColor="@color/white"
                 android:textSize="@dimen/config_text_size"/>
 
-            <TextView
-                android:id="@+id/bet_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="@dimen/num_players_value_side_margin"
-                android:layout_marginRight="@dimen/num_players_value_side_margin"
-                android:layout_toStartOf="@+id/coin"
-                android:layout_toLeftOf="@+id/coin"
-                android:gravity="center"
-                android:textColor="@color/colorAccentDark"
-                android:textSize="@dimen/config_text_size_large"
-                android:textStyle="bold"
-                tools:text="1"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/bet_bar_people_coins"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/game_config_icon_side_padding_side_small"
+            android:paddingRight="@dimen/game_config_icon_side_padding_side_small"
+            android:paddingStart="@dimen/game_config_icon_side_padding_side_small"
+            android:paddingEnd="@dimen/game_config_icon_side_padding_side_small"
+            android:paddingTop="@dimen/items_bar_padding"
+            android:paddingBottom="@dimen/items_bar_padding">
+
 
             <ImageView
-                android:id="@+id/coin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/coin"/>
+                android:id="@+id/coin_one"
+                android:layout_weight="1"
+                android:layout_width="@dimen/bet_icon"
+                android:layout_height="@dimen/bet_icon"
+                android:src="@drawable/coin1"/>
 
-        </RelativeLayout>
 
-        <SeekBar
-            android:id="@+id/seekBar_bet"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/seek_bar_padding"
-            android:paddingBottom="@dimen/seek_bar_padding"
-            android:paddingRight="@dimen/seek_thumb_offset"
-            android:paddingLeft="@dimen/seek_thumb_offset"
-            android:max="10"
-            android:splitTrack="false"
-            android:progress="1"
-            android:progressDrawable="@drawable/seek"
-            android:thumb="@drawable/thumb"/>
+            <ImageView
+                android:id="@+id/coin_five"
+                android:layout_weight="1"
+                android:layout_width="@dimen/bet_icon"
+                android:layout_height="@dimen/bet_icon"
+                android:src="@drawable/coin5"/>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/num_players_value_side_margin"
-            android:paddingRight="@dimen/num_players_value_side_margin">
+            <ImageView
+                android:id="@+id/coin_ten"
+                android:layout_weight="1"
+                android:layout_width="@dimen/bet_icon"
+                android:layout_height="@dimen/bet_icon"
+                android:src="@drawable/coin10"/>
 
-            <TextView
-                android:id="@+id/bet_value_min"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="@dimen/num_players_value_side_margin"
-                android:layout_marginRight="@dimen/num_players_value_side_margin"
-                android:gravity="center"
-                android:text="@string/bet_min"
-                android:textColor="@color/colorAccent"
-                android:textSize="@dimen/config_text_size_large"
-                android:textStyle="bold"/>
 
-            <TextView
-                android:id="@+id/bet_value_max"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="@dimen/num_players_value_side_margin"
-                android:layout_marginRight="@dimen/num_players_value_side_margin"
-                android:gravity="center"
-                android:text="@string/bet_max"
-                android:textColor="@color/colorAccent"
-                android:textSize="@dimen/config_text_size_large"
-                android:textStyle="bold"/>
+            <ImageView
+                android:id="@+id/coin_twenty"
+                android:layout_weight="1"
+                android:layout_width="@dimen/bet_icon"
+                android:layout_height="@dimen/bet_icon"
+                android:src="@drawable/coin20"/>
 
-        </RelativeLayout>
+            <ImageView
+                android:id="@+id/coin_fifty"
+                android:layout_weight="1"
+                android:layout_width="@dimen/bet_icon"
+                android:layout_height="@dimen/bet_icon"
+                android:src="@drawable/coin50"/>
+
+        </LinearLayout>
+
 
     </LinearLayout>
 

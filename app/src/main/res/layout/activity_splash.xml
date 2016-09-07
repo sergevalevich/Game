@@ -6,6 +6,17 @@
                 android:background="@drawable/back">
 
 
+    <me.zhanghai.android.materialprogressbar.MaterialProgressBar
+        android:id="@+id/progress_bar"
+        style="@style/Widget.MaterialProgressBar.ProgressBar.Large"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:tint="@color/white"
+        android:visibility="gone"
+        android:layout_centerInParent="true"/>
+
+
     <TextView
         android:id="@+id/title"
         android:layout_width="match_parent"

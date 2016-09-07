@@ -1,22 +1,22 @@
 package com.valevich.game.ui.activities;
 
+import android.graphics.Color;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.trello.rxlifecycle.components.RxActivity;
+import com.valevich.game.DataManager;
 import com.valevich.game.R;
-import com.valevich.game.network.RestService;
-import com.valevich.game.network.model.QuestionApiModel;
 import com.valevich.game.storage.model.Question;
 import com.valevich.game.util.NetworkStateChecker;
 import com.valevich.game.util.Preferences_;
 import com.valevich.game.util.UrlFormatter;
 
-import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
@@ -25,23 +25,13 @@ import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.StringRes;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.ResponseBody;
-import rx.Observable;
+import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
-import timber.log.Timber;
 
 @EActivity(R.layout.activity_splash)
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends RxActivity {
 
     @ViewById(R.id.root)
     RelativeLayout mRootView;
@@ -55,23 +45,27 @@ public class SplashActivity extends AppCompatActivity {
     @ViewById(R.id.online_game_btn)
     TextView mOnlineGameButton;
 
-    @StringRes(R.string.network_unavailbale_message)
-    String mNetworkUnavailableMessage;
+    @ViewById(R.id.progress_bar)
+    MaterialProgressBar mProgressBar;
 
-    @Bean
-    RestService mRestService;
+    @StringRes(R.string.network_unavailbale_message)
+    String mNetworkErrorMessage;
+
+    @StringRes(R.string.try_again_message)
+    String mRetryMessage;
 
     @Bean
     NetworkStateChecker mNetworkStateChecker;
 
-    private Snackbar mSnackbar;
+    @Bean
+    DataManager mDataManager;
 
     private Subscription mSubscription;
 
-    private Observable<Boolean> mLoadQuestionsObservable;
+    private Snackbar mSnackbar;
 
     @Pref
-    static Preferences_ mPreferences;
+    Preferences_ mPreferences;
 
     @Click(R.id.offline_game_btn)
     void onOfflinePicked() {
@@ -84,34 +78,81 @@ public class SplashActivity extends AppCompatActivity {
 
     }
 
-    @AfterInject
-    void initObservable() {
-        if(isSyncNeeded())
-            mLoadQuestionsObservable = getLoadQuestionsObservable();
-    }
-
     @Override
-    protected void onResume() {
-        super.onResume();
-        if(isSyncNeeded()) {
-            if (mNetworkStateChecker.isNetworkAvailable()) {
-                notifyLoading();
-                loadQuestions();
-            } else {
-                notifyUserWith(mNetworkUnavailableMessage);
-                showViews();
-            }
-        } else showViews();
+    protected void onStart() {
+        super.onStart();
+        if(!isDataFresh()) loadQuestions();
+        else showViews();
+//        Question question = new Question();
+//        question.setIsPlayed(0);
+//        question.setRightAnswer("Right answer");
+//        question.setMediaType("photo");
+//        question.setAnswers("answer_1,answer_2,answer_3");
+//        question.setTextQuest("What da heck?");
+//        question.setThemeQuest("general");
+//        question.setMediaPath("http://minionomaniya.ru/wp-content/uploads/2015/10/%D0%BC%D0%B8%D0%BD%D1%8C%D0%BE%D0%BD%D1%8B-%D0%BA%D0%B0%D1%80%D1%82%D0%B8%D0%BD%D0%BA%D0%B8-%D0%B2-%D1%85%D0%BE%D1%80%D0%BE%D1%88%D0%B5%D0%BC-%D0%BA%D0%B0%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5.jpg");
+//        question.save();
+//        Question q = new Question();
+//        q.setIsPlayed(0);
+//        q.setRightAnswer("Right answer_2");
+//        q.setMediaType("photo");
+//        q.setAnswers("answer_1,answer_2,answer_3");
+//        q.setTextQuest("What?");
+//        q.setThemeQuest("general");
+//        q.setMediaPath("http://minionomaniya.ru/wp-content/uploads/2015/10/%D0%BC%D0%B8%D0%BD%D1%8C%D0%BE%D0%BD%D1%8B-%D0%BA%D0%B0%D1%80%D1%82%D0%B8%D0%BD%D0%BA%D0%B8-%D0%B2-%D1%85%D0%BE%D1%80%D0%BE%D1%88%D0%B5%D0%BC-%D0%BA%D0%B0%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5.jpg");
+//        q.save();
+//        Question question1 = new Question();
+//        question1.setIsPlayed(0);
+//        question1.setRightAnswer("Right answer_3");
+//        question1.setMediaType("photo");
+//        question1.setAnswers("answer_1,answer_2,answer_3");
+//        question1.setTextQuest("Where?");
+//        question1.setThemeQuest("general");
+//        question1.setMediaPath("http://minionomaniya.ru/wp-content/uploads/2015/10/%D0%BC%D0%B8%D0%BD%D1%8C%D0%BE%D0%BD%D1%8B-%D0%BA%D0%B0%D1%80%D1%82%D0%B8%D0%BD%D0%BA%D0%B8-%D0%B2-%D1%85%D0%BE%D1%80%D0%BE%D1%88%D0%B5%D0%BC-%D0%BA%D0%B0%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5.jpg");
+//        question1.save();
+//        showViews();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        setButtonsVisibility(View.INVISIBLE);
+        if(mSnackbar!=null && mSnackbar.isShown()) mSnackbar.dismiss();
+    }
+
+    @Override
+    protected void onDestroy() {
         if (mSubscription != null && !mSubscription.isUnsubscribed()) mSubscription.unsubscribe();
+        super.onDestroy();
+    }
+
+    private void loadQuestions() {
+        if (mNetworkStateChecker.isNetworkAvailable()) {
+            notifyLoading();
+
+            mSubscription = mDataManager.loadQuestions()
+                    .compose(bindToLifecycle())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(isSuccessful -> {},
+                            throwable -> {
+                                dismissLoading();
+                                notifyUserWith(mNetworkErrorMessage);
+                            },
+                            () -> {
+                                mPreferences.isDataFresh().put(true);
+                                dismissLoading();
+                                showViews();
+                            });
+
+        } else {
+            notifyUserWith(mNetworkErrorMessage);
+        }
     }
 
     private void showViews() {
+
+        if(areButtonsVisible()) setButtonsVisibility(View.INVISIBLE);//hide first
+
         Animation slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
         Animation slideInLeft = AnimationUtils.loadAnimation(this, R.anim.slide_in_left);
         Animation slideInRight = AnimationUtils.loadAnimation(this, R.anim.slide_in_right);
@@ -213,110 +254,35 @@ public class SplashActivity extends AppCompatActivity {
         mOnlineGameButton.setVisibility(visibility);
     }
 
-    private void loadQuestions() {
-        mSubscription = mLoadQuestionsObservable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        isSuccessful -> {
-                        },
-                        throwable -> {
-                            dismissLoading();
-                            notifyUserWith(throwable.getLocalizedMessage());
-                        },
-                        () -> {
-                            mPreferences.isSyncNeeded().put(false);
-                            dismissLoading();
-                            showViews();
-                        });
+    private boolean areButtonsVisible() {
+        return mOfflineGameButton.getVisibility() == View.VISIBLE
+                || mOnlineGameButton.getVisibility() == View.VISIBLE;
     }
 
-    private Observable<Boolean> getLoadQuestionsObservable() {
-        return Observable
-                .zip(mRestService.loadQuestions()
-                                .flatMap(Observable::from)
-                                .flatMap(Question::insertQuestion)
-                                .filter(questionApiModel -> questionApiModel.getMediaType() != null)
-                                .flatMap(questionApiModel -> mRestService.loadQuestionMedia(UrlFormatter.getFileNameFrom(
-                                        questionApiModel.getMediaType()),
-                                        UrlFormatter.getFileNameFrom(questionApiModel.getMediaUrl()))),
-                        mRestService.loadQuestions()
-                                .flatMap(Observable::from)
-                                .flatMap(Question::insertQuestion)
-                                .filter(questionApiModel -> questionApiModel.getMediaType() != null)
-                                .flatMap(this::getFileName), this::writeResponseBodyToDisk)
-                .cache();
-    }
-
-
-
-    private Observable<String> getFileName(QuestionApiModel questionApiModel) {
-        return Observable.just(UrlFormatter.getFileNameFrom(questionApiModel.getMediaUrl()));
-    }
-
-    private boolean writeResponseBodyToDisk(ResponseBody body, String filename) {
-        try {
-            // todo change the file location/name according to your needs
-            File file = new File(getFilesDir() + File.separator + filename);
-
-            InputStream inputStream = null;
-            OutputStream outputStream = null;
-
-            try {
-                byte[] fileReader = new byte[4096];
-
-                long fileSize = body.contentLength();
-                long fileSizeDownloaded = 0;
-
-                inputStream = body.byteStream();
-                outputStream = new FileOutputStream(file);
-
-                while (true) {
-                    int read = inputStream.read(fileReader);
-
-                    if (read == -1) {
-                        break;
-                    }
-
-                    outputStream.write(fileReader, 0, read);
-
-                    fileSizeDownloaded += read;
-                }
-
-                outputStream.flush();
-
-                return true;
-            } catch (IOException e) {
-                return false;
-            } finally {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-
-                if (outputStream != null) {
-                    outputStream.close();
-                }
-            }
-        } catch (IOException e) {
-            return false;
-        }
-    }
-
-    private boolean isSyncNeeded() {
-        return mPreferences.isSyncNeeded().get();
+    private boolean isDataFresh() {
+        return mPreferences.isDataFresh().get();
     }
 
     private void notifyUserWith(String message) {
-        Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG).show();
-    }
+        mSnackbar = Snackbar.make(mRootView, message, Snackbar.LENGTH_INDEFINITE)
+                .setAction(mRetryMessage, view -> {
+                    loadQuestions();
+                })
+                .setActionTextColor(ContextCompat.getColor(this,R.color.colorAccent));
 
-    private void notifyLoading() {
-        mSnackbar = Snackbar.make(mRootView,"Загрузка вопросов...",Snackbar.LENGTH_INDEFINITE);
+        View view = mSnackbar.getView();
+        TextView tv = (TextView) view.findViewById(android.support.design.R.id.snackbar_text);
+        tv.setTextColor(Color.WHITE);
+
         mSnackbar.show();
     }
 
+    private void notifyLoading() {
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
     private void dismissLoading() {
-        mSnackbar.dismiss();
+        mProgressBar.setVisibility(View.GONE);
     }
 
 }

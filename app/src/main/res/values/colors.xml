@@ -5,6 +5,8 @@
     <color name="colorAccent">#ffde76</color>
     <color name="colorAccentDark">#fecf05</color>
     <color name="white">#ffffff</color>
+    <color name="transparent">#00000000</color>
+    <color name="opaque">#ffffffff</color>
     <color name="round_fill">#33000000</color>
     <color name="colorAnswerRight">#71ae40</color>
     <color name="colorAnswerWrong">#F44336</color>

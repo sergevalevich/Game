@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
-              android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:background="@drawable/back">
@@ -39,10 +38,11 @@
                 <TextView
                     android:visibility="gone"
                     android:id="@+id/enemy_answer_indicator_first"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="@dimen/indicator_size"
+                    android:layout_height="@dimen/indicator_size"
                     android:layout_gravity="end"
                     android:background="@drawable/status_new"
+                    android:textSize="@dimen/indicator_text_size"
                     android:gravity="center"
                     tools:text="1"/>
 
@@ -83,10 +83,12 @@
                 <TextView
                     android:visibility="gone"
                     android:id="@+id/enemy_answer_indicator_second"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="@dimen/indicator_size"
+                    android:layout_height="@dimen/indicator_size"
+                    android:textSize="@dimen/indicator_text_size"
                     android:layout_gravity="end"
                     android:background="@drawable/status_new"
+
                     android:gravity="center"
                     tools:text="1"/>
 
@@ -127,8 +129,9 @@
                 <TextView
                     android:visibility="gone"
                     android:id="@+id/enemy_answer_indicator_third"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="@dimen/indicator_size"
+                    android:layout_height="@dimen/indicator_size"
+                    android:textSize="@dimen/indicator_text_size"
                     android:layout_gravity="end"
                     android:background="@drawable/status_new"
                     android:gravity="center"
@@ -171,8 +174,9 @@
                 <TextView
                     android:visibility="gone"
                     android:id="@+id/enemy_answer_indicator_fourth"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="@dimen/indicator_size"
+                    android:layout_height="@dimen/indicator_size"
+                    android:textSize="@dimen/indicator_text_size"
                     android:layout_gravity="end"
                     android:background="@drawable/status_new"
                     android:gravity="center"
@@ -215,8 +219,9 @@
                 <TextView
                     android:visibility="gone"
                     android:id="@+id/enemy_answer_indicator_fifth"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="@dimen/indicator_size"
+                    android:layout_height="@dimen/indicator_size"
+                    android:textSize="@dimen/indicator_text_size"
                     android:layout_gravity="end"
                     android:background="@drawable/status_new"
                     android:gravity="center"
@@ -240,16 +245,19 @@
     </LinearLayout>
 
     <LinearLayout
+        android:layout_below="@id/enemies_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="@dimen/game_general_padding"
         android:orientation="vertical">
 
         <FrameLayout
-            android:layout_weight="10"
+            android:layout_weight="1"
+            android:id="@+id/question_area"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:background="@drawable/round_option"
+            android:visibility="invisible"
             android:layout_marginBottom="@dimen/option_bottom_margin">
 
             <TextView
@@ -266,10 +274,11 @@
 
             <ImageView
                 android:id="@+id/question_image"
-                tools:src = "@drawable/vk"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                android:layout_width="wrap_content"
+                tools:src = "@mipmap/ic_launcher"
+                android:padding="@dimen/question_image_margin"
+                android:visibility="visible"
+                android:scaleType="fitXY"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
 
             <TextView
@@ -300,199 +309,264 @@
 
         </FrameLayout>
 
-        <TextView
-            android:layout_weight="2"
-            android:id="@+id/option_one"
-            style="@style/OptionStyle"
-            tools:text="Девяносто"/>
-
-        <TextView
-            android:layout_weight="2"
-            android:id="@+id/option_two"
-            style="@style/OptionStyle"
-            tools:text="Девяносто"/>
-
-        <TextView
-            android:layout_weight="2"
-            android:id="@+id/option_three"
-            style="@style/OptionStyle"
-            tools:text="Девяносто"/>
-
-        <TextView
-            android:layout_weight="2"
-            android:id="@+id/option_four"
-            style="@style/OptionStyle"
-            tools:text="Девяносто"/>
-
-
-        <FrameLayout
+        <LinearLayout
+            android:layout_weight="0.6"
+            android:id="@+id/content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:orientation="vertical">
 
             <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/hint_bar_height"
-                android:layout_gravity="center_vertical"
-                android:background = "@drawable/timeback">
+                style="@style/OptionFrameStyle"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/option_one"
+                    style="@style/OptionStyle"
+                    android:visibility="invisible"
+                    tools:text="Девяносто"/>
+
+                <TextView
+                    android:id="@+id/option_one_percent"
+                    style="@style/PercentStyle"
+                    android:visibility="gone"
+                    tools:text="10%"/>
 
             </FrameLayout>
 
-            <RelativeLayout
-                android:layout_gravity="center_vertical"
+            <FrameLayout
+                style="@style/OptionFrameStyle"
+                android:layout_weight="1">
+
+            <TextView
+                android:layout_weight="1"
+                android:id="@+id/option_two"
+                style="@style/OptionStyle"
+                android:visibility="invisible"
+                tools:text="Девяносто"/>
+
+                <TextView
+                    android:id="@+id/option_two_percent"
+                    style="@style/PercentStyle"
+                    android:visibility="gone"
+                    tools:text="100%"/>
+
+            </FrameLayout>
+
+            <FrameLayout
+                style="@style/OptionFrameStyle"
+                android:layout_weight="1">
+
+            <TextView
+                android:layout_weight="1"
+                android:id="@+id/option_three"
+                android:visibility="invisible"
+                style="@style/OptionStyle"
+                tools:text="Девяносто"/>
+
+                <TextView
+                    android:id="@+id/option_three_percent"
+                    style="@style/PercentStyle"
+                    android:visibility="gone"
+                    tools:text="100%"/>
+
+            </FrameLayout>
+
+            <FrameLayout
+                style="@style/OptionFrameStyle"
+                android:layout_weight="1">
+
+            <TextView
+                android:layout_weight="1"
+                android:id="@+id/option_four"
+                style="@style/OptionStyle"
+                android:visibility="invisible"
+                tools:text="Девяносто"/>
+
+                <TextView
+                    android:id="@+id/option_four_percent"
+                    style="@style/PercentStyle"
+                    android:visibility="gone"
+                    tools:text="100%"/>
+
+            </FrameLayout>
+
+
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_centerVertical="true"
-                    android:gravity="center"
-                    android:layout_toLeftOf="@+id/timer_wrapper"
-                    android:layout_toStartOf="@+id/timer_wrapper"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true">
-
-                    <TextView
-                        android:id="@+id/score_label"
-                        android:text="@string/start_score"
-                        android:layout_marginRight="@dimen/score_end_margin"
-                        android:layout_marginEnd="@dimen/score_end_margin"
-                        android:maxLength="6"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:singleLine="true"
-                        android:gravity="center"
-                        android:textColor="@color/colorAccent"
-                        android:textSize="@dimen/score_text_size"
-                        android:textStyle="italic|bold"/>
-
-                    <ImageView
-                        android:src = "@drawable/sstar"
-                        android:layout_width="@dimen/score_star_size"
-                        android:layout_height="@dimen/score_star_size"/>
-
-                </LinearLayout>
-
-
                 <FrameLayout
-                    android:id="@+id/timer_wrapper"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_centerInParent="true">
-
-                    <ImageView
-                        android:id="@+id/timer_bg"
-                        android:layout_width="@dimen/timer_size"
-                        android:layout_height="@dimen/timer_size"
-                        android:layout_gravity="center_horizontal"
-                        android:src="@drawable/time"/>
-
-                    <ProgressBar
-                        android:id="@+id/timer"
-                        android:padding="@dimen/timer_padding"
-                        android:layout_height="@dimen/timer_size"
-                        android:layout_width="@dimen/timer_size"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_gravity="center"
-                        android:indeterminate="false"
-                        android:max="25000"
-                        android:progress="0"
-                        android:rotation="270"
-                        android:progressDrawable="@drawable/timer" />
-
-                    <TextView
-                        android:id="@+id/timer_label"
-                        android:layout_width="@dimen/timer_size"
-                        android:layout_height="@dimen/timer_size"
-                        android:text = "@string/round_length"
-                        android:textColor="@color/white"
-                        android:textStyle="bold"
-                        android:textSize="@dimen/timer_text_size"
-                        android:gravity="center"
-                        android:maxLength="2"/>
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/hint_bar_height"
+                    android:layout_gravity="center_vertical"
+                    android:background = "@drawable/timeback">
 
                 </FrameLayout>
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_centerVertical="true"
-                    android:layout_toRightOf="@+id/timer_wrapper"
-                    android:layout_toEndOf="@+id/timer_wrapper">
+                <RelativeLayout
+                    android:layout_gravity="center_vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
 
-                    <ImageView
-                        android:layout_weight="1"
-                        android:id="@+id/right_answer_hint"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/hint_start_margin"
-                        android:layout_marginStart="@dimen/hint_start_margin"
-                        android:layout_marginRight="@dimen/hint_end_margin_default"
-                        android:layout_marginEnd="@dimen/hint_end_margin_default"
-                        android:src="@drawable/right"/>
+                        android:orientation="horizontal"
+                        android:layout_centerVertical="true"
+                        android:gravity="center"
+                        android:layout_toLeftOf="@+id/timer_wrapper"
+                        android:layout_toStartOf="@+id/timer_wrapper"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true">
 
-                    <ImageView
-                        android:layout_weight="1"
-                        android:id="@+id/audience_help_hint"
+                        <TextView
+                            android:id="@+id/score_label"
+                            android:text="@string/start_score"
+                            android:layout_marginRight="@dimen/score_end_margin"
+                            android:layout_marginEnd="@dimen/score_end_margin"
+                            android:maxLength="6"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:singleLine="true"
+                            android:gravity="center"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="@dimen/score_text_size"
+                            android:textStyle="italic|bold"/>
+
+                        <ImageView
+                            android:src="@drawable/sstar"
+                            android:layout_width="@dimen/score_star_size"
+                            android:layout_height="@dimen/score_star_size"/>
+
+                    </LinearLayout>
+
+
+                    <FrameLayout
+                        android:id="@+id/timer_wrapper"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="@dimen/hint_end_margin_default"
-                        android:layout_marginEnd="@dimen/hint_end_margin_default"
-                        android:src="@drawable/zal"/>
+                        android:layout_gravity="center_horizontal"
+                        android:layout_centerInParent="true">
 
-                    <ImageView
-                        android:layout_weight="1"
-                        android:id="@+id/fifty_fifty_hint"
+                        <ImageView
+                            android:id="@+id/timer_bg"
+                            android:layout_width="@dimen/timer_size"
+                            android:layout_height="@dimen/timer_size"
+                            android:layout_gravity="center_horizontal"
+                            android:src="@drawable/time"/>
+
+                        <ProgressBar
+                            android:id="@+id/timer"
+                            android:padding="@dimen/timer_padding"
+                            android:layout_height="@dimen/timer_size"
+                            android:layout_width="@dimen/timer_size"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_gravity="center"
+                            android:indeterminate="false"
+                            android:max="25000"
+                            android:progress="0"
+                            android:rotation="270"
+                            android:progressDrawable="@drawable/timer" />
+
+                        <TextView
+                            android:id="@+id/timer_label"
+                            android:layout_width="@dimen/timer_size"
+                            android:layout_height="@dimen/timer_size"
+                            android:text = "@string/round_length"
+                            android:textColor="@color/white"
+                            android:textStyle="bold"
+                            android:textSize="@dimen/timer_text_size"
+                            android:gravity="center"
+                            android:maxLength="2"/>
+
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:id="@+id/hint_area"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginRight="@dimen/hint_end_margin_last"
-                        android:layout_marginEnd="@dimen/hint_end_margin_last"
-                        android:src="@drawable/fifty_fifty"/>
+                        android:orientation="horizontal"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@+id/timer_wrapper"
+                        android:layout_toEndOf="@+id/timer_wrapper">
 
 
-                </LinearLayout>
+                        <ImageView
+                            android:layout_weight="1"
+                            android:id="@+id/right_answer_hint"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/hint_start_margin"
+                            android:layout_marginStart="@dimen/hint_start_margin"
+                            android:layout_marginRight="@dimen/hint_end_margin_default"
+                            android:layout_marginEnd="@dimen/hint_end_margin_default"
+                            android:enabled="false"
+                            android:src="@drawable/right"/>
 
-                <TextView
-                    android:id="@+id/tour_number_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textColor="@color/colorAccent"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_toLeftOf="@+id/timer_wrapper"
-                    android:layout_toStartOf="@+id/timer_wrapper"
-                    android:textStyle="bold|italic"
-                    android:textSize="@dimen/primary_text_size"
+                        <ImageView
+                            android:layout_weight="1"
+                            android:id="@+id/audience_help_hint"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="@dimen/hint_end_margin_default"
+                            android:layout_marginEnd="@dimen/hint_end_margin_default"
+                            android:enabled="false"
+                            android:src="@drawable/zal"/>
 
-                    android:layout_alignBottom="@id/timer_wrapper"
-                    tools:text = "@string/tour_label_text"/>
+                        <ImageView
+                            android:layout_weight="1"
+                            android:id="@+id/fifty_fifty_hint"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="@dimen/hint_end_margin_last"
+                            android:layout_marginEnd="@dimen/hint_end_margin_last"
+                            android:enabled="false"
+                            android:src="@drawable/fifty_fifty"/>
 
-                <TextView
-                    android:id="@+id/question_number_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textColor="@color/colorAccent"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_toRightOf="@+id/timer_wrapper"
-                    android:layout_toEndOf="@+id/timer_wrapper"
-                    android:textStyle="bold|italic"
-                    android:textSize="@dimen/primary_text_size"
-                    android:layout_alignBottom="@id/timer_wrapper"
-                    tools:text = "@string/question_label_text"/>
 
-            </RelativeLayout>
+                    </LinearLayout>
 
-        </FrameLayout>
+                    <TextView
+                        android:id="@+id/tour_number_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="@color/colorAccent"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:layout_toLeftOf="@+id/timer_wrapper"
+                        android:layout_toStartOf="@+id/timer_wrapper"
+                        android:textStyle="bold|italic"
+                        android:textSize="@dimen/primary_text_size"
 
+                        android:layout_alignBottom="@id/timer_wrapper"
+                        tools:text = "@string/tour_label_text"/>
+
+                    <TextView
+                        android:id="@+id/question_number_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="@color/colorAccent"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
+                        android:layout_toRightOf="@+id/timer_wrapper"
+                        android:layout_toEndOf="@+id/timer_wrapper"
+                        android:textStyle="bold|italic"
+                        android:textSize="@dimen/primary_text_size"
+                        android:layout_alignBottom="@id/timer_wrapper"
+                        tools:text = "@string/question_label_text"/>
+
+                </RelativeLayout>
+
+            </FrameLayout>
+
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+</RelativeLayout>

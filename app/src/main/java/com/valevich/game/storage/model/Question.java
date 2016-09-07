@@ -128,13 +128,12 @@ public class Question extends BaseModel {
         this.rightAnswer = rightAnswer;
     }
 
-    public static Observable<List<Question>> getQuestions(int limit) {
+    public static Observable<Question> getQuestion() { // FIXME: 05.09.2016 return unplayed question
         return Observable.defer(() -> Observable.just(
                 SQLite.select()
                         .from(Question.class)
                         .where(Question_Table.isPlayed.notEq(1))
-                        .limit(limit)
-                        .queryList()));
+                        .querySingle()));
     }
 
     public static Observable<QuestionApiModel> insertQuestion(QuestionApiModel apiQuestion) {
