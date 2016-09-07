@@ -95,7 +95,7 @@ public class Player implements Comparable<Player> , Parcelable{
 
     private void setAnswerOption(int answerOption) {
         mAnswerOption = answerOption;
-        Timber.d(String.valueOf(answerOption));
+        Timber.d(String.valueOf(answerOption) + "answer");
     }
 
     public void setAnswerTime(int answerTime) {
@@ -173,8 +173,20 @@ public class Player implements Comparable<Player> , Parcelable{
         setAnswerTime(getNormalAnswerTime());
     }
 
+    public int getCoinsPortion(Player[] players) {
+        int totalRightAnswers = 0;
+        int totalBet = 0;
+        for(Player player:players) {
+            if (player != null) {
+                totalRightAnswers += player.getTotalRightAnswersCount();
+                totalBet += player.getTotalCoins();
+            }
+        }
+        return (getTotalRightAnswersCount()*totalBet)/totalRightAnswers;
+    }
+
     private void setRandomAnswer(int rightAnswerPosition) {
-        List<Integer> options = new ArrayList<>(Arrays.asList(0, rightAnswerPosition, 1, rightAnswerPosition,2,3));
+        List<Integer> options = new ArrayList<>(Arrays.asList(0, rightAnswerPosition, 1, rightAnswerPosition,2,rightAnswerPosition,3));
         setAnswerOption(options.get(generateAnswerOption(options.size())));
     }
 
@@ -186,22 +198,24 @@ public class Player implements Comparable<Player> , Parcelable{
         return mAnswerOptionRandom.nextInt(max);
     }
 
-    public static List<Player> get(int count) {
+    public static List<Player> get(int count,int bet) {
         List<Player> enemies = new ArrayList<>(count);
         Collections.shuffle(IMAGES_BY_NAME);
         for (int i = 0; i < count; i++) {
             Player player = new Player();
             player.setName(IMAGES_BY_NAME.get(i).getKey());
             player.setImageResId(IMAGES_BY_NAME.get(i).getValue());
+            player.setTotalCoins(bet);
             enemies.add(player);
         }
         return enemies;
     }
 
-    public static Player getUser() {
+    public static Player getUser(int bet) {
         Player user = new Player();
         user.setName(ConstantsManager.DEFAULT_USER_NAME);
         user.setImageResId(IMAGES_BY_NAME.get(new Random().nextInt(3)).getValue());
+        user.setTotalCoins(bet);
         return user;
     }
 

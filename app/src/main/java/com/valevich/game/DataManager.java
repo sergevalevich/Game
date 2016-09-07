@@ -32,9 +32,10 @@ public class DataManager {
 
     public Observable<Object> loadQuestions() {
 
-        return getQuestions().flatMap(apiQuestions -> Observable.merge(
-                saveQuestions(apiQuestions),
-                saveQuestionsMedia(apiQuestions))).cache();
+//        return getQuestions().flatMap(apiQuestions -> Observable.merge(
+//                saveQuestions(apiQuestions),
+//                saveQuestionsMedia(apiQuestions))).cache();
+        return getQuestions().flatMap(this::saveQuestions);
 
     }
 

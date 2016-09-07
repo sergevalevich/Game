@@ -51,7 +51,12 @@
                   android:screenOrientation="portrait">
         </activity>
 
-        <!--evernote -->
+        <activity android:name=".ui.activities.GameFinalActivity_"
+                  android:theme="@style/AppTheme.NoActionBar"
+                  android:screenOrientation="portrait">
+        </activity>
+
+        <!--jobs -->
         <service
             android:name="com.evernote.android.job.v21.PlatformJobService"
             android:exported="false"

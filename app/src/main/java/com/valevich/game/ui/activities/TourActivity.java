@@ -181,8 +181,8 @@ public class TourActivity extends AppCompatActivity {
 
     @AfterExtras
     void setEnemies() {
-        mEnemies = Player.get(enemiesCount);
-        mUser = Player.getUser();
+        mEnemies = Player.get(enemiesCount,bet);
+        mUser = Player.getUser(bet);
     }
 
     @AfterViews
@@ -526,7 +526,9 @@ public class TourActivity extends AppCompatActivity {
             Player player = new Player(enemy);
             players.add(player);
         }
-        Collections.sort(players, (player1, player2) -> player2.getTotalScore() - player1.getTotalScore());
+
+        Collections.sort(players, (player1, player2) -> player2.getLastRoundScore() - player1.getLastRoundScore());
+
         Player[] pls = new Player[players.size()];
         pls = players.toArray(pls);
 
@@ -534,6 +536,8 @@ public class TourActivity extends AppCompatActivity {
             enemy.setLastRoundScore(0);
             enemy.setLastRoundAnswersCount(0);
         }
+        mUser.setLastRoundScore(0);
+        mUser.setLastRoundAnswersCount(0);
 
         ResultsActivity_.intent(this).parcelablePlayers(pls).tourNumber(mCurrentTour-1).start();
 
@@ -712,7 +716,7 @@ public class TourActivity extends AppCompatActivity {
     }
 
     private void showAudienceHelpHint() {
-        if (getVisibleOptions(mOptionLabels).size() > 1) {
+        if (getVisibleOptions(mOptionLabels).size() > 2) {
             ImageView hint = mHints.get(1);
             hint.setClickable(false);
             mUsedHints.append(1, true);

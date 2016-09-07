@@ -22,4 +22,5 @@
     <string name="results_title_game">Результат игры</string>
     <string name="results_title_round">Результат тура</string>
     <string name="finish_round">Завершить раунд</string>
+    <string name="exit">Выход</string>
 </resources>

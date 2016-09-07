@@ -1,13 +1,11 @@
 package com.valevich.game.ui.activities;
 
+import android.content.Intent;
 import android.os.Parcelable;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.valevich.game.R;
 import com.valevich.game.model.Player;
@@ -45,6 +43,9 @@ public class ResultsActivity extends AppCompatActivity {
     @StringRes(R.string.results_title_game)
     String mGameFinishedTitle;
 
+    @StringRes(R.string.exit)
+    String mExitMessage;
+
     @Extra
     Parcelable[] parcelablePlayers;
 
@@ -61,21 +62,38 @@ public class ResultsActivity extends AppCompatActivity {
         for (int i = 0; i < parcelablePlayers.length; i++) {
             mPlayers[i] = (Player) parcelablePlayers[i];
         }
-        mPlayersAdapter = new PlayersAdapter(mPlayers, tourNumber);
+        mPlayersAdapter = new PlayersAdapter(mPlayers);
     }
 
     @AfterViews
     void setUpViews() {
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         setupActionBar();
         setUpCongrats();
         setUpPlayersList();
+        setUpButton();
     }
 
     @Click(R.id.finish_round)
     void finishRound() {
-        if(tourNumber == 4) {
-            Toast.makeText(this,"Конец игры",Toast.LENGTH_LONG).show();
-        } else finish();
+        if(tourNumber == 3) {
+            showUserResults();
+        } else if (tourNumber == 4) {
+            exit();
+        }
+        else finish();
+    }
+
+    private void exit() {
+        Intent intent = new Intent(this,SplashActivity_.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 
     @Override
@@ -83,7 +101,17 @@ public class ResultsActivity extends AppCompatActivity {
 
     }
 
+    private void showUserResults() {
+        tourNumber++;
+        GameFinalActivity_.intent(this).start();
+    }
+
+    private void setUpButton() {
+        if(tourNumber == 4) mFinishButton.setText(mExitMessage);
+    }
+
     private void setUpPlayersList() {
+        mPlayersAdapter.setTourNumber(tourNumber);
         mPlayersList.setLayoutManager(new LinearLayoutManager(this));
         mPlayersList.setAdapter(mPlayersAdapter);
     }

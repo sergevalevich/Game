@@ -21,12 +21,11 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayersH
 
     private int mTourNumber;
 
-    public PlayersAdapter(Player[] players, int tourNumber) {
+    public PlayersAdapter(Player[] players) {
         Player[] pl = new Player[players.length + 1];
         pl[0] = null;
         System.arraycopy(players, 0, pl, 1, pl.length - 1);
         mPlayers = pl;
-        mTourNumber = tourNumber;
     }
 
     @Override
@@ -112,7 +111,7 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayersH
                 mMaxQuestionsLabel.setText(String.valueOf(ConstantsManager.MAX_QUESTIONS_COUNT));
                 mAnsweredQuestionsLabel.setText(String.valueOf(player.getTotalRightAnswersCount()));
                 mPointsLabel.setText(String.valueOf(player.getTotalScore()));
-                mCoinsLabel.setText(String.valueOf(player.getTotalCoins()));
+                mCoinsLabel.setText(String.valueOf(player.getCoinsPortion(mPlayers)));
             } else {
                 mMaxQuestionsLabel.setText(String.valueOf(ConstantsManager.ROUND_QUESTIONS_COUNT));
                 mAnsweredQuestionsLabel.setText(String.valueOf(player.getLastRoundAnswersCount()));
@@ -122,6 +121,11 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayersH
             }
         }
 
+    }
+
+    public void setTourNumber(int tourNumber) {
+        mTourNumber = tourNumber;
+        notifyDataSetChanged();
     }
 
     private boolean wasLastRound() {

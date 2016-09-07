@@ -133,6 +133,7 @@ public class Question extends BaseModel {
                 SQLite.select()
                         .from(Question.class)
                         .where(Question_Table.isPlayed.notEq(1))
+                        .and(Question_Table.mediaPath.isNull()) // FIXME: 07.09.2016
                         .querySingle()));
     }
 
