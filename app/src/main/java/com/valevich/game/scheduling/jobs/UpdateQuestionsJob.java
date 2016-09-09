@@ -31,7 +31,8 @@ public class UpdateQuestionsJob extends Job {
     protected Result onRunJob(Params params) {
         Timber.d("onRunJob");
 
-        mDataManager.loadQuestions()
+        mDataManager.downloadQuestions()
+                .flatMap(questionApiModels -> mDataManager.saveQuestions(questionApiModels))
                 .subscribe(o -> {},throwable -> {},() -> mPreferences.isDataFresh().put(true));
 
         return Result.SUCCESS;

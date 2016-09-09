@@ -8,6 +8,7 @@
     <dimen name="primary_text_size">16sp</dimen>
     <dimen name="secondary_text_size">14sp</dimen>
     <dimen name="score_text_size">32sp</dimen>
+    <dimen name="score_text_size_enter">24sp</dimen>
     <dimen name="option_bottom_margin">8dp</dimen>
     <dimen name="button_bottom_margin">24dp</dimen>
     <dimen name="option_side_margin">16dp</dimen>
@@ -54,10 +55,28 @@
     <dimen name="place_label_thickness">1dp</dimen>
     <dimen name="players_places_padding">8dp</dimen>
     <dimen name="players_place_end_margin">4dp</dimen>
-    <dimen name="players_name_vertical_margin">12dp</dimen>
+    <dimen name="players_name_vertical_margin">8dp</dimen>
     <dimen name="players_place_end_margin_small">2dp</dimen>
     <dimen name="points_size">28dp</dimen>
     <dimen name="players_name_vertical_margin_small">4dp</dimen>
     <dimen name="congrats_title">24sp</dimen>
     <dimen name="congrats_padding">48dp</dimen>
+    <dimen name="results_image_size">72dp</dimen>
+    <dimen name="enter_logo_top_margin">48dp</dimen>
+    <dimen name="enter_logo_width">205dp</dimen>
+    <dimen name="enter_logo_height">256dp</dimen>
+    <dimen name="enter_button_top_margin">48dp</dimen>
+    <dimen name="enter_toolbar_height">72dp</dimen>
+    <dimen name="user_image_size">56dp</dimen>
+    <dimen name="profile_image_end_margin">24dp</dimen>
+    <dimen name="profile_image_start_margin">16dp</dimen>
+    <dimen name="enter_min_side_margin">8dp</dimen>
+    <dimen name="points_divider">16dp</dimen>
+    <dimen name="congrats_text_size">32sp</dimen>
+    <dimen name="congrats_top_margin">108dp</dimen>
+    <dimen name="place_text_size_large">88sp</dimen>
+    <dimen name="place_word_bottom_margin">4dp</dimen>
+    <dimen name="cup_width">116dp</dimen>
+    <dimen name="cup_height">148dp</dimen>
+    <dimen name="cup_start_padding">18dp</dimen>
 </resources>

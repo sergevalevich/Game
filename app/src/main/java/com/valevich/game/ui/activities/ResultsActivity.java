@@ -7,13 +7,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 
+import com.valevich.game.GameApplication;
 import com.valevich.game.R;
 import com.valevich.game.model.Player;
 import com.valevich.game.ui.adapters.PlayersAdapter;
 import com.valevich.game.util.ConstantsManager;
 
 import org.androidannotations.annotations.AfterExtras;
-import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
@@ -52,6 +52,8 @@ public class ResultsActivity extends AppCompatActivity {
     @Extra
     int tourNumber;
 
+    private boolean mIsGameFinished = false;
+
     private PlayersAdapter mPlayersAdapter;
 
     private Player[] mPlayers;
@@ -62,17 +64,12 @@ public class ResultsActivity extends AppCompatActivity {
         for (int i = 0; i < parcelablePlayers.length; i++) {
             mPlayers[i] = (Player) parcelablePlayers[i];
         }
-        mPlayersAdapter = new PlayersAdapter(mPlayers);
-    }
-
-    @AfterViews
-    void setUpViews() {
-
+        mPlayersAdapter = new PlayersAdapter(mPlayers,tourNumber);
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onStart() {
+        super.onStart();
         setupActionBar();
         setUpCongrats();
         setUpPlayersList();
@@ -81,16 +78,15 @@ public class ResultsActivity extends AppCompatActivity {
 
     @Click(R.id.finish_round)
     void finishRound() {
-        if(tourNumber == 3) {
-            showUserResults();
-        } else if (tourNumber == 4) {
-            exit();
-        }
+
+        if(mIsGameFinished) exit();
+        else if(tourNumber == 3) showUserResults();
         else finish();
+
     }
 
     private void exit() {
-        Intent intent = new Intent(this,SplashActivity_.class);
+        Intent intent = new Intent(this,EnterActivity_.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
@@ -102,22 +98,37 @@ public class ResultsActivity extends AppCompatActivity {
     }
 
     private void showUserResults() {
-        tourNumber++;
-        GameFinalActivity_.intent(this).start();
+        mIsGameFinished = true;
+        int place = -1;
+        int coins = 0;
+        int points = 0;
+        for(int i = 0; i<mPlayers.length; i++) {
+            Player player = mPlayers[i];
+            if(player.getName().equals(GameApplication.getUserName())) {
+                place = i;
+                coins = player.getCoinsPortion(mPlayers);
+                points = player.getTotalScore();
+            }
+        }
+        GameFinalActivity_.intent(this)
+                .coins(coins)
+                .points(points)
+                .place(place)
+                .start();
     }
 
     private void setUpButton() {
-        if(tourNumber == 4) mFinishButton.setText(mExitMessage);
+        if(mIsGameFinished) mFinishButton.setText(mExitMessage);
     }
 
     private void setUpPlayersList() {
-        mPlayersAdapter.setTourNumber(tourNumber);
+        mPlayersAdapter.setGameFinished(mIsGameFinished);
         mPlayersList.setLayoutManager(new LinearLayoutManager(this));
         mPlayersList.setAdapter(mPlayersAdapter);
     }
 
     private void setupActionBar() {
-        mToolbar.setText(tourNumber < 4
+        mToolbar.setText(!mIsGameFinished
                 ? String.format(Locale.getDefault(), "%s %d", mRoundFinishedTitle, tourNumber)
                 : mGameFinishedTitle);
     }
@@ -132,7 +143,7 @@ public class ResultsActivity extends AppCompatActivity {
         int playersPlace = 0;
         for(int i = 0; i<mPlayers.length; i++) {
             Player player = mPlayers[i];
-            if(player.getName().equals(ConstantsManager.DEFAULT_USER_NAME)) playersPlace = i+1;
+            if(player.getName().equals(GameApplication.getUserName())) playersPlace = i+1;
         }
         if(playersPlace == 2) congratsStart += "о";
 

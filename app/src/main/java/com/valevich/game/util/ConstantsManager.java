@@ -20,7 +20,5 @@ public interface ConstantsManager {
     int MAX_QUESTIONS_COUNT = 21;
     int ROUND_QUESTIONS_COUNT = 7;
 
-    String DEFAULT_USER_NAME = "Новичок";
-
     String UPDATE_QUESTIONS_JOB_TAG = "job_demo_tag";
 }

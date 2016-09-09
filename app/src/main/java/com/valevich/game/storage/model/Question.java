@@ -1,5 +1,8 @@
 package com.valevich.game.storage.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.ConflictAction;
 import com.raizlabs.android.dbflow.annotation.ModelContainer;
@@ -7,33 +10,23 @@ import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.annotation.Unique;
 import com.raizlabs.android.dbflow.annotation.UniqueGroup;
-import com.raizlabs.android.dbflow.config.DatabaseDefinition;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
+import com.raizlabs.android.dbflow.sql.language.Where;
 import com.raizlabs.android.dbflow.structure.BaseModel;
-import com.raizlabs.android.dbflow.structure.database.transaction.ProcessModelTransaction;
-import com.raizlabs.android.dbflow.structure.database.transaction.Transaction;
 import com.valevich.game.network.model.QuestionApiModel;
 import com.valevich.game.storage.GameDatabase;
 import com.valevich.game.util.UrlFormatter;
 
-import org.androidannotations.annotations.Bean;
-import org.androidannotations.annotations.EBean;
-import org.androidannotations.annotations.res.StringRes;
-
-import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.http.Url;
 import rx.Observable;
-import timber.log.Timber;
 
-@EBean
 @ModelContainer
 @Table(
         database = GameDatabase.class,
         uniqueColumnGroups = {@UniqueGroup(groupNumber = 0, uniqueConflict = ConflictAction.IGNORE)})
-public class Question extends BaseModel {
+public class Question extends BaseModel implements Parcelable {
 
     @PrimaryKey(autoincrement = true)
     long id;
@@ -128,28 +121,87 @@ public class Question extends BaseModel {
         this.rightAnswer = rightAnswer;
     }
 
-    public static Observable<Question> getQuestion() { // FIXME: 05.09.2016 return unplayed question
-        return Observable.defer(() -> Observable.just(
-                SQLite.select()
-                        .from(Question.class)
-                        .where(Question_Table.isPlayed.notEq(1))
-                        .and(Question_Table.mediaPath.isNull()) // FIXME: 07.09.2016
-                        .querySingle()));
-    }
+//    public static Observable<Question> getQuestion() { // FIXME: 05.09.2016 return unplayed question
+//        return Observable.defer(() -> Observable.just(
+//                SQLite.select()
+//                        .from(Question.class)
+//                        .where(Question_Table.isPlayed.notEq(1))
+//                        .and(Question_Table.mediaPath.isNull()) // FIXME: 07.09.2016
+//                        .querySingle()));
+//    }
 
-    public static Observable<QuestionApiModel> insertQuestion(QuestionApiModel apiQuestion) {
+    public static Observable<List<Question>> getQuestions(int limit, boolean isMediaAllowed) {
         return Observable.defer(() -> {
-            Question question = new Question();
-            question.setAnswers(apiQuestion.getAnswers());
-            question.setMediaType(apiQuestion.getMediaType());
-            question.setRightAnswer(apiQuestion.getRightAnswer());
-            question.setTextQuest(apiQuestion.getTextQuest());
-            question.setThemeQuest(apiQuestion.getThemeQuest());
-            String url = apiQuestion.getMediaUrl();
-            if (url != null) question.setMediaPath(UrlFormatter.getFileNameFrom(url));
-            question.save();
-            return Observable.just(apiQuestion);
+            Where<Question> query = SQLite.select()
+                    .from(Question.class)
+                    .where(Question_Table.isPlayed.notEq(1));
+            if (!isMediaAllowed) query = query.and(Question_Table.mediaPath.isNull());
+            return Observable.just(query.limit(limit).queryList());
         });
     }
 
+
+    public static Observable<List<QuestionApiModel>> insertQuestions(List<QuestionApiModel> apiModels) {
+        return Observable.defer(() -> {
+
+            FlowManager.getDatabase(GameDatabase.class).executeTransaction(databaseWrapper -> {
+                for(QuestionApiModel apiQuestion:apiModels) {
+                    Question question = new Question();
+                    question.setAnswers(apiQuestion.getAnswers());
+                    question.setMediaType(apiQuestion.getMediaType());
+                    question.setRightAnswer(apiQuestion.getRightAnswer());
+                    question.setTextQuest(apiQuestion.getTextQuest());
+                    question.setThemeQuest(apiQuestion.getThemeQuest());
+                    String url = apiQuestion.getMediaUrl();
+                    if (url != null) question.setMediaPath(UrlFormatter.getFileNameFrom(url));
+                    question.save(databaseWrapper);
+                }
+            });
+
+            return Observable.just(apiModels);
+
+        });
+    }
+
+    public Question() {}
+
+    protected Question(Parcel in) {
+        id = in.readLong();
+        themeQuest = in.readString();
+        textQuest = in.readString();
+        mediaType = in.readString();
+        mediaPath = in.readString();
+        answers = in.readString();
+        rightAnswer = in.readString();
+        isPlayed = in.readInt();
+    }
+
+    public static final Creator<Question> CREATOR = new Creator<Question>() {
+        @Override
+        public Question createFromParcel(Parcel in) {
+            return new Question(in);
+        }
+
+        @Override
+        public Question[] newArray(int size) {
+            return new Question[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(id);
+        parcel.writeString(themeQuest);
+        parcel.writeString(textQuest);
+        parcel.writeString(mediaType);
+        parcel.writeString(mediaPath);
+        parcel.writeString(answers);
+        parcel.writeString(rightAnswer);
+        parcel.writeInt(isPlayed);
+    }
 }

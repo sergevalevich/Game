@@ -71,7 +71,6 @@ dependencies {
     compile 'com.jakewharton.timber:timber:4.1.2'
     compile "com.facebook.stetho:stetho:$stethoVer"
     compile "com.facebook.stetho:stetho-okhttp3:$stethoVer"
-    compile 'com.trello:rxlifecycle-components:0.7.0'
     compile 'me.zhanghai.android.materialprogressbar:library:1.1.7'
     compile 'com.evernote:android-job:1.0.12'
     compile 'jp.wasabeef:glide-transformations:2.0.1'

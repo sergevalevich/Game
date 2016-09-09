@@ -7,15 +7,20 @@ import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.valevich.game.scheduling.GameJobCreator;
 import com.valevich.game.scheduling.jobs.UpdateQuestionsJob;
+import com.valevich.game.util.Preferences_;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EApplication;
 import org.androidannotations.annotations.EBean;
+import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import timber.log.Timber;
 
 @EApplication
 public class GameApplication extends Application {
+
+    @Pref
+    static Preferences_ mPreferences;
 
     @Bean
     GameJobCreator mGameJobCreator;
@@ -44,5 +49,9 @@ public class GameApplication extends Application {
                 }
             });
         }
+    }
+
+    public static String getUserName() {
+        return mPreferences.userName().get();
     }
 }

@@ -12,4 +12,5 @@
     <color name="colorAnswerWrong">#F44336</color>
     <color name="colorAnswerSelected">#FFEB3B</color>
     <color name="colorButton">#BF9165ac</color>
+    <color name="colorCongrats">#ff7e00</color>
 </resources>

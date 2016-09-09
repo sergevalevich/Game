@@ -28,8 +28,8 @@
 
         <ImageView
             android:id="@+id/image"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
+            android:layout_width="@dimen/results_image_size"
+            android:layout_height="@dimen/results_image_size"
             android:layout_marginEnd="@dimen/players_place_end_margin_small"
             android:layout_marginRight="@dimen/players_place_end_margin_small"
             android:layout_toEndOf="@+id/place_label"
@@ -38,124 +38,118 @@
             tools:text="1"/>
 
 
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/row_one"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/players_name_vertical_margin"
+            android:orientation="horizontal"
             android:layout_toEndOf="@+id/image"
             android:layout_toRightOf="@+id/image"
-            android:textColor="@color/white"
-            android:textSize="@dimen/primary_text_size"
-            tools:text="Новичок"/>
+            android:gravity="center_vertical"
+            android:layout_marginTop="@dimen/players_name_vertical_margin">
 
-        <TextView
-            android:id="@+id/answers_label"
-            android:layout_width="wrap_content"
+            <TextView
+                android:layout_weight="1"
+                android:id="@+id/name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="@dimen/primary_text_size"
+                tools:text="Новичок"/>
+
+            <TextView
+                android:id="@+id/points"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorAccent"
+                android:textSize="@dimen/place_text_size"
+                android:layout_marginEnd="@dimen/players_place_end_margin"
+                android:layout_marginRight="@dimen/players_place_end_margin"
+                android:textStyle="bold"
+                tools:text="4878"/>
+
+
+            <ImageView
+                android:id="@+id/star"
+                android:layout_width="@dimen/points_size"
+                android:layout_height="@dimen/points_size"
+                android:src="@drawable/sstar"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/row_two"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/image"
-            android:layout_marginBottom="@dimen/players_name_vertical_margin"
-            android:layout_marginEnd="@dimen/players_place_end_margin_small"
-            android:layout_marginRight="@dimen/players_place_end_margin_small"
+            android:orientation="horizontal"
             android:layout_toEndOf="@+id/image"
             android:layout_toRightOf="@+id/image"
-            android:text="@string/answers"
-            android:textColor="@color/colorPrimary"
-            android:textSize="@dimen/primary_text_size"
-            android:textStyle="bold"/>
-
-
-        <TextView
-            android:id="@+id/answered_value"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:layout_alignBottom="@+id/image"
-            android:layout_marginBottom="@dimen/players_name_vertical_margin"
-            android:layout_marginEnd="@dimen/players_place_end_margin_small"
-            android:layout_marginRight="@dimen/players_place_end_margin_small"
-            android:layout_toEndOf="@+id/answers_label"
-            android:layout_toRightOf="@+id/answers_label"
-            android:textColor="@color/white"
-            android:textSize="@dimen/primary_text_size"
-            tools:text="21"/>
-
-        <TextView
-            android:id="@+id/answered_from"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/image"
-            android:layout_marginBottom="@dimen/players_name_vertical_margin"
-            android:layout_marginEnd="@dimen/players_place_end_margin_small"
-            android:layout_marginRight="@dimen/players_place_end_margin_small"
-            android:layout_toEndOf="@+id/answered_value"
-            android:layout_toRightOf="@+id/answered_value"
-            android:text="@string/from"
-            android:textColor="@color/white"
-            android:textSize="@dimen/primary_text_size"/>
+            android:layout_marginBottom="@dimen/players_name_vertical_margin">
 
 
-        <TextView
-            android:id="@+id/question_count"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/image"
-            android:layout_marginBottom="@dimen/players_name_vertical_margin"
-            android:layout_toEndOf="@+id/answered_from"
-            android:layout_toLeftOf="@+id/coins"
-            android:layout_toRightOf="@+id/answered_from"
-            android:layout_toStartOf="@+id/coins"
-            android:textColor="@color/white"
-            android:textSize="@dimen/primary_text_size"
-            tools:text="21"/>
+            <TextView
+                android:id="@+id/answers_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/players_place_end_margin_small"
+                android:layout_marginRight="@dimen/players_place_end_margin_small"
+                android:text="@string/answers"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/primary_text_size"
+                android:textStyle="bold"/>
 
 
-        <ImageView
-            android:id="@+id/star"
-            android:layout_width="@dimen/points_size"
-            android:layout_height="@dimen/points_size"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:src="@drawable/sstar"/>
+            <TextView
+                android:id="@+id/answered_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/players_place_end_margin_small"
+                android:layout_marginRight="@dimen/players_place_end_margin_small"
+                android:textColor="@color/white"
+                android:textSize="@dimen/primary_text_size"
+                tools:text="21"/>
+
+            <TextView
+                android:id="@+id/answered_from"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/players_place_end_margin_small"
+                android:layout_marginRight="@dimen/players_place_end_margin_small"
+                android:text="@string/from"
+                android:textColor="@color/white"
+                android:textSize="@dimen/primary_text_size"/>
 
 
-        <ImageView
-            android:id="@+id/coin"
-            android:layout_width="@dimen/points_size"
-            android:layout_height="@dimen/points_size"
-            android:layout_alignBottom="@+id/image"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginBottom="10dp"
-            android:src="@drawable/clevercoin"/>
+            <TextView
+                android:layout_weight="1"
+                android:id="@+id/question_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="@dimen/primary_text_size"
+                tools:text="21"/>
 
-        <TextView
-            android:id="@+id/points"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/players_place_end_margin"
-            android:layout_marginRight="@dimen/players_place_end_margin"
-            android:layout_marginTop="@dimen/players_name_vertical_margin_small"
-            android:layout_toLeftOf="@+id/star"
-            android:layout_toStartOf="@+id/star"
-            android:textColor="@color/colorAccent"
-            android:textSize="@dimen/place_text_size"
-            android:textStyle="bold"
-            tools:text="4878"/>
+            <TextView
+                android:id="@+id/coins"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/players_place_end_margin"
+                android:layout_marginRight="@dimen/players_place_end_margin"
+                android:textColor="@color/colorAccentDark"
+                android:textSize="@dimen/place_text_size"
+                android:textStyle="bold"
+                tools:text="100"/>
 
-        <TextView
-            android:id="@+id/coins"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/image"
-            android:layout_marginBottom="10dp"
-            android:layout_marginEnd="@dimen/players_place_end_margin"
-            android:layout_marginRight="@dimen/players_place_end_margin"
-            android:layout_toLeftOf="@+id/coin"
-            android:layout_toStartOf="@+id/coin"
-            android:textColor="@color/colorAccentDark"
-            android:textSize="@dimen/place_text_size"
-            android:textStyle="bold"
-            tools:text="100"/>
+            <ImageView
+                android:id="@+id/coin"
+                android:layout_width="@dimen/points_size"
+                android:layout_height="@dimen/points_size"
+                android:src="@drawable/clevercoin"/>
+
+            </LinearLayout>
+
 
     </RelativeLayout>
 

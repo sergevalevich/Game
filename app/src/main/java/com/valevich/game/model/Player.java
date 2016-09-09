@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.valevich.game.GameApplication;
 import com.valevich.game.R;
 import com.valevich.game.util.ConstantsManager;
 
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import timber.log.Timber;
 
 public class Player implements Comparable<Player> , Parcelable{
 
@@ -29,11 +29,7 @@ public class Player implements Comparable<Player> , Parcelable{
 
     private int mTotalScore;
 
-    private int mLastRoundScore;
-
     private int mRightAnswersCount;
-
-    private int mLastRoundAnswersCount;
 
     private int mTotalCoins;
 
@@ -53,9 +49,7 @@ public class Player implements Comparable<Player> , Parcelable{
         mAnswerOption = player.getAnswerOption();
         mImageResId = player.getImageResId();
         mTotalScore = player.getTotalScore();
-        mLastRoundScore = player.getLastRoundScore();
         mRightAnswersCount = player.getTotalRightAnswersCount();
-        mLastRoundAnswersCount = player.getLastRoundAnswersCount();
         mTotalCoins = player.getTotalCoins();
     }
 
@@ -67,9 +61,7 @@ public class Player implements Comparable<Player> , Parcelable{
         mAnswerOption = in.readInt();
         mImageResId = in.readInt();
         mTotalScore = in.readInt();
-        mLastRoundScore = in.readInt();
         mRightAnswersCount = in.readInt();
-        mLastRoundAnswersCount = in.readInt();
         mTotalCoins = in.readInt();
     }
 
@@ -95,7 +87,6 @@ public class Player implements Comparable<Player> , Parcelable{
 
     private void setAnswerOption(int answerOption) {
         mAnswerOption = answerOption;
-        Timber.d(String.valueOf(answerOption) + "answer");
     }
 
     public void setAnswerTime(int answerTime) {
@@ -122,37 +113,11 @@ public class Player implements Comparable<Player> , Parcelable{
         return mTotalScore;
     }
 
-    public void setTotalScore(int totalScore) {
-        mTotalScore = totalScore;
-    }
-
-    public int getLastRoundScore() {
-        return mLastRoundScore;
-    }
-
-    public void setLastRoundScore(int lastRoundScore) {
-        mLastRoundScore = lastRoundScore;
-    }
-
-    public void setRightAnswersCount(int rightAnswersCount) {
-        mRightAnswersCount = rightAnswersCount;
-    }
-
-    public int getLastRoundAnswersCount() {
-        return mLastRoundAnswersCount;
-    }
-
-    public void setLastRoundAnswersCount(int lastRoundAnswersCount) {
-        mLastRoundAnswersCount = lastRoundAnswersCount;
-    }
-
     public void addPoints(int points) {
-        mLastRoundScore += points;
         mTotalScore += points;
     }
 
     public void addRightAnswer() {
-        mLastRoundAnswersCount++;
         mRightAnswersCount++;
     }
 
@@ -171,6 +136,10 @@ public class Player implements Comparable<Player> , Parcelable{
     public void setAnswer(int rightAnswerPosition) {
         setRandomAnswer(rightAnswerPosition);
         setAnswerTime(getNormalAnswerTime());
+        if(getAnswerOption() == rightAnswerPosition) {
+            addPoints((ConstantsManager.ROUND_LENGTH - getAnswerTime())/100);
+            addRightAnswer();
+        }
     }
 
     public int getCoinsPortion(Player[] players) {
@@ -186,7 +155,12 @@ public class Player implements Comparable<Player> , Parcelable{
     }
 
     private void setRandomAnswer(int rightAnswerPosition) {
-        List<Integer> options = new ArrayList<>(Arrays.asList(0, rightAnswerPosition, 1, rightAnswerPosition,2,rightAnswerPosition,3));
+        List<Integer> options = new ArrayList<>(Arrays.asList(
+                0,rightAnswerPosition,
+                1,rightAnswerPosition,
+                2,rightAnswerPosition,
+                3,rightAnswerPosition));
+
         setAnswerOption(options.get(generateAnswerOption(options.size())));
     }
 
@@ -213,7 +187,7 @@ public class Player implements Comparable<Player> , Parcelable{
 
     public static Player getUser(int bet) {
         Player user = new Player();
-        user.setName(ConstantsManager.DEFAULT_USER_NAME);
+        user.setName(GameApplication.getUserName());
         user.setImageResId(IMAGES_BY_NAME.get(new Random().nextInt(3)).getValue());
         user.setTotalCoins(bet);
         return user;
@@ -236,9 +210,7 @@ public class Player implements Comparable<Player> , Parcelable{
         parcel.writeInt(mAnswerOption);
         parcel.writeInt(mImageResId);
         parcel.writeInt(mTotalScore);
-        parcel.writeInt(mLastRoundScore);
         parcel.writeInt(mRightAnswersCount);
-        parcel.writeInt(mLastRoundAnswersCount);
         parcel.writeInt(mTotalCoins);
     }
 }

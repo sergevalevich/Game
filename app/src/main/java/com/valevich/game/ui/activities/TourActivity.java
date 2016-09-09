@@ -1,6 +1,7 @@
 package com.valevich.game.ui.activities;
 
 import android.content.res.Resources;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.SparseBooleanArray;
 import android.view.View;
@@ -17,6 +18,7 @@ import com.valevich.game.R;
 import com.valevich.game.model.Player;
 import com.valevich.game.storage.model.Question;
 import com.valevich.game.util.ConstantsManager;
+import com.valevich.game.util.Preferences_;
 
 import org.androidannotations.annotations.AfterExtras;
 import org.androidannotations.annotations.AfterViews;
@@ -25,12 +27,13 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.ViewsById;
 import org.androidannotations.annotations.res.StringRes;
+import org.androidannotations.annotations.sharedpreferences.Pref;
+import org.androidannotations.api.sharedpreferences.IntPrefField;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -137,6 +140,14 @@ public class TourActivity extends AppCompatActivity {
     @Extra
     int bet;
 
+    @Extra
+    Parcelable[] parcelableQuestions;
+
+    @Pref
+    Preferences_ mPreferences;
+
+    private List<Question> mQuestions = new ArrayList<>();
+
     private int[] mNeededEnemiesPositions;
 
     private SparseBooleanArray mUsedHints = new SparseBooleanArray();
@@ -180,15 +191,23 @@ public class TourActivity extends AppCompatActivity {
     }
 
     @AfterExtras
-    void setEnemies() {
+    void processExtras() {
         mEnemies = Player.get(enemiesCount,bet);
         mUser = Player.getUser(bet);
+        for (Parcelable parcelableQuestion : parcelableQuestions) {
+            mQuestions.add((Question) parcelableQuestion);
+        }
     }
 
     @AfterViews
     void setUpViews() {
         setUpEnemiesBar();
         setUpOptions();
+    }
+
+    @Override
+    public void onBackPressed() {
+
     }
 
     private void setUpDefaultRatio() {
@@ -477,13 +496,6 @@ public class TourActivity extends AppCompatActivity {
             mCurrentQuestion.update();
         }
 
-        for (Player enemy : mEnemies) {
-            if(enemy.getAnswerOption() == mRightAnswerPosition) {
-                enemy.addPoints((ConstantsManager.ROUND_LENGTH - enemy.getAnswerTime())/100);
-                enemy.addRightAnswer();
-            }
-        }
-
         mAnswersRatios.clear();
 
         for (TextView option : mOptionLabels) {
@@ -520,25 +532,24 @@ public class TourActivity extends AppCompatActivity {
         mCurrentQuestionNumber = 1;
         mCurrentTour++;
 
-        List<Player> players = new ArrayList<>(mEnemies.size());
+        List<Player> players = new ArrayList<>();
         players.add(new Player(mUser));
         for(Player enemy:mEnemies) {
             Player player = new Player(enemy);
             players.add(player);
         }
 
-        Collections.sort(players, (player1, player2) -> player2.getLastRoundScore() - player1.getLastRoundScore());
+        Collections.sort(players, (player1, player2) -> player2.getTotalScore() - player1.getTotalScore());
 
         Player[] pls = new Player[players.size()];
         pls = players.toArray(pls);
 
-        for(Player enemy:mEnemies) {
-            enemy.setLastRoundScore(0);
-            enemy.setLastRoundAnswersCount(0);
+        if(mCurrentTour == 4) {
+            IntPrefField userScore = mPreferences.userScore();
+            IntPrefField userCoins = mPreferences.userCoins();
+            userScore.put(userScore.get() + mUser.getTotalScore());
+            userCoins.put(userCoins.get() + mUser.getCoinsPortion(pls));
         }
-        mUser.setLastRoundScore(0);
-        mUser.setLastRoundAnswersCount(0);
-
         ResultsActivity_.intent(this).parcelablePlayers(pls).tourNumber(mCurrentTour-1).start();
 
     }
@@ -779,10 +790,10 @@ public class TourActivity extends AppCompatActivity {
     }
 
     private Observable<Boolean> getQuestionCycle() {
-        return Question.getQuestion()
+        return getQuestion()
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(this::bindData).delay(2, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread())
-                .flatMap(questions1 -> Observable
+                .flatMap(questions -> Observable
                         .interval(ConstantsManager.COUNTDOWN_INTERVAL_NORMAL, TimeUnit.MILLISECONDS))
                 .observeOn(AndroidSchedulers.mainThread())
                 .flatMap(this::onTick)
@@ -800,6 +811,15 @@ public class TourActivity extends AppCompatActivity {
                         .flatMap(this::resetQuestion)
                         .delay(1, TimeUnit.SECONDS)
                         .observeOn(AndroidSchedulers.mainThread()));
+    }
+
+    private Observable<Question> getQuestion() {
+        Question question = mQuestions.get((mCurrentTour - 1)
+                *ConstantsManager.ROUND_QUESTIONS_COUNT
+                + mCurrentQuestionNumber - 1);
+        return question == null
+                ? Observable.error(new RuntimeException("No question"))
+                : Observable.just(question);
     }
 
     private List<Integer> getVisibleOptions(List<TextView> options) {

@@ -27,15 +27,15 @@
         <activity android:name=".ui.activities.OfflineGameConfigActivity_"
                   android:theme="@style/AppTheme.NoActionBar"
                   android:screenOrientation="portrait"
-                  android:parentActivityName=".ui.activities.SplashActivity_">
+                  android:parentActivityName=".ui.activities.EnterActivity_">
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.SplashActivity_"/>
+                android:value=".ui.activities.EnterActivity_"/>
 
         </activity>
 
-        <activity android:name=".ui.activities.SplashActivity_"
+        <activity android:name=".ui.activities.EnterActivity_"
                   android:theme="@style/AppTheme.NoActionBar"
                   android:screenOrientation="portrait">
             <intent-filter>

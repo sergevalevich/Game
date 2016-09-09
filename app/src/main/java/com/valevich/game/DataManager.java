@@ -30,43 +30,31 @@ public class DataManager {
     @Bean
     RestService mRestService;
 
-    public Observable<Object> loadQuestions() {
-
-//        return getQuestions().flatMap(apiQuestions -> Observable.merge(
-//                saveQuestions(apiQuestions),
-//                saveQuestionsMedia(apiQuestions))).cache();
-        return getQuestions().flatMap(this::saveQuestions);
-
-    }
-
-    private Observable<List<QuestionApiModel>> getQuestions() {
+    public Observable<List<QuestionApiModel>> downloadQuestions() {
         return mRestService.loadQuestions();
     }
 
-    private Observable<QuestionApiModel> saveQuestions(List<QuestionApiModel> apiQuestions) {
-        return Observable.from(apiQuestions).flatMap(Question::insertQuestion);
+    public Observable<List<QuestionApiModel>> saveQuestions(List<QuestionApiModel> apiQuestions) {
+        return Question.insertQuestions(apiQuestions);
     }
 
-    private Observable<Boolean> saveQuestionsMedia(List<QuestionApiModel> apiQuestions) {
-        return Observable
-                .from(apiQuestions)
-                .filter(question -> question.getMediaType() != null)
-                .flatMap(apiQuestion -> Observable.zip(getQuestionMedia(apiQuestion), getFileName(apiQuestion), this::writeResponseBodyToDisk));
+    public Observable<List<Question>> getQuestions(int limit,boolean isMediaAllowed) {
+        return Question.getQuestions(limit,isMediaAllowed);
     }
 
-    private Observable<ResponseBody> getQuestionMedia(QuestionApiModel apiQuestion) {
+    public Observable<Question> downloadQuestionsMedia(Question question) {
+        return getQuestionMedia(question).flatMap(responseBody -> writeResponseBodyToDisk(responseBody,question));
+    }
+
+    private Observable<ResponseBody> getQuestionMedia(Question question) {
         return mRestService.loadQuestionMedia(UrlFormatter.getFileNameFrom(
-                apiQuestion.getMediaType()),
-                UrlFormatter.getFileNameFrom(apiQuestion.getMediaUrl()));
+                question.getMediaType()),
+                UrlFormatter.getFileNameFrom(question.getMediaPath()));
     }
 
-    private Observable<String> getFileName(QuestionApiModel questionApiModel) {
-        return Observable.just(UrlFormatter.getFileNameFrom(questionApiModel.getMediaUrl()));
-    }
-
-    private boolean writeResponseBodyToDisk(ResponseBody body, String filename) {
+    private Observable<Question> writeResponseBodyToDisk(ResponseBody body, Question question) {
         try {
-            File file = new File(mContext.getFilesDir() + File.separator + filename);
+            File file = new File(mContext.getFilesDir() + File.separator + UrlFormatter.getFileNameFrom(question.getMediaPath()));
 
             InputStream inputStream = null;
             OutputStream outputStream = null;
@@ -87,10 +75,10 @@ public class DataManager {
 
                 outputStream.flush();
 
-                return true;
+                return Observable.just(question);
 
             } catch (IOException e) {
-                return false;
+                return Observable.empty();
             } finally {
                 if (inputStream != null) {
                     inputStream.close();
@@ -101,7 +89,7 @@ public class DataManager {
                 }
             }
         } catch (IOException e) {
-            return false;
+            return Observable.empty();
         }
     }
 }

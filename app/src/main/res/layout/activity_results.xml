@@ -8,23 +8,14 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimary"
-            android:gravity="center"
-            android:textColor="@color/white"
-            android:textSize="@dimen/config_text_size"/>
+        android:layout_height="match_parent"
+        android:paddingTop="64dp">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/players_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/finish_round"
-            android:layout_below="@+id/toolbar"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         </android.support.v7.widget.RecyclerView>
@@ -43,14 +34,21 @@
 
     </RelativeLayout>
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/transparent_results">
+
+
+    </FrameLayout>
+
     <TextView
         android:id="@+id/congrats"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_results"
         android:gravity="center"
-        android:paddingTop="24dp"
-        android:paddingBottom="56dp"
+        android:paddingTop="36dp"
+        android:paddingBottom="16dp"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
         android:textColor="@color/colorAccent"
@@ -58,6 +56,16 @@
         android:layout_marginTop="?attr/actionBarSize"
         android:textSize="@dimen/congrats_title"
         tools:text="Поздравляем со 2 местом"/>
+
+
+    <TextView
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="@dimen/config_text_size"/>
 
 
 </FrameLayout>
