@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@drawable/background_big"
+             android:fitsSystemWindows="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/finish_round_button_large">
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/players_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/transparent"
+            android:layout_above="@+id/finish_round"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        </android.support.v7.widget.RecyclerView>
+
+
+        <TextView
+            android:id="@+id/finish_round"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/finish_round_button_large"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/start_game_button"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/config_text_size_large"
+            android:textStyle="bold|italic"/>
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/transparent_results_big">
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/congrats"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/results_transparency_height"
+        android:layout_marginTop="@dimen/finish_round_button_large"
+        android:background="@color/transparent"
+        android:gravity="center"
+        android:paddingBottom="@dimen/congrats_bottom_padding"
+        android:paddingLeft="@dimen/congrats_side_padding"
+        android:paddingRight="@dimen/congrats_side_padding"
+        android:paddingTop="@dimen/congrats_top_padding"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/congrats_title_large"
+        android:textStyle="italic"
+        tools:text="Поздравляем со 2 местом"/>
+
+    <TextView
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/finish_round_button_large"
+        android:background="@color/colorPrimary"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="@dimen/config_text_size_large"/>
+
+
+</FrameLayout>

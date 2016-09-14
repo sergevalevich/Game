@@ -121,14 +121,15 @@ public class Question extends BaseModel implements Parcelable {
         this.rightAnswer = rightAnswer;
     }
 
-//    public static Observable<Question> getQuestion() { // FIXME: 05.09.2016 return unplayed question
-//        return Observable.defer(() -> Observable.just(
-//                SQLite.select()
-//                        .from(Question.class)
-//                        .where(Question_Table.isPlayed.notEq(1))
-//                        .and(Question_Table.mediaPath.isNull()) // FIXME: 07.09.2016
-//                        .querySingle()));
-//    }
+    public static Observable<Question> replaceWithNonMedia(List<String> questions) {
+        return Observable.defer(() -> Observable.just(
+                SQLite.select()
+                        .from(Question.class)
+                        .where(Question_Table.isPlayed.notEq(1))
+                        .and(Question_Table.mediaPath.isNull())
+                        .and(Question_Table.textQuest.notIn(questions))
+                        .querySingle()));
+    }
 
     public static Observable<List<Question>> getQuestions(int limit, boolean isMediaAllowed) {
         return Observable.defer(() -> {
@@ -203,5 +204,14 @@ public class Question extends BaseModel implements Parcelable {
         parcel.writeString(answers);
         parcel.writeString(rightAnswer);
         parcel.writeInt(isPlayed);
+    }
+
+    @Override
+    public boolean equals(Object other){
+        if (other == null) return false;
+        if (other == this) return true;
+        if (!(other instanceof Question))return false;
+        Question question = (Question) other;
+        return question.getTextQuest().equals(this.getTextQuest());
     }
 }

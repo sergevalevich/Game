@@ -1,6 +1,7 @@
 package com.valevich.game.network;
 
 
+import com.valevich.game.network.model.LastUpdateModel;
 import com.valevich.game.network.model.QuestionApiModel;
 import com.valevich.game.network.model.QuestionMediaApiModel;
 
@@ -21,4 +22,6 @@ public interface GameApi {
             @Path("type") String mediaType,
             @Query("filename") String filename);
 
+    @GET("quests/get_date")
+    Observable<LastUpdateModel> getLastUpdate();
 }

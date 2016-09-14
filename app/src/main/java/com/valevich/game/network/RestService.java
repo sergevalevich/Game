@@ -4,6 +4,7 @@ package com.valevich.game.network;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.valevich.game.network.model.LastUpdateModel;
 import com.valevich.game.network.model.QuestionApiModel;
 import com.valevich.game.util.ConstantsManager;
 
@@ -60,6 +61,10 @@ public class RestService {
 
     public Observable<ResponseBody> loadQuestionMedia(String mediaType,String fileName) {
         return mGameApi.loadQuestionMedia(mediaType,fileName);
+    }
+
+    public Observable<LastUpdateModel> getLastUpdate() {
+        return mGameApi.getLastUpdate();
     }
 
 }

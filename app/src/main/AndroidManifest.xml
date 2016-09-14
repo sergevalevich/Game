@@ -16,7 +16,8 @@
         android:fullBackupContent="@xml/backup_config"
         android:theme="@style/AppTheme">
         <activity android:name=".ui.activities.MainActivity_"
-                  android:theme="@style/AppTheme.NoActionBar">
+                  android:theme="@style/AppTheme.NoActionBar"
+                  android:screenOrientation="portrait">
         </activity>
 
         <activity android:name=".ui.activities.TourActivity_"
@@ -27,15 +28,20 @@
         <activity android:name=".ui.activities.OfflineGameConfigActivity_"
                   android:theme="@style/AppTheme.NoActionBar"
                   android:screenOrientation="portrait"
-                  android:parentActivityName=".ui.activities.EnterActivity_">
+                  android:parentActivityName=".ui.activities.OfflineGameConfigActivity_">
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.EnterActivity_"/>
+                android:value=".ui.activities.OfflineGameConfigActivity_"/>
 
         </activity>
 
         <activity android:name=".ui.activities.EnterActivity_"
+                  android:theme="@style/AppTheme.NoActionBar"
+                  android:screenOrientation="portrait">
+        </activity>
+
+        <activity android:name=".ui.activities.SplashActivity_"
                   android:theme="@style/AppTheme.NoActionBar"
                   android:screenOrientation="portrait">
             <intent-filter>
@@ -55,34 +61,6 @@
                   android:theme="@style/AppTheme.NoActionBar"
                   android:screenOrientation="portrait">
         </activity>
-
-        <!--jobs -->
-        <service
-            android:name="com.evernote.android.job.v21.PlatformJobService"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
-
-        <service
-            android:name="com.evernote.android.job.v14.PlatformAlarmService"
-            android:exported="false"/>
-
-        <receiver
-            android:name="com.evernote.android.job.v14.PlatformAlarmReceiver"
-            android:exported="false">
-            <intent-filter>
-                <!-- Keep the filter for legacy intents -->
-                <action android:name="com.evernote.android.job.v14.RUN_JOB"/>
-                <action android:name="net.vrallev.android.job.v14.RUN_JOB"/>
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name="com.evernote.android.job.JobBootReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-        </receiver>
 
     </application>
 

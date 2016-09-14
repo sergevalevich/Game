@@ -3,6 +3,7 @@ package com.valevich.game;
 import android.content.Context;
 
 import com.valevich.game.network.RestService;
+import com.valevich.game.network.model.LastUpdateModel;
 import com.valevich.game.network.model.QuestionApiModel;
 import com.valevich.game.storage.model.Question;
 import com.valevich.game.util.UrlFormatter;
@@ -91,5 +92,13 @@ public class DataManager {
         } catch (IOException e) {
             return Observable.empty();
         }
+    }
+
+    public Observable<Question> replaceWithNonMedia(List<String> questions) {
+        return Question.replaceWithNonMedia(questions);
+    }
+
+    public Observable<LastUpdateModel> getLastUpdate() {
+        return mRestService.getLastUpdate();
     }
 }

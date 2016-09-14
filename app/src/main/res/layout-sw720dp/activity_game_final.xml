@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/root"
+                android:background = "@drawable/bg_final_large"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/stars_1536">
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/your_place"
+        android:text="@string/your_place"
+        android:textSize="@dimen/congrats_text_size_xlarge"
+        android:textColor="@color/colorCongrats"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/congrats_top_margin_xlarge"
+        android:textStyle="bold|italic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/place"
+        android:textSize="@dimen/place_text_size_large_xlarge"
+        android:textColor="@color/white"
+        android:gravity="center_horizontal"
+        tools:text = "1"
+        android:maxLength="1"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/place_offset"
+        android:layout_marginBottom="@dimen/place_offset"
+        android:shadowRadius="6"
+        android:shadowColor="@color/colorCongrats"
+        android:layout_below="@+id/your_place"/>
+
+    <TextView
+        android:id="@+id/place_word"
+        android:layout_below="@id/place"
+        android:text="@string/place"
+        android:textSize="@dimen/congrats_text_size_xlarge"
+        android:textColor="@color/colorCongrats"
+        android:gravity="center"
+        android:textStyle="bold|italic"
+        android:layout_width="match_parent"
+        android:layout_marginBottom="@dimen/place_word_bottom_margin_large"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:id="@+id/score_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_below="@+id/place_word">
+
+
+        <TextView
+            android:id="@+id/points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/score_text_size_enter_xlarge"
+            android:textColor="@color/colorCongrats"
+            android:layout_marginRight="@dimen/enter_min_side_margin_large"
+            android:layout_marginEnd="@dimen/enter_min_side_margin_large"
+            android:maxLines="1"
+            android:maxLength="6"
+            tools:text = "100.1k"
+            android:textStyle="bold"/>
+
+        <ImageView
+            android:id="@+id/star"
+            android:layout_width="@dimen/star_size_large"
+            android:layout_height="@dimen/star_size_large"
+            android:layout_marginRight="@dimen/points_divider"
+            android:layout_marginEnd="@dimen/points_divider"
+            android:src = "@drawable/sstar"/>
+
+        <TextView
+            android:id="@+id/coins"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/score_text_size_enter_xlarge"
+            android:textColor="@color/colorCongrats"
+            android:layout_marginRight="@dimen/enter_min_side_margin_large"
+            android:layout_marginEnd="@dimen/enter_min_side_margin_large"
+            android:maxLines="1"
+            android:maxLength="4"
+            tools:text = "1,1k"
+            android:textStyle="bold"/>
+
+        <ImageView
+            android:id="@+id/coin"
+            android:layout_width="@dimen/star_size_large"
+            android:layout_height="@dimen/star_size_large"
+            android:src = "@drawable/clevercoin"/>
+
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/cup"
+        android:layout_below="@+id/score_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="@dimen/cup_top_margin"
+        tools:src = "@drawable/firstplace"/>
+
+</RelativeLayout>

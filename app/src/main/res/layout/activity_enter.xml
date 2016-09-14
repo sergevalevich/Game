@@ -10,19 +10,20 @@
     <RelativeLayout
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/enter_toolbar_height"
+        android:layout_height="@dimen/enter_toolbar_height_small"
         android:background="@color/colorPrimary"
         android:gravity="center_vertical"
         android:visibility="invisible">
 
         <ImageView
             android:id="@+id/user_image"
-            android:layout_width="@dimen/user_image_size"
-            android:layout_height="@dimen/user_image_size"
-            android:layout_marginLeft="@dimen/profile_image_start_margin"
-            android:layout_marginStart="@dimen/profile_image_start_margin"
-            android:layout_marginRight="@dimen/profile_image_end_margin"
-            android:layout_marginEnd="@dimen/profile_image_end_margin"
+            android:layout_width="@dimen/user_image_size_small"
+            android:layout_height="@dimen/user_image_size_small"
+            android:layout_marginLeft="@dimen/profile_image_start_margin_small"
+            android:layout_marginStart="@dimen/profile_image_start_margin_small"
+            android:layout_marginRight="@dimen/profile_image_end_margin_small"
+            android:layout_marginEnd="@dimen/profile_image_end_margin_small"
+            tools:src = "@drawable/first_man_profile_flat_icon_med"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"/>
 
@@ -30,9 +31,11 @@
             android:id="@+id/user_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/config_text_size"
+            android:textSize="@dimen/config_text_size_small"
             android:textColor="@color/white"
             android:layout_toRightOf="@+id/user_image"
+            android:maxLength="20"
+            tools:text = "azazazazazaazazaz"
             android:layout_toEndOf="@+id/user_image"/>
 
         <LinearLayout
@@ -49,19 +52,19 @@
                 android:id="@+id/points"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/score_text_size_enter"
+                android:textSize="@dimen/score_text_size_enter_small"
                 android:textColor="@color/colorAccent"
-                android:layout_marginRight="@dimen/enter_min_side_margin"
-                android:layout_marginEnd="@dimen/enter_min_side_margin"
+                android:layout_marginRight="@dimen/enter_min_side_margin_small"
+                android:layout_marginEnd="@dimen/enter_min_side_margin_small"
                 android:maxLines="1"
-                android:maxLength="6"
-                tools:text = "100.1k"
+                android:maxLength="9"
+                tools:text = "100001101"
                 android:textStyle="bold"/>
 
             <ImageView
                 android:id="@+id/star"
-                android:layout_width="@dimen/points_size"
-                android:layout_height="@dimen/points_size"
+                android:layout_width="@dimen/points_size_small"
+                android:layout_height="@dimen/points_size_small"
                 android:layout_marginRight="@dimen/points_divider"
                 android:layout_marginEnd="@dimen/points_divider"
                 android:src = "@drawable/sstar"/>
@@ -70,19 +73,19 @@
                 android:id="@+id/coins"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/score_text_size_enter"
+                android:textSize="@dimen/score_text_size_enter_small"
                 android:textColor="@color/colorAccentDark"
-                android:layout_marginRight="@dimen/enter_min_side_margin"
-                android:layout_marginEnd="@dimen/enter_min_side_margin"
+                android:layout_marginRight="@dimen/enter_min_side_margin_small"
+                android:layout_marginEnd="@dimen/enter_min_side_margin_small"
                 android:maxLines="1"
-                android:maxLength="4"
-                tools:text = "1,1k"
+                tools:text = "100000"
+                android:maxLength="6"
                 android:textStyle="bold"/>
 
             <ImageView
                 android:id="@+id/coin"
-                android:layout_width="@dimen/points_size"
-                android:layout_height="@dimen/points_size"
+                android:layout_width="@dimen/points_size_small"
+                android:layout_height="@dimen/points_size_small"
                 android:src = "@drawable/clevercoin"/>
 
 
@@ -93,26 +96,47 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:layout_marginTop="@dimen/enter_logo_top_margin"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="3.5"
+        android:layout_marginTop="@dimen/enter_toolbar_height">
 
-        <ImageView
-            android:id="@+id/logo"
-            android:layout_width="@dimen/enter_logo_width"
-            android:layout_height="@dimen/enter_logo_height"
-            android:layout_gravity="center"
-            android:visibility="invisible"
-            android:src="@drawable/logoclever"/>
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:weightSum="2">
 
+            <ImageView
+                android:layout_width="0dp"
+                android:id="@+id/logo"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.1"
+                android:layout_gravity="center"
+                android:visibility="invisible"
+                android:src="@drawable/logoclever"/>
 
-        <TextView
-            android:id="@+id/offline_game_btn"
-            style="@style/ButtonStyle"
-            android:layout_gravity="bottom"
-            android:text="@string/offline"
-            android:layout_marginTop="@dimen/enter_button_top_margin"
-            android:visibility="invisible"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_weight="2.5"
+            android:gravity="center_horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="5">
+
+            <TextView
+                android:id="@+id/offline_game_btn"
+                style="@style/ButtonStyle"
+                android:text="@string/offline"
+                android:layout_weight="4"
+                android:visibility="invisible"
+                tools:ignore="NestedWeights"/>
+
+        </LinearLayout>
+
 
     </LinearLayout>
 

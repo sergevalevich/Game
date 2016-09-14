@@ -9,13 +9,12 @@
     <string name="try_again_message">Повторить</string>
     <string name="enter_title_text">Вход</string>
     <string name="offline">Играть</string>
-    <string name="offline_title">Настройки</string>
     <string name="online">Игра Online</string>
-    <string name="players_number_label">Количество игроков</string>
+    <string name="players_number_label">Количество соперников:</string>
     <string name="players_min">1</string>
     <string name="players_max">5</string>
     <string name="start_game_title">Создать игру</string>
-    <string name="bet_number_label">Размер ставки</string>
+    <string name="bet_number_label">Размер ставки:</string>
     <string name="bet_min">1</string>
     <string name="bet_max">10</string>
     <string name="loading">Загрузка</string>
@@ -23,9 +22,11 @@
     <string name="from">из</string>
     <string name="results_title_game">Результат игры</string>
     <string name="results_title_round">Результат тура</string>
-    <string name="finish_round">Завершить раунд</string>
-    <string name="exit">Выход</string>
-    <string name="no_questions">Вопросы закончились</string>
+    <string name="finish_round">Следующий тур</string>
+    <string name="exit">Завершить игру</string>
+    <string name="no_questions">Не удалось обновить вопросы. Обновление произойдёт в ближайшее время</string>
     <string name="your_place">Вы заняли</string>
     <string name="place">место</string>
+    <string name="choose_avatar_prompt">Выберите аватар</string>
+    <string name="name_enter_prompt">Введите новое имя</string>
 </resources>

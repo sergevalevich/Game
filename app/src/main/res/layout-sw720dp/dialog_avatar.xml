@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:minWidth="@dimen/dialog_width_xlarge"
+              android:background="@drawable/round_dialog"
+              tools:layout_gravity="center"
+              android:padding="@dimen/dialog_general_padding">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/dialog_title_padding"
+        android:textSize="@dimen/primary_text_size_xlarge"
+        android:textStyle="bold|italic"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:text = "@string/choose_avatar_prompt"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+        <ImageView
+            android:id="@+id/avatar_one"
+            android:layout_weight="1"
+            android:layout_width="@dimen/dialog_image_size_xlarge"
+            android:layout_height="@dimen/dialog_image_size_xlarge"
+            android:src="@drawable/first_man_profile_flat_icon_game"/>
+
+        <ImageView
+            android:layout_weight="1"
+            android:id="@+id/avatar_two"
+            android:layout_width="@dimen/dialog_image_size_xlarge"
+            android:layout_height="@dimen/dialog_image_size_xlarge"
+            android:src="@drawable/second_man_profile_flat_icon_game"/>
+
+        <ImageView
+            android:layout_weight="1"
+            android:id="@+id/avatar_three"
+            android:layout_width="@dimen/dialog_image_size_xlarge"
+            android:layout_height="@dimen/dialog_image_size_xlarge"
+            android:src="@drawable/third_man_profile_flat_icon_game"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/dialog_row_divider"
+        android:weightSum="2">
+
+        <ImageView
+            android:id="@+id/avatar_four"
+            android:layout_weight="1"
+            android:layout_width="@dimen/dialog_image_size_xlarge"
+            android:layout_height="@dimen/dialog_image_size_xlarge"
+            android:src="@drawable/first_girl_profile_flat_icon_game"
+            android:scaleType="fitEnd"
+            android:layout_marginRight="@dimen/dialog_avatar_end_margin"
+            android:layout_marginEnd="@dimen/dialog_avatar_end_margin"/>
+
+        <ImageView
+            android:id="@+id/avatar_five"
+            android:layout_weight="1"
+            android:layout_width="@dimen/dialog_image_size_xlarge"
+            android:layout_height="@dimen/dialog_image_size_xlarge"
+            android:src="@drawable/second_girl_profile_flat_icon_game"
+            android:scaleType="fitStart"/>
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/userName_field"
+        android:textSize="@dimen/secondary_text_size_xlarge"
+        android:hint="@string/name_enter_prompt"
+        android:textColor="@color/white"
+        android:textColorHint="@color/white"
+        android:background="@drawable/round_input"
+        android:layout_width="match_parent"
+        android:inputType="text"
+        android:maxLength="20"
+        android:paddingLeft="@dimen/dialog_input_filed_side_padding"
+        android:paddingRight="@dimen/dialog_input_filed_side_padding"
+        android:layout_marginTop="@dimen/dialog_input_filed_vertical_margin"
+        android:layout_marginBottom="@dimen/dialog_input_filed_vertical_margin"
+        android:layout_marginRight="@dimen/dialog_input_filed_side_margin_big"
+        android:layout_marginLeft="@dimen/dialog_input_filed_side_margin_big"
+        android:layout_height="@dimen/dialog_input_filed_height_xlarge"/>
+
+</LinearLayout>

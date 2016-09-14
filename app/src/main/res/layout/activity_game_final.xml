@@ -2,14 +2,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:id="@+id/root"
-                android:background="@drawable/backwin2"
+                android:background = "@drawable/bg_final"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/game_final">
+        android:background="@drawable/stars_1200_1920">
     </FrameLayout>
 
     <TextView
@@ -18,7 +18,7 @@
         android:textSize="@dimen/congrats_text_size"
         android:textColor="@color/colorCongrats"
         android:gravity="center"
-        android:layout_marginTop="@dimen/congrats_top_margin"
+        android:layout_marginTop="@dimen/congrats_top_margin_small"
         android:textStyle="bold|italic"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
@@ -29,11 +29,13 @@
         android:textColor="@color/white"
         android:gravity="center_horizontal"
         tools:text = "1"
+        android:layout_marginTop="@dimen/place_offset"
+        android:layout_marginBottom="@dimen/place_offset"
         android:maxLength="1"
         android:textStyle="bold"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:shadowRadius="4"
+        android:shadowRadius="8"
         android:shadowColor="@color/colorCongrats"
         android:layout_below="@+id/your_place"/>
 
@@ -46,7 +48,7 @@
         android:gravity="center"
         android:textStyle="bold|italic"
         android:layout_width="match_parent"
-        android:layout_marginBottom="@dimen/place_word_bottom_margin"
+        android:layout_marginBottom="@dimen/place_word_bottom_margin_small"
         android:layout_height="wrap_content"/>
 
     <LinearLayout
@@ -105,10 +107,9 @@
         android:id="@+id/cup"
         android:layout_below="@+id/score_bar"
         android:layout_width="@dimen/cup_width"
-        android:layout_height="@dimen/cup_height"
+        android:layout_height="@dimen/cup_height_small"
         android:layout_centerHorizontal="true"
-        android:paddingLeft="@dimen/cup_start_padding"
-        android:paddingStart="@dimen/cup_start_padding"
-        tools:src = "@drawable/sixthplace"/>
+        android:layout_marginTop="@dimen/cup_top_margin_small"
+        tools:src = "@drawable/firstplace"/>
 
 </RelativeLayout>

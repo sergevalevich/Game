@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.valevich.game.GameApplication;
@@ -25,11 +26,11 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayersH
     private boolean mIsGameFinished = false;
 
     public PlayersAdapter(Player[] players, int tourNumber) {
+        mTourNumber = tourNumber;
         Player[] pl = new Player[players.length + 1];
         pl[0] = null;
         System.arraycopy(players, 0, pl, 1, pl.length - 1);
         mPlayers = pl;
-        mTourNumber = tourNumber;
     }
 
     @Override
@@ -42,9 +43,8 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayersH
     @Override
     public void onBindViewHolder(PlayersHolder holder, int position) {
         Player player = mPlayers[position];
-        if (player == null) {
-            holder.itemView.setVisibility(View.INVISIBLE);
-        } else holder.bind(player);
+        if(player == null) holder.itemView.setVisibility(View.INVISIBLE);
+        else holder.bind(player);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayersH
             mMaxQuestionsLabel.setText(String.valueOf(ConstantsManager.ROUND_QUESTIONS_COUNT*mTourNumber));
 
             if (mIsGameFinished) {
-                mCoinsLabel.setText(String.valueOf(player.getCoinsPortion(mPlayers)));
+                mCoinsLabel.setText(String.valueOf(player.getCoinsPortion()));
             } else {
                 mCoinPicture.setVisibility(View.INVISIBLE);
                 mCoinsLabel.setVisibility(View.INVISIBLE);

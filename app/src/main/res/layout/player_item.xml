@@ -2,8 +2,10 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/players_places_padding"
+                android:layout_height="@dimen/player_item_height_small"
+                android:paddingLeft="@dimen/players_places_padding"
+                android:paddingRight="@dimen/players_places_padding"
+                android:gravity="center"
                 tools:background="@drawable/back">
 
     <RelativeLayout
@@ -14,8 +16,8 @@
 
         <TextView
             android:id="@+id/place_label"
-            android:layout_width="@dimen/place_label_size"
-            android:layout_height="@dimen/place_label_size"
+            android:layout_width="@dimen/place_label_size_small"
+            android:layout_height="@dimen/place_label_size_small"
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/players_place_end_margin"
             android:layout_marginRight="@dimen/players_place_end_margin"
@@ -28,8 +30,8 @@
 
         <ImageView
             android:id="@+id/image"
-            android:layout_width="@dimen/results_image_size"
-            android:layout_height="@dimen/results_image_size"
+            android:layout_width="@dimen/results_image_size_small"
+            android:layout_height="@dimen/results_image_size_small"
             android:layout_marginEnd="@dimen/players_place_end_margin_small"
             android:layout_marginRight="@dimen/players_place_end_margin_small"
             android:layout_toEndOf="@+id/place_label"
@@ -55,7 +57,10 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:textSize="@dimen/primary_text_size"
-                tools:text="Новичок"/>
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:maxLength="11"
+                tools:text="Новичок1222"/>
 
             <TextView
                 android:id="@+id/points"
@@ -65,14 +70,15 @@
                 android:textSize="@dimen/place_text_size"
                 android:layout_marginEnd="@dimen/players_place_end_margin"
                 android:layout_marginRight="@dimen/players_place_end_margin"
+                android:maxLength="6"
                 android:textStyle="bold"
                 tools:text="4878"/>
 
 
             <ImageView
                 android:id="@+id/star"
-                android:layout_width="@dimen/points_size"
-                android:layout_height="@dimen/points_size"
+                android:layout_width="@dimen/points_size_small"
+                android:layout_height="@dimen/points_size_small"
                 android:src="@drawable/sstar"/>
 
         </LinearLayout>
@@ -140,12 +146,13 @@
                 android:textColor="@color/colorAccentDark"
                 android:textSize="@dimen/place_text_size"
                 android:textStyle="bold"
+                android:maxLength="3"
                 tools:text="100"/>
 
             <ImageView
                 android:id="@+id/coin"
-                android:layout_width="@dimen/points_size"
-                android:layout_height="@dimen/points_size"
+                android:layout_width="@dimen/points_size_small"
+                android:layout_height="@dimen/points_size_small"
                 android:src="@drawable/clevercoin"/>
 
             </LinearLayout>

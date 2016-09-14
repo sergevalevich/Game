@@ -18,7 +18,6 @@ import com.valevich.game.R;
 import com.valevich.game.model.Player;
 import com.valevich.game.storage.model.Question;
 import com.valevich.game.util.ConstantsManager;
-import com.valevich.game.util.Preferences_;
 
 import org.androidannotations.annotations.AfterExtras;
 import org.androidannotations.annotations.AfterViews;
@@ -27,8 +26,6 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.ViewsById;
 import org.androidannotations.annotations.res.StringRes;
-import org.androidannotations.annotations.sharedpreferences.Pref;
-import org.androidannotations.api.sharedpreferences.IntPrefField;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -143,9 +140,6 @@ public class TourActivity extends AppCompatActivity {
     @Extra
     Parcelable[] parcelableQuestions;
 
-    @Pref
-    Preferences_ mPreferences;
-
     private List<Question> mQuestions = new ArrayList<>();
 
     private int[] mNeededEnemiesPositions;
@@ -156,13 +150,11 @@ public class TourActivity extends AppCompatActivity {
 
     private int mCurrentMillisecond = 0;
 
-    private int mPreBoostProgress;
-
     private int mCurrentQuestionNumber = 1;
 
     private int mCurrentTour = 1;
 
-    private int mEnemiesAnsweredCount = 0;
+    private int mPlayersAnsweredCount = 0;
 
     private TextView mUserOptionLabel;
 
@@ -179,14 +171,13 @@ public class TourActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        startQuestion();
+        if (mCurrentQuestion == null) startQuestion();
+        else continueQuestion();
     }
 
     @Override
     protected void onStop() {
-        resetQuestion(isLastQuestion());
-        if (mSubscription != null && !mSubscription.isUnsubscribed())
-            mSubscription.unsubscribe();
+        if (mSubscription != null && !mSubscription.isUnsubscribed()) mSubscription.unsubscribe();
         super.onStop();
     }
 
@@ -206,9 +197,7 @@ public class TourActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onBackPressed() {
-
-    }
+    public void onBackPressed() {}
 
     private void setUpDefaultRatio() {
         for (TextView percent : mOptionPercents) {
@@ -219,8 +208,6 @@ public class TourActivity extends AppCompatActivity {
     private void bindData(Question question) {
         if (question == null) throw new RuntimeException("No more questions");
         Timber.d("bindData");
-        setUpDefaultRatio();
-        setAnswersRatioCombinations();
         setUpSupportingLabels();
         setUpTimer();
 
@@ -236,8 +223,11 @@ public class TourActivity extends AppCompatActivity {
         mRightAnswerPosition = positions.remove(0);
 
         for(Player enemy : mEnemies) {
-            enemy.setAnswer(mRightAnswerPosition);
+            enemy.setAnswerBy(mRightAnswerPosition);
         }
+
+        setUpDefaultRatio();
+        setAnswersRatioCombinations();
 
         TextView rightOption = mOptionLabels.get(mRightAnswerPosition);
         rightOption.setText(mCurrentQuestion.getRightAnswer());
@@ -449,6 +439,7 @@ public class TourActivity extends AppCompatActivity {
         mUser.setAnswerTime(mCurrentMillisecond);
 
         mUserOptionLabel = option;
+        mPlayersAnsweredCount++;
 
         blockOptions();
         disableHints();
@@ -494,6 +485,7 @@ public class TourActivity extends AppCompatActivity {
         if(mCurrentQuestion != null) {
             mCurrentQuestion.setIsPlayed(1);
             mCurrentQuestion.update();
+            mCurrentQuestion = null;
         }
 
         mAnswersRatios.clear();
@@ -521,7 +513,7 @@ public class TourActivity extends AppCompatActivity {
         mCurrentMillisecond = 0;
         mUser.setAnswerTime(0);
 
-        mEnemiesAnsweredCount = 0;
+        mPlayersAnsweredCount = 0;
         mUserOptionLabel = null;
 
         return Observable.just(isLast);
@@ -541,17 +533,14 @@ public class TourActivity extends AppCompatActivity {
 
         Collections.sort(players, (player1, player2) -> player2.getTotalScore() - player1.getTotalScore());
 
+        if (mCurrentTour == 4) {
+            Player.countCoins(players);
+        }
+
         Player[] pls = new Player[players.size()];
         pls = players.toArray(pls);
 
-        if(mCurrentTour == 4) {
-            IntPrefField userScore = mPreferences.userScore();
-            IntPrefField userCoins = mPreferences.userCoins();
-            userScore.put(userScore.get() + mUser.getTotalScore());
-            userCoins.put(userCoins.get() + mUser.getCoinsPortion(pls));
-        }
         ResultsActivity_.intent(this).parcelablePlayers(pls).tourNumber(mCurrentTour-1).start();
-
     }
 
     private void showRightAnswer() {
@@ -568,10 +557,6 @@ public class TourActivity extends AppCompatActivity {
                 .getText()
                 .toString()
                 .equals(mCurrentQuestion.getRightAnswer());
-    }
-
-    private boolean isLastQuestion() {
-        return mCurrentQuestionNumber > 7;
     }
 
     private void setUpSupportingLabels() {
@@ -624,24 +609,19 @@ public class TourActivity extends AppCompatActivity {
     }
 
     private Observable<Boolean> onTick(long lap) {
-        Timber.d("onTick");
-        int progress = (int) ((lap + 1) * ConstantsManager.COUNTDOWN_INTERVAL_NORMAL);
-        mTimerView.setProgress(progress);
-        if (progress % 1000 == 0) {
-            mTimerLabel.setText(String.valueOf((ConstantsManager.ROUND_LENGTH - progress)/1000));
+        mCurrentMillisecond += ConstantsManager.COUNTDOWN_INTERVAL_NORMAL;
+        mTimerView.setProgress(mCurrentMillisecond);
+        if (mCurrentMillisecond % 1000 == 0) {
+            mTimerLabel.setText(String.valueOf((ConstantsManager.ROUND_LENGTH - mCurrentMillisecond)/1000));
         }
-        mCurrentMillisecond = progress;
-        mPreBoostProgress = mCurrentMillisecond;
         if (!hasEnemiesAnswered()) checkIfEnemiesAnswered(ConstantsManager.COUNTDOWN_INTERVAL_NORMAL);
         return Observable.just(hasUserAnswered());
     }
 
     private Observable<Boolean> onBoost(long lap) {
-        Timber.d("onBoost");
-        int progress = (int) ((lap + 1) * ConstantsManager.COUNTDOWN_INTERVAL_BOOST) * ConstantsManager.SPEED_BOOST;
-        mTimerView.setProgress(mPreBoostProgress + progress);
-        mTimerLabel.setText(String.valueOf((ConstantsManager.ROUND_LENGTH - (mPreBoostProgress + progress))/1000));
-        mCurrentMillisecond = mPreBoostProgress + progress;
+        mCurrentMillisecond = mCurrentMillisecond + ConstantsManager.COUNTDOWN_INTERVAL_BOOST * ConstantsManager.SPEED_BOOST;
+        mTimerView.setProgress(mCurrentMillisecond);
+        mTimerLabel.setText(String.valueOf((ConstantsManager.ROUND_LENGTH - (mCurrentMillisecond))/1000));
         if (!hasEnemiesAnswered()) checkIfEnemiesAnswered(ConstantsManager.COUNTDOWN_INTERVAL_BOOST * ConstantsManager.SPEED_BOOST);
         return Observable.just(isTimeLeft());
     }
@@ -656,7 +636,7 @@ public class TourActivity extends AppCompatActivity {
             Player enemy = mEnemies.get(i);
             if (enemy.getAnswerTime()/interval == mCurrentMillisecond/interval){
                 TextView indicator = mEnemyAnswerIndicators.get(mNeededEnemiesPositions[i]);
-                indicator.setText(String.valueOf(++mEnemiesAnsweredCount));
+                indicator.setText(String.valueOf(++mPlayersAnsweredCount));
                 indicator.setVisibility(View.VISIBLE);
 
                 updateAnswersRatio();
@@ -695,7 +675,7 @@ public class TourActivity extends AppCompatActivity {
     }
 
     private boolean hasEnemiesAnswered() {
-        return mEnemiesAnsweredCount == enemiesCount;
+        return mPlayersAnsweredCount == enemiesCount && !hasUserAnswered();
     }
 
     private boolean hasUserAnswered() {
@@ -755,7 +735,6 @@ public class TourActivity extends AppCompatActivity {
     }
 
     private void showFiftyFiftyHint() {
-        Timber.d("onClick");
         if (getVisibleOptions(mOptionLabels).size() > 1) {
             ImageView hint = mHints.get(2);
             hint.setClickable(false);
@@ -777,6 +756,20 @@ public class TourActivity extends AppCompatActivity {
 
     private void startQuestion() {
         mSubscription = getQuestionCycle()
+                .subscribe(isLast -> {},
+                        throwable -> Timber.d(throwable.getLocalizedMessage()),
+                        () -> {
+                            if (mCurrentQuestionNumber == ConstantsManager.ROUND_QUESTIONS_COUNT) {
+                                resetRound();
+                            } else {
+                                mCurrentQuestionNumber++;
+                                startQuestion();
+                            }
+                        });
+    }
+
+    private void continueQuestion() {
+        mSubscription = startTimer(mCurrentQuestion)
                 .subscribe(isLast -> Timber.d("isLast"),
                         throwable -> Timber.d(throwable.getLocalizedMessage()),
                         () -> {
@@ -793,8 +786,12 @@ public class TourActivity extends AppCompatActivity {
         return getQuestion()
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(this::bindData).delay(2, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread())
-                .flatMap(questions -> Observable
-                        .interval(ConstantsManager.COUNTDOWN_INTERVAL_NORMAL, TimeUnit.MILLISECONDS))
+                .flatMap(this::startTimer);
+    }
+
+    private Observable<Boolean> startTimer(Question question) {
+        return Observable
+                .interval(ConstantsManager.COUNTDOWN_INTERVAL_NORMAL, TimeUnit.MILLISECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .flatMap(this::onTick)
                 .takeWhile(userAnswered -> !userAnswered && isTimeLeft())

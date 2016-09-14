@@ -11,7 +11,6 @@ import com.valevich.game.GameApplication;
 import com.valevich.game.R;
 import com.valevich.game.model.Player;
 import com.valevich.game.ui.adapters.PlayersAdapter;
-import com.valevich.game.util.ConstantsManager;
 
 import org.androidannotations.annotations.AfterExtras;
 import org.androidannotations.annotations.Click;
@@ -42,6 +41,9 @@ public class ResultsActivity extends AppCompatActivity {
 
     @StringRes(R.string.results_title_game)
     String mGameFinishedTitle;
+
+    @StringRes(R.string.finish_round)
+    String mNextRoundMessage;
 
     @StringRes(R.string.exit)
     String mExitMessage;
@@ -106,7 +108,7 @@ public class ResultsActivity extends AppCompatActivity {
             Player player = mPlayers[i];
             if(player.getName().equals(GameApplication.getUserName())) {
                 place = i;
-                coins = player.getCoinsPortion(mPlayers);
+                coins = player.getCoinsPortion();
                 points = player.getTotalScore();
             }
         }
@@ -118,7 +120,11 @@ public class ResultsActivity extends AppCompatActivity {
     }
 
     private void setUpButton() {
-        if(mIsGameFinished) mFinishButton.setText(mExitMessage);
+        String buttonTitle;
+        if(mIsGameFinished) buttonTitle = mExitMessage;
+        else if(tourNumber == 3) buttonTitle = mGameFinishedTitle;
+        else buttonTitle = mNextRoundMessage;
+        mFinishButton.setText(buttonTitle);
     }
 
     private void setUpPlayersList() {

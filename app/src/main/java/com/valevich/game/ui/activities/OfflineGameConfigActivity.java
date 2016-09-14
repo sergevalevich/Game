@@ -12,11 +12,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.valevich.game.DataManager;
+import com.valevich.game.GameApplication;
 import com.valevich.game.R;
+import com.valevich.game.network.model.LastUpdateModel;
 import com.valevich.game.storage.model.Question;
 import com.valevich.game.util.ConstantsManager;
 import com.valevich.game.util.NetworkStateChecker;
-import com.valevich.game.util.Preferences_;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -25,7 +26,6 @@ import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.ViewsById;
 import org.androidannotations.annotations.res.StringRes;
-import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
@@ -56,14 +56,17 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
     @ViewById(R.id.start_game_button)
     TextView mStartGameButton;
 
+    @ViewById(R.id.bet_value)
+    TextView mBetValueLabel;
+
+    @ViewById(R.id.players_number_value)
+    TextView mPlayersNumberValueLabel;
+
     @ViewById(R.id.transparent_loading)
     FrameLayout mTransparentBg;
 
     @ViewById(R.id.progress_bar)
     MaterialProgressBar mProgressBar;
-
-    @StringRes(R.string.offline_title)
-    String mModeTitle;
 
     @StringRes(R.string.network_error_message)
     String mNetworkErrorMessage;
@@ -77,9 +80,6 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
     @StringRes(R.string.no_questions)
     String mNoQuestionsMessage;
 
-    @Pref
-    Preferences_ mPreferences;
-
     @Bean
     NetworkStateChecker mNetworkStateChecker;
 
@@ -92,7 +92,9 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
 
     private List<Question> mQuestions = new ArrayList<>();
 
-    private int mPlayersCount;
+    private List<Question> mCachedQuestions = new ArrayList<>();
+
+    private int mPlayersCount = 2;
 
     private int mCoinPosition;
 
@@ -139,9 +141,9 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
     }
 
     private void setQuestionsObservable() {
-        mQuestionsObservable = isDataFresh()
-                ? getCachedQuestions()
-                : loadFreshQuestions();
+        mQuestionsObservable = isNetworkAvailable()
+                ? checkLastUpdate()
+                : getCachedQuestions();
     }
 
     private void subscribeToQuestions() {
@@ -168,6 +170,7 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
 
     private void clearQuestions() {
         mQuestions.clear();
+        mCachedQuestions.clear();
     }
 
     private void startGame() {
@@ -184,14 +187,12 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
     private void setupActionBar() {
         setSupportActionBar(mToolbar);
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            setTitle(mModeTitle);
-        }
+        if (actionBar != null) actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     private void setUpCoins() {
         mCoins.get(0).setImageResource(R.drawable.coin1gold);
+        mBetValueLabel.setText(String.valueOf(ConstantsManager.DEFAULT_BET));
         for (int i = 0; i < mCoins.size(); i++) {
             ImageView coin = mCoins.get(i);
             final int position = i;
@@ -200,9 +201,11 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
     }
 
     private void setUpManIcons() {
-        mManIcons.get(0).setImageResource(R.drawable.manicongold);
+        mPlayersNumberValueLabel.setText(String.valueOf(ConstantsManager.DEFAULT_ENEMIES_COUNT));
         for (int i = 0; i < mManIcons.size(); i++) {
             ImageView manIcon = mManIcons.get(i);
+            if (i < ConstantsManager.DEFAULT_ENEMIES_COUNT)
+                manIcon.setImageResource(R.drawable.manicongold);
             final int count = i;
             manIcon.setOnClickListener(view -> setPlayersCount(count));
         }
@@ -215,6 +218,7 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
                 manIcon.setImageResource(R.drawable.manicongrey);
             }
             mPlayersCount = count;
+            mPlayersNumberValueLabel.setText(String.valueOf(mPlayersCount + 1));
 
         } else if (count > mPlayersCount) {
             for (int i = mPlayersCount + 1; i <= count; i++) {
@@ -222,6 +226,7 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
                 manIcon.setImageResource(R.drawable.manicongold);
             }
             mPlayersCount = count;
+            mPlayersNumberValueLabel.setText(String.valueOf(mPlayersCount + 1));
         }
     }
 
@@ -232,6 +237,8 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
             newCoin.setImageResource(getImageResAt(position, true));
             oldCoin.setImageResource(getImageResAt(mCoinPosition, false));
             mCoinPosition = position;
+
+            mBetValueLabel.setText(String.valueOf(mBet));
         }
     }
 
@@ -271,23 +278,17 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
         }
     }
 
-    //---data---//
-    private boolean isDataFresh() {
-        return mPreferences.isDataFresh().get();
+    private Observable<Question> loadFreshQuestions(String lastUpdate) {
+        return isNetworkAvailable()
+                ? downloadQuestionsAndGet(lastUpdate)
+                : Observable.error(new RuntimeException(mNetworkUnavailableMessage));
     }
 
-    private Observable<Question> loadFreshQuestions() {
-        return isNetworkAvailable() ? downloadQuestionsAndGet() : Observable.error(new RuntimeException(mNetworkUnavailableMessage));
-        // TODO: 08.09.2016 in oncompleted if items length != null 0 start game(onNext)
-        //// TODO: 08.09.2016 show snackbar
-        // TODO: 08.09.2016 check message in onerror
-    }
-
-    private Observable<Question> downloadQuestionsAndGet() {
+    private Observable<Question> downloadQuestionsAndGet(String lastUpdate) {
         return mDataManager.downloadQuestions()
                 .doOnNext(Collections::shuffle)
                 .flatMap(questions -> mDataManager.saveQuestions(questions))
-                .doOnNext(questions -> mPreferences.isDataFresh().put(true))
+                .doOnNext(questions -> GameApplication.setLastUpdateId(lastUpdate))
                 .flatMap(questions -> getCachedQuestions());
     }
 
@@ -297,26 +298,51 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
 
     private Observable<Question> getQuestionsWithoutMedia() {
         return mDataManager.getQuestions(ConstantsManager.MAX_QUESTIONS_COUNT, false)
-                .flatMap(this::getQuestionsStreamOrError);
+                .flatMap(this::getQuestionsIfEnough);
     }
 
     private Observable<Question> getQuestionsWithPossibleMedia() {
         return mDataManager.getQuestions(ConstantsManager.MAX_QUESTIONS_COUNT, true)
-                .flatMap(this::getQuestionsStreamOrError)
+                .flatMap(this::getQuestionsIfEnough)
                 .flatMap(question ->
                         question.getMediaPath() != null
                                 ? loadQuestionMedia(question)
                                 : Observable.just(question));
     }
 
-    private Observable<Question> getQuestionsStreamOrError(List<Question> questions) {
-        return questions.size() < ConstantsManager.MAX_QUESTIONS_COUNT
-                ? Observable.error(new RuntimeException(mNoQuestionsMessage))
-                : Observable.from(questions);
+    private Observable<Question> getQuestionsIfEnough(List<Question> questions) {
+        if (questions.size() < ConstantsManager.MAX_QUESTIONS_COUNT) {
+            return Observable.error(new RuntimeException(mNoQuestionsMessage));
+        } else {
+            mCachedQuestions = questions;
+            return Observable.from(questions);
+        }
     }
 
     private Observable<Question> loadQuestionMedia(Question question) {
-        return mDataManager.downloadQuestionsMedia(question).onErrorResumeNext(getQuestionsWithoutMedia());
+        return mDataManager.downloadQuestionsMedia(question)
+                .onErrorResumeNext(replaceWithNonMedia());
+    }
+
+    private Observable<Question> replaceWithNonMedia() {
+        List<String> questions = new ArrayList<>();
+        for (int i = 0; i < mCachedQuestions.size(); i++) {
+            Question q = mCachedQuestions.get(i);
+            if (q.getMediaPath() == null)
+                questions.add(q.getTextQuest());
+        }
+        return mDataManager.replaceWithNonMedia(questions).flatMap(newQuestion -> newQuestion == null
+                ? Observable.error(new RuntimeException(mNoQuestionsMessage))
+                : Observable.just(newQuestion));
+    }
+
+    private Observable<Question> checkLastUpdate() {
+        return mDataManager.getLastUpdate()
+                .onErrorResumeNext(throwable -> Observable.just(new LastUpdateModel("")))
+                .flatMap(lastUpdateModel ->
+                        GameApplication.getLastUpdateId().equals(lastUpdateModel.getId()) || lastUpdateModel.getId().isEmpty()
+                                ? getCachedQuestions()
+                                : loadFreshQuestions(lastUpdateModel.getId()));
     }
 
     private boolean isNetworkAvailable() {

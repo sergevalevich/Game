@@ -10,10 +10,7 @@ import org.androidannotations.annotations.sharedpreferences.SharedPref;
 @SharedPref(value=SharedPref.Scope.UNIQUE)
 public interface Preferences {
 
-    @DefaultBoolean(value = false)
-    boolean isDataFresh();
-
-    @DefaultString(value = "No_Name")
+    @DefaultString(value = ConstantsManager.DEFAULT_USER_NAME)
     String userName();
 
     @DefaultInt(value = R.drawable.first_man_profile_flat_icon_med)
@@ -24,5 +21,8 @@ public interface Preferences {
 
     @DefaultInt(value = 0)
     int userCoins();
+
+    @DefaultString(value = "")
+    String lastUpdateId();
 
 }

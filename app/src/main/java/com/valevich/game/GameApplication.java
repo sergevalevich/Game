@@ -2,16 +2,11 @@ package com.valevich.game;
 
 import android.app.Application;
 
-import com.evernote.android.job.JobManager;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
-import com.valevich.game.scheduling.GameJobCreator;
-import com.valevich.game.scheduling.jobs.UpdateQuestionsJob;
 import com.valevich.game.util.Preferences_;
 
-import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EApplication;
-import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import timber.log.Timber;
@@ -22,19 +17,9 @@ public class GameApplication extends Application {
     @Pref
     static Preferences_ mPreferences;
 
-    @Bean
-    GameJobCreator mGameJobCreator;
-
-    @Bean
-    UpdateQuestionsJob mUpdateQuestionsJob;
-
     @Override
     public void onCreate() {
         super.onCreate();
-
-        //android-job
-        JobManager.create(this).addJobCreator(mGameJobCreator);
-        mUpdateQuestionsJob.schedule();
 
         //DbFlow
         FlowManager.init(new FlowConfig.Builder(this)
@@ -54,4 +39,41 @@ public class GameApplication extends Application {
     public static String getUserName() {
         return mPreferences.userName().get();
     }
+
+    public static void setUserName(String userName) {
+        mPreferences.userName().put(userName);
+    }
+
+    public static int getUserScore() {
+        return mPreferences.userScore().get();
+    }
+
+    public static int getUserCoins() {
+        return mPreferences.userCoins().get();
+    }
+
+    public static void setUserScore(int score) {
+        mPreferences.userScore().put(score);
+    }
+
+    public static void setUserCoins(int coins) {
+        mPreferences.userCoins().put(coins);
+    }
+
+    public static int getUserImage() {
+        return mPreferences.userImage().get();
+    }
+
+    public static void setUserImage(int imageResId) {
+        mPreferences.userImage().put(imageResId);
+    }
+
+    public static String getLastUpdateId() {
+        return mPreferences.lastUpdateId().get();
+    }
+
+    public static void setLastUpdateId(String id) {
+        mPreferences.lastUpdateId().put(id);
+    }
+
 }

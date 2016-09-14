@@ -8,14 +8,19 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.squareup.otto.Subscribe;
+import com.valevich.game.GameApplication;
 import com.valevich.game.R;
-import com.valevich.game.util.Preferences_;
+import com.valevich.game.eventbus.EventBus;
+import com.valevich.game.eventbus.events.AvatarSelectedEvent;
+import com.valevich.game.eventbus.events.UserNameSelectedEvent;
+import com.valevich.game.ui.dialogs.AvatarDialog_;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
-import org.androidannotations.annotations.sharedpreferences.Pref;
 
 @EActivity(R.layout.activity_enter)
 public class EnterActivity extends AppCompatActivity {
@@ -44,51 +49,86 @@ public class EnterActivity extends AppCompatActivity {
     @ViewById(R.id.logo)
     ImageView mLogo;
 
-    @Pref
-    Preferences_ mPreferences;
+    @Bean
+    EventBus mEventBus;
 
     @AfterViews
     void setUpViews() {
         setUpUserImage();
         setUpUserName();
-        setUpUserCoins();
-        setUpUserPoints();
-    }
-
-    private void setUpUserPoints() {
-        mPointsLabel.setText(String.valueOf(mPreferences.userScore().get()));
-    }
-
-    private void setUpUserCoins() {
-        mCoinsLabel.setText(String.valueOf(mPreferences.userCoins().get()));
-    }
-
-    private void setUpUserName() {
-        mUserNameLabel.setText(mPreferences.userName().get());
-    }
-
-    private void setUpUserImage() {
-        mUserImage.setImageResource(mPreferences.userImage().get());
     }
 
     @Click(R.id.offline_game_btn)
     void onOfflinePicked() {
-        //toggleButtonBlock(false);
-        //dismissViews();
         navigateToGameConfig();
+    }
+
+    @Click(R.id.user_image)
+    void onImageClicked() {
+        showDialog();
+    }
+
+    @Click(R.id.user_name)
+    void onNameClicked() {
+        showDialog();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        subscribeBus();
+        setUpUserCoins();
+        setUpUserPoints();
         showViews();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        unSubscribeBus();
         mLogo.setVisibility(View.INVISIBLE);
         mOfflineGameButton.setVisibility(View.INVISIBLE);
+    }
+
+    @Subscribe
+    public void onAvatarSelected(AvatarSelectedEvent event) {
+        mUserImage.setImageResource(event.getAvatarResId());
+    }
+
+    @Subscribe
+    public void onUserNameSelected(UserNameSelectedEvent event) {
+        mUserNameLabel.setText(event.getUserName());
+    }
+
+    private void subscribeBus() {
+        mEventBus.register(this);
+    }
+
+    private void unSubscribeBus() {
+        mEventBus.unregister(this);
+    }
+
+    private void showDialog() {
+        AvatarDialog_.builder()
+                .currentName(GameApplication.getUserName())
+                .build()
+                .show(getSupportFragmentManager(),"choose_image");
+    }
+
+    private void setUpUserPoints() {
+        mPointsLabel.setText(String.valueOf(GameApplication.getUserScore()));
+    }
+
+    private void setUpUserCoins() {
+        mCoinsLabel.setText(String.valueOf(GameApplication.getUserCoins()));
+    }
+
+    private void setUpUserName() {
+        mUserNameLabel.setText(GameApplication.getUserName());
+    }
+
+    private void setUpUserImage() {
+        mUserImage.setImageResource(GameApplication.getUserImage());
     }
 
     private void showViews() {
@@ -137,53 +177,8 @@ public class EnterActivity extends AppCompatActivity {
         mToolbar.startAnimation(slideDownAnimation);
     }
 
-    private void dismissViews() {
-        Animation shrinkButton = AnimationUtils.loadAnimation(this, R.anim.shrink);
-        Animation shrinkLogo = AnimationUtils.loadAnimation(this, R.anim.shrink);
-        shrinkLogo.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                mLogo.setVisibility(View.INVISIBLE);
-                mOfflineGameButton.startAnimation(shrinkButton);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        shrinkButton.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                toggleButtonBlock(true);
-                mOfflineGameButton.setVisibility(View.INVISIBLE);
-                navigateToGameConfig();
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        mLogo.startAnimation(shrinkLogo);
-    }
-
-    private void toggleButtonBlock(boolean isClickable) {
-        mOfflineGameButton.setClickable(isClickable);
-    }
-
     private void navigateToGameConfig() {
-        OfflineGameConfigActivity_.intent(this).start().withAnimation(R.anim.enter_pull_in, R.anim.exit_fade_out);;
+        OfflineGameConfigActivity_.intent(this).start().withAnimation(R.anim.enter_pull_in, R.anim.exit_fade_out);
     }
 
 }
