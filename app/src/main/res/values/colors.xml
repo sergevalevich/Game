@@ -15,4 +15,5 @@
     <color name="colorButton">#BF9165ac</color>
     <color name="colorCongrats">#ff7e00</color>
     <color name="dark_gray">#424242</color>
+    <color name="transparent_tour">#CC000000</color>
 </resources>

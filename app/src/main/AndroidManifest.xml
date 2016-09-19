@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.valevich.game"
+<manifest package="com.balinasoft.clever"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -9,39 +9,35 @@
 
     <application
         android:allowBackup="true"
-        android:name=".GameApplication_"
+        android:name="com.balinasoft.clever.GameApplication_"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:fullBackupContent="@xml/backup_config"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activities.MainActivity_"
+
+        <activity android:name="com.balinasoft.clever.ui.activities.TourActivity_"
                   android:theme="@style/AppTheme.NoActionBar"
                   android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name=".ui.activities.TourActivity_"
-                  android:theme="@style/AppTheme.NoActionBar"
-                  android:screenOrientation="portrait">
-        </activity>
-
-        <activity android:name=".ui.activities.OfflineGameConfigActivity_"
+        <activity android:name="com.balinasoft.clever.ui.activities.OfflineGameConfigActivity_"
                   android:theme="@style/AppTheme.NoActionBar"
                   android:screenOrientation="portrait"
-                  android:parentActivityName=".ui.activities.OfflineGameConfigActivity_">
+                  android:parentActivityName="com.balinasoft.clever.ui.activities.OfflineGameConfigActivity_">
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.activities.OfflineGameConfigActivity_"/>
+                android:value="com.balinasoft.clever.ui.activities.OfflineGameConfigActivity_"/>
 
         </activity>
 
-        <activity android:name=".ui.activities.EnterActivity_"
+        <activity android:name="com.balinasoft.clever.ui.activities.EnterActivity_"
                   android:theme="@style/AppTheme.NoActionBar"
                   android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name=".ui.activities.SplashActivity_"
+        <activity android:name="com.balinasoft.clever.ui.activities.SplashActivity_"
                   android:theme="@style/AppTheme.NoActionBar"
                   android:screenOrientation="portrait">
             <intent-filter>
@@ -52,15 +48,26 @@
         </activity>
 
 
-        <activity android:name=".ui.activities.ResultsActivity_"
+        <activity android:name="com.balinasoft.clever.ui.activities.ResultsActivity_"
                   android:theme="@style/AppTheme.NoActionBar"
                   android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name=".ui.activities.GameFinalActivity_"
+        <activity android:name="com.balinasoft.clever.ui.activities.GameFinalActivity_"
                   android:theme="@style/AppTheme.NoActionBar"
                   android:screenOrientation="portrait">
         </activity>
+
+        <activity android:name="com.balinasoft.clever.ui.activities.BonusActivity_"
+                  android:theme="@style/AppTheme.NoActionBar"
+                  android:screenOrientation="portrait">
+        </activity>
+
+        <service android:name="com.balinasoft.clever.services.StatsService_"/>
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="bf1811db581bcbfaf2848ff7712325df8b70afb0" />
 
     </application>
 

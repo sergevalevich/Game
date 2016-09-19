@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/root"
+                android:background="@drawable/bg_final">
+
+    <TextView
+        android:visibility="visible"
+        android:id="@+id/take"
+        android:text="@string/take"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textStyle="bold|italic"
+        android:gravity="center"
+        android:layout_marginTop="@dimen/bonus_top_margin_gen"
+        android:textSize="@dimen/bonus_title_size_small"/>
+
+    <TextView
+        android:visibility="visible"
+        android:id="@+id/bonus"
+        android:text="@string/daily_bonus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textStyle="bold|italic"
+        android:layout_marginTop="@dimen/bonus_top_margin_gen"
+        android:gravity="center"
+        android:layout_below="@+id/take"
+        android:textSize="@dimen/bonus_title_size_small"/>
+
+    <LinearLayout
+        android:visibility="invisible"
+        android:id="@+id/bonus_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingTop="@dimen/bonus_area_top_padding"
+        android:layout_centerInParent="true">
+
+
+        <TextView
+            android:id="@+id/bonus_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorAccentDark"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:textStyle="bold"
+            android:textSize="@dimen/bonus_size_small"
+            android:layout_marginRight="@dimen/bonus_divider_small"
+            android:layout_marginEnd="@dimen/bonus_divider_small"
+            tools:text = "+30"/>
+
+        <ImageView
+            android:layout_width="@dimen/bonus_coin_size_small"
+            android:layout_height="@dimen/bonus_coin_size_small"
+            android:layout_gravity="center"
+            android:src = "@drawable/clevercoin"/>
+    </LinearLayout>
+
+    <TextView
+        android:visibility="visible"
+        android:id="@+id/bonus_support"
+        android:layout_marginTop="@dimen/bonus_area_top_padding"
+        android:text="@string/play_every_day"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textStyle="bold|italic"
+        android:gravity="center"
+        android:layout_below="@+id/bonus_area"
+        android:textSize="@dimen/bonus_support_text_size_small"/>
+
+    <TextView
+        android:visibility="visible"
+        android:id="@+id/bonus_support_bottom"
+        android:text="@string/get_yesterday"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:textStyle="bold|italic"
+        android:gravity="center"
+        android:layout_below="@+id/bonus_support"
+        android:textSize="@dimen/bonus_support_text_size_small"/>
+
+    <LinearLayout
+        android:layout_below="@+id/bonus_support_bottom"
+        android:visibility="invisible"
+        android:id="@+id/bonus_area_next"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:layout_centerInParent="true">
+
+
+        <TextView
+            android:id="@+id/bonus_label_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorAccentDark"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:textStyle="bold"
+            android:textSize="@dimen/next_bonus_size_small"
+            android:layout_marginRight="@dimen/bonus_divider_small"
+            android:layout_marginEnd="@dimen/bonus_divider_small"
+            tools:text = "2"/>
+
+        <ImageView
+            android:layout_width="@dimen/next_bonus_coin_size_small"
+            android:layout_height="@dimen/next_bonus_coin_size_small"
+            android:layout_gravity="center"
+            android:src = "@drawable/clevercoin"/>
+    </LinearLayout>
+
+</RelativeLayout>

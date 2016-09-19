@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'io.fabric'
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.0"
@@ -11,15 +12,16 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.valevich.game"
+        applicationId "com.balinasoft.clever"
         minSdkVersion 15
         targetSdkVersion 24
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -41,8 +43,9 @@ final okHttpVer = '3.3.1'
 final retrofitVer = '2.1.0'
 final gsonVer = '2.6.2'
 
-//Developer
-final stethoVer = '1.3.1'
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -69,11 +72,12 @@ dependencies {
     compile 'com.squareup:otto:1.3.8'
     apt "org.androidannotations:otto:4.0.0"
     compile 'com.jakewharton.timber:timber:4.1.2'
-    compile "com.facebook.stetho:stetho:$stethoVer"
-    compile "com.facebook.stetho:stetho-okhttp3:$stethoVer"
     compile 'me.zhanghai.android.materialprogressbar:library:1.1.7'
-    compile 'com.evernote:android-job:1.0.12'
     compile 'jp.wasabeef:glide-transformations:2.0.1'
     compile 'com.jakewharton:butterknife:8.4.0'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.3@aar') {
+        transitive = true;
+    }
+    compile 'com.squareup.retrofit2:converter-scalars:2.1.0'
 }

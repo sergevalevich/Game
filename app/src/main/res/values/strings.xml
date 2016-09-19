@@ -24,9 +24,15 @@
     <string name="results_title_round">Результат тура</string>
     <string name="finish_round">Следующий тур</string>
     <string name="exit">Завершить игру</string>
-    <string name="no_questions">Не удалось обновить вопросы. Обновление произойдёт в ближайшее время</string>
+    <string name="no_questions">Необходимо обновить список вопросов. Проверьте подключение к сети</string>
     <string name="your_place">Вы заняли</string>
     <string name="place">место</string>
     <string name="choose_avatar_prompt">Выберите аватар</string>
     <string name="name_enter_prompt">Введите новое имя</string>
+    <string name="take">Получите</string>
+    <string name="daily_bonus">Бонус за посещение</string>
+    <string name="not_enough_coins">Недостаточно монет !</string>
+    <string name="get_yesterday">Завтра вы сможете получить уже</string>
+    <string name="play_every_day">Играйте каждый день!</string>
+    <string name="support_head">Завтра мы вам подарим</string>
 </resources>
