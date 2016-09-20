@@ -11,6 +11,7 @@ import com.balinasoft.clever.GameApplication;
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.model.Player;
 import com.balinasoft.clever.ui.adapters.PlayersAdapter;
+import com.balinasoft.clever.util.ConstantsManager;
 
 import org.androidannotations.annotations.AfterExtras;
 import org.androidannotations.annotations.Click;
@@ -112,11 +113,7 @@ public class ResultsActivity extends AppCompatActivity {
                 points = player.getTotalScore();
             }
         }
-        GameFinalActivity_.intent(this)
-                .coins(coins)
-                .points(points)
-                .place(place)
-                .start();
+        GameFinalActivity_.intent(this).coins(coins).points(points).place(place).start();
     }
 
     private void setUpButton() {
@@ -144,14 +141,14 @@ public class ResultsActivity extends AppCompatActivity {
     }
 
     private String getCongratsString() {
-        String congratsStart = "Поздравляем с";
-        String congratsEnd = "местом!";
+        String congratsStart = ConstantsManager.CONGRATS_START;
+        String congratsEnd = ConstantsManager.CONGRATS_END;
         int playersPlace = 0;
         for(int i = 0; i<mPlayers.length; i++) {
             Player player = mPlayers[i];
             if(player.getName().equals(GameApplication.getUserName()) && player.getAnswerTime() == 0) playersPlace = i+1;
         }
-        if(playersPlace == 2) congratsStart += "о";
+        if(playersPlace == 2) congratsStart += ConstantsManager.CONGRATS_ENDING;
 
         return String.format(Locale.getDefault(),"%s %d %s",congratsStart,playersPlace,congratsEnd);
     }

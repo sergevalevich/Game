@@ -13,8 +13,6 @@ import android.widget.TextView;
 import com.balinasoft.clever.DataManager;
 import com.balinasoft.clever.GameApplication;
 import com.balinasoft.clever.R;
-import com.balinasoft.clever.network.model.LastUpdateModel;
-import com.balinasoft.clever.services.StatsService_;
 import com.balinasoft.clever.storage.model.Question;
 import com.balinasoft.clever.util.ConstantsManager;
 import com.balinasoft.clever.util.NetworkStateChecker;
@@ -29,11 +27,9 @@ import org.androidannotations.annotations.res.StringRes;
 
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
-import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -71,14 +67,8 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
     @StringRes(R.string.network_error_message)
     String mNetworkErrorMessage;
 
-    @StringRes(R.string.network_unavailbale_message)
-    String mNetworkUnavailableMessage;
-
     @StringRes(R.string.try_again_message)
     String mRetryMessage;
-
-    @StringRes(R.string.no_questions)
-    String mNoQuestionsMessage;
 
     @StringRes(R.string.not_enough_coins)
     String mNotEnoughCoinsMessage;
@@ -91,11 +81,7 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
 
     private Subscription mSubscription;
 
-    private Observable<Question> mQuestionsObservable;
-
     private List<Question> mQuestions = new ArrayList<>();
-
-    private List<Question> mCachedQuestions = new ArrayList<>();
 
     private int mPlayersCount = 2;
 
@@ -113,10 +99,10 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (mQuestionsObservable != null) {
+        if (mSubscription != null) {
             setButtonClickable(false);
             notifyLoading(View.VISIBLE);
-            subscribeToQuestions();
+            getQuestions();
         }
     }
 
@@ -140,8 +126,7 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
         if(areEnoughCoins()) {
             setButtonClickable(false);
             notifyLoading(View.VISIBLE);
-            setQuestionsObservable();
-            subscribeToQuestions();
+            getQuestions();
         } else {
             notifyUserWith(mNotEnoughCoinsMessage);
         }
@@ -151,50 +136,44 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
         return GameApplication.getUserCoins() >= mBet;
     }
 
-    private void setQuestionsObservable() {
-        if(isNetworkAvailable()) {
-            sendStats();
-            mQuestionsObservable = checkLastUpdate();
-        } else {
-            mQuestionsObservable = getCachedQuestions();
-        }
-    }
-
-    private void sendStats() {
-        StatsService_.intent(this).start();
-    }
-
-    private void subscribeToQuestions() {
-        mSubscription = mQuestionsObservable
+    private void getQuestions() {
+        mSubscription = mDataManager.getQuestions()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(question -> mQuestions.add(question), throwable -> {
-                    clearQuestions();
-                    setButtonClickable(true);
-                    notifyLoading(View.GONE);
-                    notifyUserWith(throwable instanceof SocketTimeoutException
-                            ? mNetworkErrorMessage
-                            : throwable.getMessage());
-                }, () -> {
-                    if (mQuestions.size() == ConstantsManager.MAX_QUESTIONS_COUNT)
-                        startGame();
-                    else {
-                        clearQuestions();
-                        setButtonClickable(true);
-                        notifyLoading(View.GONE);
-                    }
-                });
+                .subscribe(this::onNext, this::onError, this::onCompleted);
+    }
+
+    private void onNext(Question question) {
+        mQuestions.add(question);
+    }
+
+    private void onError(Throwable throwable) {
+        clearQuestions();
+        setButtonClickable(true);
+        notifyLoading(View.GONE);
+        notifyUserWith(throwable instanceof SocketTimeoutException
+                ? mNetworkErrorMessage
+                : throwable.getMessage());
+    }
+
+    private void onCompleted() {
+        if (mQuestions.size() == ConstantsManager.MAX_QUESTIONS_COUNT)
+            startGame();
+        else {
+            clearQuestions();
+            setButtonClickable(true);
+            notifyLoading(View.GONE);
+        }
     }
 
     private void clearQuestions() {
         mQuestions.clear();
-        mCachedQuestions.clear();
     }
 
     private void startGame() {
         Question[] questions = new Question[mQuestions.size()];
         questions = mQuestions.toArray(questions);
-        TourActivity_.intent(this)
+        TourActivityOffline_.intent(this)
                 .enemiesCount(mPlayersCount + 1)
                 .bet(mBet)
                 .parcelableQuestions(questions)
@@ -297,80 +276,6 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
             default:
                 throw new RuntimeException("Invalid coin position");
         }
-    }
-
-    private Observable<Question> loadFreshQuestions(String lastUpdate) {
-        return isNetworkAvailable()
-                ? downloadQuestionsAndGet(lastUpdate)
-                : Observable.error(new RuntimeException(mNetworkUnavailableMessage));
-    }
-
-    private Observable<Question> downloadQuestionsAndGet(String lastUpdate) {
-        return mDataManager.downloadQuestions()
-                .doOnNext(Collections::shuffle)
-                .flatMap(questions -> mDataManager.saveQuestions(questions))
-                .doOnNext(questions -> GameApplication.setLastUpdate(lastUpdate))
-                .flatMap(questions -> getCachedQuestions());
-    }
-
-    private Observable<Question> getCachedQuestions() {
-        return isNetworkAvailable() ? getQuestionsWithPossibleMedia() : getQuestionsWithoutMedia();
-    }
-
-    private Observable<Question> getQuestionsWithoutMedia() {
-        return mDataManager.getQuestions(ConstantsManager.MAX_QUESTIONS_COUNT, false)
-                .flatMap(this::getQuestionsIfEnough);
-    }
-
-    private Observable<Question> getQuestionsWithPossibleMedia() {
-        return mDataManager.getQuestions(ConstantsManager.MAX_QUESTIONS_COUNT, true)
-                .flatMap(this::getQuestionsIfEnough)
-                .flatMap(question ->
-                        question.getMediaPath() != null
-                                ? loadQuestionMedia(question)
-                                : Observable.just(question));
-    }
-
-    private Observable<Question> getQuestionsIfEnough(List<Question> questions) {
-        if (questions.size() < ConstantsManager.MAX_QUESTIONS_COUNT) {
-            return Observable.error(new RuntimeException(mNoQuestionsMessage));
-        } else {
-            mCachedQuestions = new ArrayList<>(questions);
-            return Observable.from(questions);
-        }
-    }
-
-    private Observable<Question> loadQuestionMedia(Question question) {
-        return mDataManager.downloadQuestionsMedia(question)
-                .onErrorResumeNext(replaceWithNonMedia());
-    }
-
-    private Observable<Question> replaceWithNonMedia() {
-        List<String> questions = new ArrayList<>();
-        for (int i = 0; i < mCachedQuestions.size(); i++) {
-            Question q = mCachedQuestions.get(i);
-            if (q.getMediaPath() == null)
-                questions.add(q.getTextQuest());
-        }
-
-        return mDataManager.replaceWithNonMedia(questions).flatMap(newQuestion -> newQuestion == null
-                ? Observable.error(new RuntimeException(mNoQuestionsMessage))
-                : Observable.just(newQuestion))
-                .doOnNext(question -> mCachedQuestions.add(question));
-    }
-
-    private Observable<Question> checkLastUpdate() {
-        return mDataManager
-                .getLastUpdate()
-                .onErrorResumeNext(throwable -> Observable.just(new LastUpdateModel("")))
-                .flatMap(lastUpdateModel ->
-                        GameApplication.getLastUpdate().equals(lastUpdateModel.getLastUpdate()) || lastUpdateModel.getLastUpdate().isEmpty()
-                                ? getCachedQuestions()
-                                : loadFreshQuestions(lastUpdateModel.getLastUpdate()));
-    }
-
-    private boolean isNetworkAvailable() {
-        return mNetworkStateChecker.isNetworkAvailable();
     }
 
     private void notifyUserWith(String message) {

@@ -69,6 +69,27 @@ public class Player implements Comparable<Player> , Parcelable{
         mCoinsPortion = in.readInt();
     }
 
+    public static List<Player> get(int count,int bet) {
+        List<Player> enemies = new ArrayList<>(count);
+        Collections.shuffle(IMAGES_BY_NAME);
+        for (int i = 0; i < count; i++) {
+            Player player = new Player();
+            player.setName(IMAGES_BY_NAME.get(i).getKey());
+            player.setImageResId(IMAGES_BY_NAME.get(i).getValue());
+            player.setBet(bet);
+            enemies.add(player);
+        }
+        return enemies;
+    }
+
+    public static Player getUser(int bet) {
+        Player user = new Player();
+        user.setName(GameApplication.getUserName());
+        user.setImageResId(GameApplication.getUserImage());
+        user.setBet(bet);
+        return user;
+    }
+
     public static final Creator<Player> CREATOR = new Creator<Player>() {
         @Override
         public Player createFromParcel(Parcel in) {
@@ -180,45 +201,6 @@ public class Player implements Comparable<Player> , Parcelable{
         }
     }
 
-    private void setRandomAnswer(int rightAnswerPosition) {
-        List<Integer> options = new ArrayList<>(Arrays.asList(rightAnswerPosition,
-                0,rightAnswerPosition,
-                1,rightAnswerPosition,
-                2,rightAnswerPosition,
-                3,rightAnswerPosition));
-
-        setAnswerOption(options.get(generateAnswerOption(options.size())));
-    }
-
-    private static int getNormalAnswerTime() {
-        return mAnswerTimeRandom.nextInt(4000) + 4000;
-    }
-
-    private static int generateAnswerOption(int max) {
-        return mAnswerOptionRandom.nextInt(max);
-    }
-
-    public static List<Player> get(int count,int bet) {
-        List<Player> enemies = new ArrayList<>(count);
-        Collections.shuffle(IMAGES_BY_NAME);
-        for (int i = 0; i < count; i++) {
-            Player player = new Player();
-            player.setName(IMAGES_BY_NAME.get(i).getKey());
-            player.setImageResId(IMAGES_BY_NAME.get(i).getValue());
-            player.setBet(bet);
-            enemies.add(player);
-        }
-        return enemies;
-    }
-
-    public static Player getUser(int bet) {
-        Player user = new Player();
-        user.setName(GameApplication.getUserName());
-        user.setImageResId(GameApplication.getUserImage());
-        user.setBet(bet);
-        return user;
-    }
-
     @Override
     public int compareTo(@NonNull Player player) {
         return mAnswerTime - player.getAnswerTime();
@@ -240,4 +222,23 @@ public class Player implements Comparable<Player> , Parcelable{
         parcel.writeInt(mBet);
         parcel.writeInt(mCoinsPortion);
     }
+
+    private void setRandomAnswer(int rightAnswerPosition) {
+        List<Integer> options = new ArrayList<>(Arrays.asList(rightAnswerPosition,
+                0,rightAnswerPosition,
+                1,rightAnswerPosition,
+                2,rightAnswerPosition,
+                3,rightAnswerPosition));
+
+        setAnswerOption(options.get(generateAnswerOption(options.size())));
+    }
+
+    private static int getNormalAnswerTime() {
+        return mAnswerTimeRandom.nextInt(4000) + 4000;
+    }
+
+    private static int generateAnswerOption(int max) {
+        return mAnswerOptionRandom.nextInt(max);
+    }
+
 }

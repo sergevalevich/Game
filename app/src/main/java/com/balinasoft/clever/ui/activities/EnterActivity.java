@@ -8,6 +8,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.balinasoft.clever.scheduling.jobs.QuestionsStatsJob;
+import com.balinasoft.clever.util.ConstantsManager;
 import com.squareup.otto.Subscribe;
 import com.balinasoft.clever.GameApplication;
 import com.balinasoft.clever.R;
@@ -52,6 +54,9 @@ public class EnterActivity extends AppCompatActivity {
     @Bean
     EventBus mEventBus;
 
+    @Bean
+    QuestionsStatsJob mQuestionsStatsJob;
+
     @AfterViews
     void setUpViews() {
         setUpUserImage();
@@ -90,6 +95,12 @@ public class EnterActivity extends AppCompatActivity {
         mOfflineGameButton.setVisibility(View.INVISIBLE);
     }
 
+    @Override
+    public void onBackPressed() {
+        sendStats();
+        super.onBackPressed();
+    }
+
     @Subscribe
     public void onAvatarSelected(AvatarSelectedEvent event) {
         mUserImage.setImageResource(event.getAvatarResId());
@@ -112,7 +123,7 @@ public class EnterActivity extends AppCompatActivity {
         AvatarDialog_.builder()
                 .currentName(GameApplication.getUserName())
                 .build()
-                .show(getSupportFragmentManager(),"choose_image");
+                .show(getSupportFragmentManager(), ConstantsManager.AVATAR_DIALOG_TAG);
     }
 
     private void setUpUserPoints() {
@@ -179,6 +190,10 @@ public class EnterActivity extends AppCompatActivity {
 
     private void navigateToGameConfig() {
         OfflineGameConfigActivity_.intent(this).start().withAnimation(R.anim.enter_pull_in, R.anim.exit_fade_out);
+    }
+
+    private void sendStats() {
+        mQuestionsStatsJob.schedule();
     }
 
 }

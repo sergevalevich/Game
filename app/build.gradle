@@ -80,4 +80,6 @@ dependencies {
         transitive = true;
     }
     compile 'com.squareup.retrofit2:converter-scalars:2.1.0'
+    compile 'com.evernote:android-job:1.0.13'
+    compile 'com.jenzz:RxAppState:1.1.0'
 }

@@ -21,9 +21,21 @@ public interface ConstantsManager {
     int ROUND_QUESTIONS_COUNT = 7;
 
     String DEFAULT_USER_NAME = "No_Name";
+    String CONGRATS_START = "Поздравляем с";
+    String CONGRATS_END = "местом!";
+    String CONGRATS_ENDING = "о";
 
     int DEFAULT_ENEMIES_COUNT = 3;
     int DEFAULT_BET = 1;
     int INIT_SCORE = 100;
     int MAX_BONUS = 30;
+
+    String QUESTION_STATS_JOB_TAG = "QUESTIONS_STATS_JOB";
+
+    String USERS_STATS_JOB_TAG = "USERS_STATS_JOB";
+
+    String AVATAR_DIALOG_TAG = "choose_image";
+
+
+    String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 }

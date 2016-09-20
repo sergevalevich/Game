@@ -2,7 +2,7 @@ package com.balinasoft.clever.network.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class StatsModel {
+public class QuestionsStatsModel {
 
     @SerializedName("num_of_answ")
     private int mAnswersCount;

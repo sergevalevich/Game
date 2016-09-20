@@ -31,5 +31,17 @@ public interface GameApi {
 
     @FormUrlEncoded
     @POST("quests/stat")
-    Observable<Response<StatsResponseModel>> sendStats(@Field("quests") String stats);
+    Observable<Response<StatsResponseModel>> sendQuestionsStats(@Field("quests") String stats);
+
+    @FormUrlEncoded
+    @POST("users/stat")
+    Observable<Response<StatsResponseModel>> sendUserStats(@Field("device_token") String token,
+                                                           @Field("time_session") long sessionTime,
+                                                           @Field("coins") int userCoins,
+                                                           @Field("score") int userScore,
+                                                           @Field("entry_time") String launchTime);
+
+    @FormUrlEncoded
+    @POST("users/check_in")
+    Observable<Response<StatsResponseModel>> checkIn(@Field("device_token") String token);
 }

@@ -2,7 +2,9 @@ package com.balinasoft.clever.util;
 
 import com.balinasoft.clever.R;
 
+import org.androidannotations.annotations.sharedpreferences.DefaultBoolean;
 import org.androidannotations.annotations.sharedpreferences.DefaultInt;
+import org.androidannotations.annotations.sharedpreferences.DefaultLong;
 import org.androidannotations.annotations.sharedpreferences.DefaultString;
 import org.androidannotations.annotations.sharedpreferences.SharedPref;
 
@@ -29,4 +31,14 @@ public interface Preferences {
 
     @DefaultInt(value = 0)
     int bonus();
+
+    //stats//remove//
+    @DefaultBoolean(value = false)
+    boolean isUserCheckedIn();
+
+    @DefaultLong(value = 0)
+    long sessionLength();
+
+    @DefaultLong(value = 0)
+    long launchTime();
 }

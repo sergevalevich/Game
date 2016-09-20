@@ -1,12 +1,12 @@
 package com.balinasoft.clever.network;
 
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.balinasoft.clever.network.model.LastUpdateModel;
 import com.balinasoft.clever.network.model.QuestionApiModel;
 import com.balinasoft.clever.network.model.StatsResponseModel;
 import com.balinasoft.clever.util.ConstantsManager;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.androidannotations.annotations.AfterInject;
 import org.androidannotations.annotations.EBean;
@@ -69,8 +69,20 @@ public class RestService {
         return mGameApi.getLastUpdate();
     }
 
-    public Observable<Response<StatsResponseModel>> sendStats(String json) {
-        return mGameApi.sendStats(json);
+    public Observable<Response<StatsResponseModel>> sendQuestionsStats(String json) {
+        return mGameApi.sendQuestionsStats(json);
+    }
+
+    public Observable<Response<StatsResponseModel>> sendUserStats(String token,
+                                                                  long sessionTime,
+                                                                  int userCoins,
+                                                                  int userScore,
+                                                                  String launchTime) {
+        return mGameApi.sendUserStats(token, sessionTime, userCoins, userScore, launchTime);
+    }
+
+    public Observable<Response<StatsResponseModel>> checkIn(String token) {
+        return mGameApi.checkIn(token);
     }
 
 }

@@ -1,32 +1,21 @@
 package com.balinasoft.clever.ui.activities;
 
 import android.content.res.Resources;
-import android.os.Parcelable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.model.Player;
 import com.balinasoft.clever.storage.model.Question;
 import com.balinasoft.clever.util.ConstantsManager;
+import com.bumptech.glide.Glide;
 
-import org.androidannotations.annotations.AfterExtras;
-import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.Extra;
-import org.androidannotations.annotations.ViewById;
-import org.androidannotations.annotations.ViewsById;
-import org.androidannotations.annotations.res.StringRes;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,7 +25,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 import rx.Observable;
@@ -46,135 +34,18 @@ import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 @EActivity(R.layout.activity_tour)
-public class TourActivity extends AppCompatActivity {
-
-    @ViewsById({R.id.enemy_image_first,
-            R.id.enemy_image_second,
-            R.id.enemy_image_third,
-            R.id.enemy_image_fourth,
-            R.id.enemy_image_fifth})
-    List<ImageView> mEnemyImages;
-
-    @ViewsById({R.id.enemy_answer_indicator_first,
-            R.id.enemy_answer_indicator_second,
-            R.id.enemy_answer_indicator_third,
-            R.id.enemy_answer_indicator_fourth,
-            R.id.enemy_answer_indicator_fifth})
-    List<TextView> mEnemyAnswerIndicators;
-
-    @ViewsById({R.id.option_one_percent,
-            R.id.option_two_percent,
-            R.id.option_three_percent,
-            R.id.option_four_percent})
-    List<TextView> mOptionPercents;
-
-    @ViewsById({R.id.enemy_name_first,
-            R.id.enemy_name_second,
-            R.id.enemy_name_third,
-            R.id.enemy_name_fourth,
-            R.id.enemy_name_fifth})
-    List<TextView> mEnemyNameLabels;
-
-    @ViewsById({R.id.option_one,
-            R.id.option_two,
-            R.id.option_three,
-            R.id.option_four})
-    List<TextView> mOptionLabels;
-
-
-    @ViewsById({R.id.area_option_one,
-            R.id.area_option_two,
-            R.id.area_option_three,
-            R.id.area_option_four,
-            R.id.area_option_five,})
-    List<LinearLayout> mOptionAreas;
-
-    @ViewsById({R.id.right_answer_hint,
-            R.id.audience_help_hint,
-            R.id.fifty_fifty_hint})
-    List<ImageView> mHints;
-
-    @ViewById(R.id.score_label)
-    TextView mScoreLabel;
-
-    @ViewById(R.id.tour_number_label)
-    TextView mTourNumberLabel;
-
-    @ViewById(R.id.question_number_label)
-    TextView mQuestionNumberLabel;
-
-    @ViewById(R.id.timer)
-    ProgressBar mTimerView;
-
-    @ViewById(R.id.timer_label)
-    TextView mTimerLabel;
-
-    @ViewById(R.id.category)
-    TextView mCategoryLabel;
-
-    @ViewById(R.id.question_area)
-    FrameLayout mQuestionArea;
-
-    @ViewById(R.id.question_label)
-    TextView mQuestionLabel;
-
-    @ViewById(R.id.question_label_bottom)
-    TextView mQuestionLabelBottom;
-
-    @ViewById(R.id.question_image)
-    ImageView mQuestionImage;
-
-    @ViewById(R.id.scaled_image_area)
-    FrameLayout mScaledImageArea;
-
-    @ViewById(R.id.scaled_image)
-    ImageView mScaledImage;
-
-    @ViewById(R.id.enemies_bar)
-    LinearLayout mEnemiesBar;
-
-    @StringRes(R.string.tour_label_text)
-    String mDefaultTourText;
-
-    @StringRes(R.string.question_label_text)
-    String mDefaultQuestionText;
-
-    @Extra
-    int enemiesCount;
-
-    @Extra
-    int bet;
-
-    @Extra
-    Parcelable[] parcelableQuestions;
-
-    private List<Question> mQuestions = new ArrayList<>();
-
-    private int[] mNeededEnemiesPositions;
+public class TourActivityOffline extends TourActivityBase {
 
     private SparseBooleanArray mUsedHints = new SparseBooleanArray();
 
     List<List<Integer>> mAnswersRatios = new ArrayList<>();
 
-    private AtomicInteger mCurrentMillisecond = new AtomicInteger(0);
-
     private int mCurrentQuestionNumber = 1;
 
     private int mCurrentTour = 1;
 
-    private int mPlayersAnsweredCount = 0;
-
-    private TextView mUserOptionLabel;
-
-    private int mRightAnswerPosition;
-
-    private Question mCurrentQuestion;
-
-    private List<Player> mEnemies;
-
-    private Player mUser;
-
     private Subscription mSubscription;
+
 
     @Override
     protected void onResume() {
@@ -187,21 +58,6 @@ public class TourActivity extends AppCompatActivity {
     protected void onStop() {
         if (mSubscription != null && !mSubscription.isUnsubscribed()) mSubscription.unsubscribe();
         super.onStop();
-    }
-
-    @AfterExtras
-    void processExtras() {
-        mEnemies = Player.get(enemiesCount,bet);
-        mUser = Player.getUser(bet);
-        for (Parcelable parcelableQuestion : parcelableQuestions) {
-            mQuestions.add((Question) parcelableQuestion);
-        }
-    }
-
-    @AfterViews
-    void setUpViews() {
-        setUpEnemiesBar();
-        setUpOptions();
     }
 
     @Click(R.id.question_image)
@@ -304,12 +160,6 @@ public class TourActivity extends AppCompatActivity {
         toggleQuestion(slideDownAnimation, View.VISIBLE);
     }
 
-    private void disableHints() {
-        for (ImageView hint : mHints) {
-            hint.setOnClickListener(null);
-        }
-    }
-
     private void hideQuestion() {
 
         Animation slideUpQuestionAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_up_fast);
@@ -360,12 +210,6 @@ public class TourActivity extends AppCompatActivity {
         });
 
         toggleQuestion(slideUpQuestionAnimation, View.INVISIBLE);
-    }
-
-    private void setUpOptions() {
-        for (TextView option : mOptionLabels) {
-            option.setOnClickListener(view -> acceptAnswer(option));
-        }
     }
 
     private void showOptions() {
@@ -458,27 +302,6 @@ public class TourActivity extends AppCompatActivity {
         option.startAnimation(animation);
     }
 
-    private void acceptAnswer(TextView option) {
-
-        mUser.setAnswerTime(mCurrentMillisecond.get());
-
-        mUserOptionLabel = option;
-        mPlayersAnsweredCount++;
-
-        blockOptions();
-        disableHints();
-        blockImage();
-
-        showRightAnswer();
-        if (!isUserAnswerCorrect()) {
-            showWrongAnswer();
-            return;
-        }
-        mUser.addRightAnswer();
-        mUser.addPoints((ConstantsManager.ROUND_LENGTH - mUser.getAnswerTime())/100);
-        mScoreLabel.setText(String.valueOf(mUser.getTotalScore()));
-    }
-
     private Observable<Boolean> onPlayersAnswered(boolean b) {
 
         mScaledImageArea.setVisibility(View.GONE);
@@ -495,7 +318,7 @@ public class TourActivity extends AppCompatActivity {
 
         for (int i = 0; i < enemiesCount; i++) {
             Player enemy = mEnemies.get(i);
-            TextView indicator = mEnemyAnswerIndicators.get(mNeededEnemiesPositions[i]);
+            TextView indicator = mEnemyAnswerIndicators.get(mEnemiesPositions[i]);
             indicator.setText("");
             indicator.setBackgroundResource(enemy.getAnswerOption() == mRightAnswerPosition
                     ? R.drawable.green
@@ -525,7 +348,7 @@ public class TourActivity extends AppCompatActivity {
         mCategoryLabel.setText("");
 
         for (int i = 0; i < enemiesCount; i++) {
-            TextView indicator = mEnemyAnswerIndicators.get(mNeededEnemiesPositions[i]);
+            TextView indicator = mEnemyAnswerIndicators.get(mEnemiesPositions[i]);
             indicator.setBackgroundResource(R.drawable.status_new);
             indicator.setText("");
             indicator.setVisibility(View.GONE);
@@ -568,69 +391,9 @@ public class TourActivity extends AppCompatActivity {
         ResultsActivity_.intent(this).parcelablePlayers(pls).tourNumber(mCurrentTour-1).start();
     }
 
-    private void showRightAnswer() {
-        TextView rightOption = mOptionLabels.get(mRightAnswerPosition);
-        rightOption.setBackgroundResource(R.drawable.right_answer);
-    }
-
-    private void showWrongAnswer() {
-        mUserOptionLabel.setBackgroundResource(R.drawable.wrong_answer);
-    }
-
-    private boolean isUserAnswerCorrect() {
-        return mUserOptionLabel
-                .getText()
-                .toString()
-                .equals(mCurrentQuestion.getRightAnswer());
-    }
-
     private void setUpSupportingLabels() {
         mTourNumberLabel.setText(String.format(Locale.getDefault(), "%s %d", mDefaultTourText, mCurrentTour));
         mQuestionNumberLabel.setText(String.format(Locale.getDefault(), "%s %d", mDefaultQuestionText, mCurrentQuestionNumber));
-    }
-
-    private void setUpEnemiesBar() {
-        switch (enemiesCount) {
-            case 1:
-                mNeededEnemiesPositions = ConstantsManager.ENEMY_ONE;
-                break;
-            case 2:
-                mNeededEnemiesPositions = ConstantsManager.ENEMY_TWO;
-                break;
-            case 3:
-                mNeededEnemiesPositions = ConstantsManager.ENEMY_THREE;
-                break;
-            case 4:
-                mNeededEnemiesPositions = ConstantsManager.ENEMY_FOUR;
-                break;
-            case 5:
-                mNeededEnemiesPositions = ConstantsManager.ENEMY_FIVE;
-
-                break;
-            default:
-                throw new RuntimeException("Wrong enemies count!");
-        }
-        setUpEnemyViews();
-        showEnemiesBar();
-    }
-
-    private void setUpEnemyViews() {
-        for (int i = 0; i < enemiesCount; i++) {
-            int position = mNeededEnemiesPositions[i];
-            ImageView image = mEnemyImages.get(position);
-            TextView name = mEnemyNameLabels.get(position);
-            LinearLayout optionArea = mOptionAreas.get(position);
-            Player enemy = mEnemies.get(i);
-            image.setImageResource(enemy.getImageResId());
-            name.setText(enemy.getName());
-            optionArea.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void showEnemiesBar() {
-        Animation slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
-        mEnemiesBar.setVisibility(View.VISIBLE);
-        mEnemiesBar.startAnimation(slideDownAnimation);
     }
 
     private Observable<Boolean> onTick(long lap) {
@@ -658,7 +421,7 @@ public class TourActivity extends AppCompatActivity {
         for (int i = 0; i < enemiesCount; i++) {
             Player enemy = mEnemies.get(i);
             if (enemy.getAnswerTime()/interval == mCurrentMillisecond.get()/interval){
-                TextView indicator = mEnemyAnswerIndicators.get(mNeededEnemiesPositions[i]);
+                TextView indicator = mEnemyAnswerIndicators.get(mEnemiesPositions[i]);
                 indicator.setText(String.valueOf(++mPlayersAnsweredCount));
                 indicator.setVisibility(View.VISIBLE);
 
@@ -705,12 +468,6 @@ public class TourActivity extends AppCompatActivity {
         return mUserOptionLabel != null;
     }
 
-    private void blockOptions() {
-        for (TextView option : mOptionLabels) {
-            option.setClickable(false);
-        }
-    }
-
     private void unBlockOptions() {
         for (TextView option : mOptionLabels) {
             option.setClickable(true);
@@ -721,10 +478,6 @@ public class TourActivity extends AppCompatActivity {
         for (TextView option : mOptionLabels) {
             option.setBackgroundResource(R.drawable.round_option);
         }
-    }
-
-    private void blockImage() {
-        mQuestionImage.setClickable(false);
     }
 
     private void unBlockImage() {
@@ -872,4 +625,8 @@ public class TourActivity extends AppCompatActivity {
         return visibleOptions;
     }
 
+    @Override
+    protected List<Player> getEnemies() {
+        return Player.get(enemiesCount,bet);
+    }
 }

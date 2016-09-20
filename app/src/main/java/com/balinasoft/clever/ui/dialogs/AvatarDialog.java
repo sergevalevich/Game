@@ -59,6 +59,7 @@ public class AvatarDialog extends DialogFragment implements DialogInterface.OnDi
     void onFourthAvatarSelected() {
         onAvatarSelected(R.drawable.first_girl_profile_flat_icon_med);
     }
+
     @Click(R.id.avatar_five)
     void onFifthAvatarSelected() {
         onAvatarSelected(R.drawable.second_girl_profile_flat_icon_med);

@@ -2,11 +2,16 @@ package com.balinasoft.clever;
 
 import android.app.Application;
 
+import com.balinasoft.clever.scheduling.GameJobCreator;
+import com.balinasoft.clever.scheduling.jobs.UsersStatsJob;
+import com.balinasoft.clever.util.Preferences_;
 import com.crashlytics.android.Crashlytics;
+import com.evernote.android.job.JobManager;
+import com.jenzz.appstate.RxAppState;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
-import com.balinasoft.clever.util.Preferences_;
 
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EApplication;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
@@ -19,9 +24,17 @@ public class GameApplication extends Application {
     @Pref
     static Preferences_ mPreferences;
 
+    @Bean
+    GameJobCreator mGameJobCreator;
+
+    @Bean
+    UsersStatsJob mUsersStatsJob;
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        JobManager.create(this).addJobCreator(mGameJobCreator);
 
         //Fabric
         Fabric.with(this, new Crashlytics());
@@ -39,6 +52,21 @@ public class GameApplication extends Application {
                 }
             });
         }
+
+        //App state
+        RxAppState.monitor(this).subscribe(appState -> {
+            switch (appState) {
+                case FOREGROUND:
+                    JobManager.instance().cancel(mUsersStatsJob.getId());
+                    setLaunchTime(getCurrentTime());
+                    break;
+                case BACKGROUND:
+                    setSessionTime(getCurrentTime() - getLaunchTime());
+                    Timber.d("%d azaz %d", getCurrentTime(), getLaunchTime());
+                    mUsersStatsJob.schedule();
+                    break;
+            }
+        });
     }
 
     public static String getUserName() {
@@ -100,5 +128,35 @@ public class GameApplication extends Application {
     public static boolean isFirstLaunch() {
         return getLastAppLaunchDay() == 0;
     }
+
+    public static boolean isUserCheckedIn() {
+        return mPreferences.isUserCheckedIn().get();
+    }
+
+    public static void setUserCheckedIn(boolean isCheckedIn) {
+        mPreferences.isUserCheckedIn().put(isCheckedIn);
+    }
+
+    public static void setSessionTime(long sessionTime) {
+        mPreferences.sessionLength().put(sessionTime/1000);
+    }
+
+    public static void setLaunchTime(long launchTime) {
+        mPreferences.launchTime().put(launchTime);
+    }
+
+    public static long getLaunchTime() {
+        return mPreferences.launchTime().get();
+    }
+
+    public static long getSessionLength() {
+        return mPreferences.sessionLength().get();
+    }
+
+    private long getCurrentTime() {
+        return System.currentTimeMillis();
+    }
+
+
 
 }
