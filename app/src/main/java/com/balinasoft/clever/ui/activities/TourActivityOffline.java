@@ -1,7 +1,6 @@
 package com.balinasoft.clever.ui.activities;
 
 import android.content.res.Resources;
-import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -28,24 +27,12 @@ import java.util.concurrent.TimeUnit;
 
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 import rx.Observable;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 @EActivity(R.layout.activity_tour)
 public class TourActivityOffline extends TourActivityBase {
-
-    private SparseBooleanArray mUsedHints = new SparseBooleanArray();
-
-    List<List<Integer>> mAnswersRatios = new ArrayList<>();
-
-    private int mCurrentQuestionNumber = 1;
-
-    private int mCurrentTour = 1;
-
-    private Subscription mSubscription;
-
 
     @Override
     protected void onResume() {

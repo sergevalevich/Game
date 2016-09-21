@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.balinasoft.clever.GameApplication;
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.util.ConstantsManager;
 
@@ -15,6 +14,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import static com.balinasoft.clever.GameApplication.getUserCoins;
+import static com.balinasoft.clever.GameApplication.getUserImage;
+import static com.balinasoft.clever.GameApplication.getUserName;
+import static com.balinasoft.clever.GameApplication.getUserScore;
+import static com.balinasoft.clever.GameApplication.setUserCoins;
+import static com.balinasoft.clever.GameApplication.setUserScore;
 
 
 public class Player implements Comparable<Player> , Parcelable{
@@ -56,9 +62,9 @@ public class Player implements Comparable<Player> , Parcelable{
         mCoinsPortion = player.getCoinsPortion();
     }
 
-    public Player() {}
+    private Player() {}
 
-    protected Player(Parcel in) {
+    private Player(Parcel in) {
         mName = in.readString();
         mAnswerTime = in.readInt();
         mAnswerOption = in.readInt();
@@ -84,8 +90,8 @@ public class Player implements Comparable<Player> , Parcelable{
 
     public static Player getUser(int bet) {
         Player user = new Player();
-        user.setName(GameApplication.getUserName());
-        user.setImageResId(GameApplication.getUserImage());
+        user.setName(getUserName());
+        user.setImageResId(getUserImage());
         user.setBet(bet);
         return user;
     }
@@ -130,7 +136,7 @@ public class Player implements Comparable<Player> , Parcelable{
         mName = name;
     }
 
-    public void setImageResId(int imageResId) {
+    private void setImageResId(int imageResId) {
         mImageResId = imageResId;
     }
 
@@ -150,11 +156,11 @@ public class Player implements Comparable<Player> , Parcelable{
         return mRightAnswersCount;
     }
 
-    public int getBet() {
+    private int getBet() {
         return mBet;
     }
 
-    public void setBet(int coins) {
+    private void setBet(int coins) {
         mBet = coins;
     }
 
@@ -171,7 +177,7 @@ public class Player implements Comparable<Player> , Parcelable{
         return mCoinsPortion;
     }
 
-    public void setCoinsPortion(int coinsPortion) {
+    private void setCoinsPortion(int coinsPortion) {
         mCoinsPortion = coinsPortion;
     }
 
@@ -193,9 +199,9 @@ public class Player implements Comparable<Player> , Parcelable{
                 portion = Math.round((player.getTotalRightAnswersCount() * totalBet) / totalRightAnswers);
                 portionSum += portion;
             }
-            if(player.getName().equals(GameApplication.getUserName()) && player.getAnswerTime() == 0) {
-                GameApplication.setUserCoins(GameApplication.getUserCoins() + portion - player.getBet());
-                GameApplication.setUserScore(GameApplication.getUserScore() + player.getTotalScore());
+            if(player.getName().equals(getUserName()) && player.getAnswerTime() == 0) {
+                setUserCoins(getUserCoins() + portion - player.getBet());
+                setUserScore(getUserScore() + player.getTotalScore());
             }
             player.setCoinsPortion(portion);
         }

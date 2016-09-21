@@ -1,6 +1,5 @@
 package com.balinasoft.clever.ui.activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -19,8 +18,10 @@ import org.androidannotations.annotations.ViewById;
 
 import java.util.Locale;
 
+import static com.balinasoft.clever.GameApplication.getBonus;
+
 @EActivity(R.layout.activity_bonus)
-public class BonusActivity extends AppCompatActivity {
+public class BonusActivity extends BaseActivity {
 
     @ViewById(R.id.root)
     RelativeLayout mRootView;
@@ -50,7 +51,7 @@ public class BonusActivity extends AppCompatActivity {
     }
 
     private void setUpBonus() {
-        int bonus = GameApplication.getBonus();
+        int bonus = getBonus();
         int nextBonus = bonus < ConstantsManager.MAX_BONUS ? bonus + 1 : ConstantsManager.MAX_BONUS;
         mBonusLabel.setText(String.format(Locale.getDefault(), "%s%d", "+",bonus));
         mNextBonusLabel.setText(String.valueOf(nextBonus));

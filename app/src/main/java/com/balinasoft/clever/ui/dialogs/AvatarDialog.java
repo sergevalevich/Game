@@ -26,6 +26,9 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
+import static com.balinasoft.clever.GameApplication.setUserImage;
+import static com.balinasoft.clever.GameApplication.setUserName;
+
 @EFragment
 public class AvatarDialog extends DialogFragment implements DialogInterface.OnDismissListener {
 
@@ -92,11 +95,11 @@ public class AvatarDialog extends DialogFragment implements DialogInterface.OnDi
     }
 
     private void saveSelections() {
-        if(mCurrentSelection != 0) GameApplication.setUserImage(mCurrentSelection);
+        if(mCurrentSelection != 0) setUserImage(mCurrentSelection);
         String userName = mUserNameField.getText().toString();
         if(userName.isEmpty()) userName = ConstantsManager.DEFAULT_USER_NAME;
         mEventBus.post(new UserNameSelectedEvent(userName));
-        GameApplication.setUserName(userName);
+        setUserName(userName);
     }
 
     private void onAvatarSelected(int selectedResId) {

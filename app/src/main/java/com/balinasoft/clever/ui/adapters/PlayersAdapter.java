@@ -7,13 +7,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.balinasoft.clever.GameApplication;
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.model.Player;
 import com.balinasoft.clever.util.ConstantsManager;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.balinasoft.clever.GameApplication.getUserName;
 
 
 public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayersHolder> {
@@ -86,15 +87,15 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayersH
         @BindView(R.id.answers_label)
         TextView mAnswersLabel;
 
-        public PlayersHolder(View itemView) {
+        PlayersHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
         }
 
-        public void bind(Player player) {
+        void bind(Player player) {
             mPlaceLabel.setText(String.valueOf(getAdapterPosition()));
 
-            if (player.getName().equals(GameApplication.getUserName()) && player.getAnswerTime() == 0)
+            if (player.getName().equals(getUserName()) && player.getAnswerTime() == 0)
                 mPlaceLabel.setBackgroundResource(R.drawable.place2);
             mPlayerImage.setBackgroundResource(player.getImageResId());
             mPlayerName.setText(player.getName());

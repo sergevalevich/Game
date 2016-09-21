@@ -3,6 +3,9 @@ package com.balinasoft.clever.storage.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.balinasoft.clever.network.model.QuestionApiModel;
+import com.balinasoft.clever.storage.GameDatabase;
+import com.balinasoft.clever.util.UrlFormatter;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.ConflictAction;
 import com.raizlabs.android.dbflow.annotation.ModelContainer;
@@ -14,9 +17,6 @@ import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.sql.language.Where;
 import com.raizlabs.android.dbflow.structure.BaseModel;
-import com.balinasoft.clever.network.model.QuestionApiModel;
-import com.balinasoft.clever.storage.GameDatabase;
-import com.balinasoft.clever.util.UrlFormatter;
 
 import java.util.List;
 
@@ -69,11 +69,11 @@ public class Question extends BaseModel implements Parcelable {
         return serverId;
     }
 
-    public void setServerId(String serverId) {
+    void setServerId(String serverId) {
         this.serverId = serverId;
     }
 
-    public int getHasSent() {
+    int getHasSent() {
         return hasSent;
     }
 
@@ -97,7 +97,7 @@ public class Question extends BaseModel implements Parcelable {
         this.answerTime = answerTime;
     }
 
-    public int getIsPlayed() {
+    int getIsPlayed() {
         return isPlayed;
     }
 
@@ -117,7 +117,7 @@ public class Question extends BaseModel implements Parcelable {
         return themeQuest;
     }
 
-    public void setThemeQuest(String themeQuest) {
+    void setThemeQuest(String themeQuest) {
         this.themeQuest = themeQuest;
     }
 
@@ -125,7 +125,7 @@ public class Question extends BaseModel implements Parcelable {
         return textQuest;
     }
 
-    public void setTextQuest(String textQuest) {
+    void setTextQuest(String textQuest) {
         this.textQuest = textQuest;
     }
 
@@ -133,7 +133,7 @@ public class Question extends BaseModel implements Parcelable {
         return mediaType;
     }
 
-    public void setMediaType(String mediaType) {
+    void setMediaType(String mediaType) {
         this.mediaType = mediaType;
     }
 
@@ -141,7 +141,7 @@ public class Question extends BaseModel implements Parcelable {
         return mediaPath;
     }
 
-    public void setMediaPath(String mediaPath) {
+    void setMediaPath(String mediaPath) {
         this.mediaPath = mediaPath;
     }
 
@@ -161,7 +161,7 @@ public class Question extends BaseModel implements Parcelable {
         return rightAnswer;
     }
 
-    public void setRightAnswer(String rightAnswer) {
+    void setRightAnswer(String rightAnswer) {
         this.rightAnswer = rightAnswer;
     }
 
@@ -217,9 +217,9 @@ public class Question extends BaseModel implements Parcelable {
                 .queryList()));
     }
 
-    public Question() {}
+    Question() {}
 
-    protected Question(Parcel in) {
+    private Question(Parcel in) {
         id = in.readLong();
         serverId = in.readString();
         themeQuest = in.readString();

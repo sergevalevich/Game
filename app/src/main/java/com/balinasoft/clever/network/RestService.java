@@ -21,7 +21,6 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 import rx.Observable;
 
 @EBean
@@ -34,7 +33,6 @@ public class RestService {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(ConstantsManager.BASE_URL)
                 .client(getOkHttpClient())
-                .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(getGson()))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();

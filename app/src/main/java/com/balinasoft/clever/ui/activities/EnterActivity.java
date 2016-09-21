@@ -1,6 +1,5 @@
 package com.balinasoft.clever.ui.activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -8,15 +7,16 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.balinasoft.clever.scheduling.jobs.QuestionsStatsJob;
-import com.balinasoft.clever.util.ConstantsManager;
-import com.squareup.otto.Subscribe;
-import com.balinasoft.clever.GameApplication;
+import com.balinasoft.clever.DataManager;
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.eventbus.EventBus;
 import com.balinasoft.clever.eventbus.events.AvatarSelectedEvent;
 import com.balinasoft.clever.eventbus.events.UserNameSelectedEvent;
+import com.balinasoft.clever.services.QuestionStatsService_;
+import com.balinasoft.clever.services.UserStatsService_;
 import com.balinasoft.clever.ui.dialogs.AvatarDialog_;
+import com.balinasoft.clever.util.ConstantsManager;
+import com.squareup.otto.Subscribe;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -24,8 +24,18 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
+import timber.log.Timber;
+
+import static com.balinasoft.clever.GameApplication.getCurrentTime;
+import static com.balinasoft.clever.GameApplication.getLaunchTime;
+import static com.balinasoft.clever.GameApplication.getUserCoins;
+import static com.balinasoft.clever.GameApplication.getUserImage;
+import static com.balinasoft.clever.GameApplication.getUserName;
+import static com.balinasoft.clever.GameApplication.getUserScore;
+import static com.balinasoft.clever.GameApplication.setSessionTime;
+
 @EActivity(R.layout.activity_enter)
-public class EnterActivity extends AppCompatActivity {
+public class EnterActivity extends BaseActivity {
 
     @ViewById(R.id.root)
     RelativeLayout mRootView;
@@ -55,7 +65,7 @@ public class EnterActivity extends AppCompatActivity {
     EventBus mEventBus;
 
     @Bean
-    QuestionsStatsJob mQuestionsStatsJob;
+    DataManager mDataManager;
 
     @AfterViews
     void setUpViews() {
@@ -121,25 +131,25 @@ public class EnterActivity extends AppCompatActivity {
 
     private void showDialog() {
         AvatarDialog_.builder()
-                .currentName(GameApplication.getUserName())
+                .currentName(getUserName())
                 .build()
                 .show(getSupportFragmentManager(), ConstantsManager.AVATAR_DIALOG_TAG);
     }
 
     private void setUpUserPoints() {
-        mPointsLabel.setText(String.valueOf(GameApplication.getUserScore()));
+        mPointsLabel.setText(String.valueOf(getUserScore()));
     }
 
     private void setUpUserCoins() {
-        mCoinsLabel.setText(String.valueOf(GameApplication.getUserCoins()));
+        mCoinsLabel.setText(String.valueOf(getUserCoins()));
     }
 
     private void setUpUserName() {
-        mUserNameLabel.setText(GameApplication.getUserName());
+        mUserNameLabel.setText(getUserName());
     }
 
     private void setUpUserImage() {
-        mUserImage.setImageResource(GameApplication.getUserImage());
+        mUserImage.setImageResource(getUserImage());
     }
 
     private void showViews() {
@@ -193,7 +203,22 @@ public class EnterActivity extends AppCompatActivity {
     }
 
     private void sendStats() {
-        mQuestionsStatsJob.schedule();
+        Timber.d("on back pressed %s",String.valueOf(RESUMED_ACTIVITIES_COUNT));
+        if(mNetworkStateChecker.isNetworkAvailable()) {
+            sendQuestionsStats();
+            if(--RESUMED_ACTIVITIES_COUNT == 0) {
+                setSessionTime(getCurrentTime() - getLaunchTime());
+                sendUserStats();
+            }
+        }
+    }
+
+    private void sendQuestionsStats() {
+        QuestionStatsService_.intent(this).start();
+    }
+
+    private void sendUserStats() {
+        UserStatsService_.intent(this).start();
     }
 
 }

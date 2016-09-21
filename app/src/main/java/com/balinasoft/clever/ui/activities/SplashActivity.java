@@ -1,6 +1,5 @@
 package com.balinasoft.clever.ui.activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -19,8 +18,16 @@ import java.util.GregorianCalendar;
 
 import timber.log.Timber;
 
+import static com.balinasoft.clever.GameApplication.getBonus;
+import static com.balinasoft.clever.GameApplication.getLastAppLaunchDay;
+import static com.balinasoft.clever.GameApplication.getUserCoins;
+import static com.balinasoft.clever.GameApplication.isFirstLaunch;
+import static com.balinasoft.clever.GameApplication.setBonus;
+import static com.balinasoft.clever.GameApplication.setLastAppLaunchDay;
+import static com.balinasoft.clever.GameApplication.setUserCoins;
+
 @EActivity(R.layout.activity_splash)
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends BaseActivity {
 
     @ViewById(R.id.logo)
     ImageView mLogo;
@@ -79,15 +86,14 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void checkBonus() {
-        Timber.d("Checking bonus........");
         GregorianCalendar calendar = (GregorianCalendar) Calendar.getInstance();
         int currentDay = calendar.get(Calendar.DAY_OF_YEAR);
-        int savedDay = GameApplication.getLastAppLaunchDay();
+        int savedDay = getLastAppLaunchDay();
 
         int dayRange;
-        if (GameApplication.isFirstLaunch()) {
+        if (isFirstLaunch()) {
             dayRange = 1;
-            GameApplication.setUserCoins(ConstantsManager.INIT_SCORE);
+            setUserCoins(ConstantsManager.INIT_SCORE);
         } else {
             dayRange = currentDay - savedDay;
         }
@@ -97,17 +103,17 @@ public class SplashActivity extends AppCompatActivity {
                 && !calendar.isLeapYear(calendar.get(Calendar.YEAR) - 1))
                 || dayRange == -365) {
 
-            int currentBonus = GameApplication.getBonus();
+            int currentBonus = getBonus();
             if (currentBonus < ConstantsManager.MAX_BONUS) {
-                GameApplication.setBonus(++currentBonus);
+                setBonus(++currentBonus);
             }
-            GameApplication.setUserCoins(GameApplication.getUserCoins() + currentBonus);
-            GameApplication.setLastAppLaunchDay(currentDay);
+            setUserCoins(getUserCoins() + currentBonus);
+            setLastAppLaunchDay(currentDay);
             showBonus();
 
         } else if (Math.abs(dayRange) > 1) {
-            GameApplication.setBonus(0);
-            GameApplication.setLastAppLaunchDay(currentDay);
+            setBonus(0);
+            setLastAppLaunchDay(currentDay);
             enter();
 
         } else enter();

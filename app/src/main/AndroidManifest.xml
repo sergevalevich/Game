@@ -21,11 +21,6 @@
                   android:screenOrientation="portrait">
         </activity>
 
-        <activity android:name=".ui.activities.TourActivityBase_"
-                  android:theme="@style/AppTheme.NoActionBar"
-                  android:screenOrientation="portrait">
-        </activity>
-
         <activity android:name="com.balinasoft.clever.ui.activities.OfflineGameConfigActivity_"
                   android:theme="@style/AppTheme.NoActionBar"
                   android:screenOrientation="portrait"
@@ -68,33 +63,11 @@
                   android:screenOrientation="portrait">
         </activity>
 
-        <!--jobs -->
         <service
-            android:name="com.evernote.android.job.v21.PlatformJobService"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE"/>
+            android:name="com.balinasoft.clever.services.QuestionStatsService_"/>
 
         <service
-            android:name="com.evernote.android.job.v14.PlatformAlarmService"
-            android:exported="false"/>
-
-        <receiver
-            android:name="com.evernote.android.job.v14.PlatformAlarmReceiver"
-            android:exported="false">
-            <intent-filter>
-                <!-- Keep the filter for legacy intents -->
-                <action android:name="com.evernote.android.job.v14.RUN_JOB"/>
-                <action android:name="net.vrallev.android.job.v14.RUN_JOB"/>
-            </intent-filter>
-        </receiver>
-
-        <receiver
-            android:name="com.evernote.android.job.JobBootReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
-        </receiver>
+            android:name="com.balinasoft.clever.services.UserStatsService_"/>
 
         <meta-data
             android:name="io.fabric.ApiKey"

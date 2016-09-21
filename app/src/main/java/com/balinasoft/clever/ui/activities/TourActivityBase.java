@@ -1,7 +1,7 @@
 package com.balinasoft.clever.ui.activities;
 
 import android.os.Parcelable;
-import android.support.v7.app.AppCompatActivity;
+import android.util.SparseBooleanArray;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -28,8 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import rx.Subscription;
+
 @EActivity(R.layout.activity_tour)
-public abstract class TourActivityBase extends AppCompatActivity {
+public abstract class TourActivityBase extends BaseActivity {
 
     @ViewsById({R.id.enemy_image_first,
             R.id.enemy_image_second,
@@ -131,23 +133,33 @@ public abstract class TourActivityBase extends AppCompatActivity {
     @Extra
     Parcelable[] parcelableQuestions;
 
-    protected int[] mEnemiesPositions;
+    int[] mEnemiesPositions;
 
-    protected List<Question> mQuestions = new ArrayList<>();
+    List<Question> mQuestions = new ArrayList<>();
 
-    protected Question mCurrentQuestion;
+    Question mCurrentQuestion;
 
-    protected List<Player> mEnemies;
+    List<Player> mEnemies;
 
-    protected Player mUser;
+    Player mUser;
 
-    protected int mPlayersAnsweredCount = 0;
+    int mPlayersAnsweredCount = 0;
 
-    protected int mRightAnswerPosition;
+    int mRightAnswerPosition;
 
-    protected TextView mUserOptionLabel;
+    TextView mUserOptionLabel;
 
-    protected AtomicInteger mCurrentMillisecond = new AtomicInteger(0);
+    AtomicInteger mCurrentMillisecond = new AtomicInteger(0);
+
+    SparseBooleanArray mUsedHints = new SparseBooleanArray();
+
+    List<List<Integer>> mAnswersRatios = new ArrayList<>();
+
+    int mCurrentQuestionNumber = 1;
+
+    int mCurrentTour = 1;
+
+    Subscription mSubscription;
 
     @AfterExtras
     void setPlayers() {

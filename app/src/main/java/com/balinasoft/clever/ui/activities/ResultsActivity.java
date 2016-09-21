@@ -22,8 +22,10 @@ import org.androidannotations.annotations.res.StringRes;
 
 import java.util.Locale;
 
+import static com.balinasoft.clever.GameApplication.getUserName;
+
 @EActivity(R.layout.activity_results)
-public class ResultsActivity extends AppCompatActivity {
+public class ResultsActivity extends BaseActivity {
 
     @ViewById(R.id.players_list)
     RecyclerView mPlayersList;
@@ -107,7 +109,7 @@ public class ResultsActivity extends AppCompatActivity {
         int points = 0;
         for(int i = 0; i<mPlayers.length; i++) {
             Player player = mPlayers[i];
-            if(player.getName().equals(GameApplication.getUserName()) && player.getAnswerTime() == 0) {
+            if(player.getName().equals(getUserName()) && player.getAnswerTime() == 0) {
                 place = i;
                 coins = player.getCoinsPortion();
                 points = player.getTotalScore();
@@ -146,7 +148,7 @@ public class ResultsActivity extends AppCompatActivity {
         int playersPlace = 0;
         for(int i = 0; i<mPlayers.length; i++) {
             Player player = mPlayers[i];
-            if(player.getName().equals(GameApplication.getUserName()) && player.getAnswerTime() == 0) playersPlace = i+1;
+            if(player.getName().equals(getUserName()) && player.getAnswerTime() == 0) playersPlace = i+1;
         }
         if(playersPlace == 2) congratsStart += ConstantsManager.CONGRATS_ENDING;
 

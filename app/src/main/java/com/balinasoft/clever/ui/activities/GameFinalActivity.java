@@ -14,7 +14,7 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_game_final)
-public class GameFinalActivity extends AppCompatActivity {
+public class GameFinalActivity extends BaseActivity {
 
     @ViewById(R.id.root)
     RelativeLayout mRoot;

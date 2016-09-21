@@ -2,12 +2,9 @@ package com.balinasoft.clever;
 
 import android.app.Application;
 
-import com.balinasoft.clever.scheduling.GameJobCreator;
-import com.balinasoft.clever.scheduling.jobs.UsersStatsJob;
+import com.balinasoft.clever.util.NetworkStateChecker;
 import com.balinasoft.clever.util.Preferences_;
 import com.crashlytics.android.Crashlytics;
-import com.evernote.android.job.JobManager;
-import com.jenzz.appstate.RxAppState;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
 
@@ -25,16 +22,11 @@ public class GameApplication extends Application {
     static Preferences_ mPreferences;
 
     @Bean
-    GameJobCreator mGameJobCreator;
-
-    @Bean
-    UsersStatsJob mUsersStatsJob;
+    NetworkStateChecker mNetworkStateChecker;
 
     @Override
     public void onCreate() {
         super.onCreate();
-
-        JobManager.create(this).addJobCreator(mGameJobCreator);
 
         //Fabric
         Fabric.with(this, new Crashlytics());
@@ -52,21 +44,6 @@ public class GameApplication extends Application {
                 }
             });
         }
-
-        //App state
-        RxAppState.monitor(this).subscribe(appState -> {
-            switch (appState) {
-                case FOREGROUND:
-                    JobManager.instance().cancel(mUsersStatsJob.getId());
-                    setLaunchTime(getCurrentTime());
-                    break;
-                case BACKGROUND:
-                    setSessionTime(getCurrentTime() - getLaunchTime());
-                    Timber.d("%d azaz %d", getCurrentTime(), getLaunchTime());
-                    mUsersStatsJob.schedule();
-                    break;
-            }
-        });
     }
 
     public static String getUserName() {
@@ -149,14 +126,12 @@ public class GameApplication extends Application {
         return mPreferences.launchTime().get();
     }
 
-    public static long getSessionLength() {
-        return mPreferences.sessionLength().get();
-    }
-
-    private long getCurrentTime() {
+    public static long getCurrentTime() {
         return System.currentTimeMillis();
     }
 
-
+    public static long getSessionLength() {
+        return mPreferences.sessionLength().get();
+    }
 
 }

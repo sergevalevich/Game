@@ -3,7 +3,6 @@ package com.balinasoft.clever.ui.activities;
 import android.graphics.Color;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -15,7 +14,6 @@ import com.balinasoft.clever.GameApplication;
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.storage.model.Question;
 import com.balinasoft.clever.util.ConstantsManager;
-import com.balinasoft.clever.util.NetworkStateChecker;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -34,8 +32,10 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static com.balinasoft.clever.GameApplication.getUserCoins;
+
 @EActivity(R.layout.activity_offline_config)
-public class OfflineGameConfigActivity extends AppCompatActivity {
+public class OfflineGameConfigActivity extends BaseActivity {
 
     @ViewById(R.id.root)
     FrameLayout mRootView;
@@ -72,9 +72,6 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
 
     @StringRes(R.string.not_enough_coins)
     String mNotEnoughCoinsMessage;
-
-    @Bean
-    NetworkStateChecker mNetworkStateChecker;
 
     @Bean
     DataManager mDataManager;
@@ -133,7 +130,7 @@ public class OfflineGameConfigActivity extends AppCompatActivity {
     }
 
     private boolean areEnoughCoins() {
-        return GameApplication.getUserCoins() >= mBet;
+        return getUserCoins() >= mBet;
     }
 
     private void getQuestions() {

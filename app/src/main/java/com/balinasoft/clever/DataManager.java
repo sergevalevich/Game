@@ -33,6 +33,12 @@ import okhttp3.ResponseBody;
 import retrofit2.Response;
 import rx.Observable;
 
+import static com.balinasoft.clever.GameApplication.getLaunchTime;
+import static com.balinasoft.clever.GameApplication.getSessionLength;
+import static com.balinasoft.clever.GameApplication.getUserCoins;
+import static com.balinasoft.clever.GameApplication.getUserScore;
+import static com.balinasoft.clever.GameApplication.isUserCheckedIn;
+
 @EBean
 public class DataManager {
 
@@ -75,15 +81,15 @@ public class DataManager {
     }
 
     public Observable<Response<StatsResponseModel>> sendUserStats() {
-        return GameApplication.isUserCheckedIn() ? sendUserData() : checkInAndSendUserStats();
+        return isUserCheckedIn() ? sendUserData() : checkInAndSendUserStats();
     }
 
     private Observable<Response<StatsResponseModel>> sendUserData() {
         return mRestService.sendUserStats(getDeviceToken(),
-                GameApplication.getSessionLength(),
-                GameApplication.getUserCoins(),
-                GameApplication.getUserScore(),
-                mTimeFormatter.formatTime(GameApplication.getLaunchTime()));
+                getSessionLength(),
+                getUserCoins(),
+                getUserScore(),
+                mTimeFormatter.formatTime(getLaunchTime()));
     }
 
     private Observable<Response<StatsResponseModel>> checkInAndSendUserStats() {
