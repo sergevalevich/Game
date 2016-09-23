@@ -205,7 +205,6 @@ public abstract class TourActivityBase extends BaseActivity {
     }
 
     private void acceptAnswer(TextView option) {
-
         setUserAnswerTime();
         setUserOptionLabel(option);
         addRightAnsweredUsersCount();
@@ -213,6 +212,10 @@ public abstract class TourActivityBase extends BaseActivity {
         disableHints();
         blockImage();
         showRightAnswer();
+
+
+        boostTimer();
+
         if (!isUserAnswerCorrect()) {
             showWrongAnswer();
             return;
@@ -221,6 +224,8 @@ public abstract class TourActivityBase extends BaseActivity {
         addUserPoints();
         updateScoreLabel();
     }
+
+    protected abstract void boostTimer();
 
     protected void blockOptions() {
         for (TextView option : mOptionLabels) {

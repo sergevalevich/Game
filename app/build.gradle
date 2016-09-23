@@ -80,3 +80,9 @@ dependencies {
         transitive = true;
     }
 }
+
+apt {
+    arguments {
+        trace 'true'
+    }
+}

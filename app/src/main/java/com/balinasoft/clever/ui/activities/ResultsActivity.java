@@ -2,12 +2,10 @@ package com.balinasoft.clever.ui.activities;
 
 import android.content.Intent;
 import android.os.Parcelable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 
-import com.balinasoft.clever.GameApplication;
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.model.Player;
 import com.balinasoft.clever.ui.adapters.PlayersAdapter;
@@ -109,7 +107,7 @@ public class ResultsActivity extends BaseActivity {
         int points = 0;
         for(int i = 0; i<mPlayers.length; i++) {
             Player player = mPlayers[i];
-            if(player.getName().equals(getUserName()) && player.getAnswerTime() == 0) {
+            if(player.getName().equals(getUserName()) && player.getId() == ConstantsManager.USER_ID) {
                 place = i;
                 coins = player.getCoinsPortion();
                 points = player.getTotalScore();
@@ -148,7 +146,7 @@ public class ResultsActivity extends BaseActivity {
         int playersPlace = 0;
         for(int i = 0; i<mPlayers.length; i++) {
             Player player = mPlayers[i];
-            if(player.getName().equals(getUserName()) && player.getAnswerTime() == 0) playersPlace = i+1;
+            if(player.getName().equals(getUserName()) && player.getId() == ConstantsManager.USER_ID) playersPlace = i+1;
         }
         if(playersPlace == 2) congratsStart += ConstantsManager.CONGRATS_ENDING;
 

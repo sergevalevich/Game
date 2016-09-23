@@ -1,5 +1,6 @@
 package com.balinasoft.clever.ui.activities;
 
+
 import android.content.res.Resources;
 import android.view.View;
 import android.view.animation.Animation;
@@ -9,7 +10,6 @@ import android.widget.TextView;
 
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.model.Player;
-import com.balinasoft.clever.storage.model.Question;
 import com.balinasoft.clever.util.ConstantsManager;
 import com.bumptech.glide.Glide;
 
@@ -28,8 +28,10 @@ import java.util.concurrent.TimeUnit;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import timber.log.Timber;
+
+import static com.balinasoft.clever.util.ConstantsManager.COUNTDOWN_INTERVAL_NORMAL;
+
 
 @EActivity(R.layout.activity_tour)
 public class TourActivityOffline extends TourActivityBase {
@@ -37,8 +39,8 @@ public class TourActivityOffline extends TourActivityBase {
     @Override
     protected void onResume() {
         super.onResume();
-        if (mCurrentQuestion == null) startQuestion();
-        else continueQuestion();
+        if (mCurrentQuestion == null) bindData();
+        else startTimer(hasUserAnswered() ? ConstantsManager.COUNTDOWN_INTERVAL_BOOST : ConstantsManager.COUNTDOWN_INTERVAL_NORMAL);
     }
 
     @Override
@@ -49,32 +51,81 @@ public class TourActivityOffline extends TourActivityBase {
 
     @Click(R.id.question_image)
     void onImageClicked() {
-        if(mQuestionImage.getVisibility() == View.VISIBLE) {
-            mScaledImageArea.setVisibility(View.VISIBLE);
-        }
+        if (mQuestionImage.getVisibility() == View.VISIBLE) showScaledImage();
     }
 
     @Click(R.id.scaled_image_area)
     void onScaledAreaClicked() {
-        mScaledImageArea.setVisibility(View.GONE);
+        hideScaledImage();
     }
 
     @Override
-    public void onBackPressed() {}
+    public void onBackPressed() {
+    }
 
-    private void setUpDefaultRatio() {
+    private void setUpDefaultAnswersRatio() {
         for (TextView percent : mOptionPercents) {
             percent.setText("0%");
         }
     }
 
-    private void bindData(Question question) {
-        if (question == null) throw new RuntimeException("No more questions");
-        Timber.d("bindData");
-        setUpSupportingLabels();
-        setUpTimer();
+    private void hideScaledImage() {
+        mScaledImageArea.setVisibility(View.GONE);
+    }
 
-        mCurrentQuestion = question;
+    private void showScaledImage() {
+        mScaledImageArea.setVisibility(View.VISIBLE);
+    }
+
+    private void bindData() {
+        setUpSupportingLabels();
+        setUpTimerViews();
+        setQuestion();
+        setQuestionCategory();
+        setOptions();
+        setEnemiesAnswers();
+        setAnswersRatioCombinations();
+        setQuestionContent();
+        showQuestion();
+    }
+
+    private void setQuestionContent() {
+        if (isMediaQuestion()) setUpMediaQuestion();
+        else setUpTextQuestion();
+    }
+
+    private boolean isMediaQuestion() {
+        return mCurrentQuestion.getMediaPath() != null;
+    }
+
+    private void setUpMediaQuestion() {
+        String path = getFilesDir() + File.separator + mCurrentQuestion.getMediaPath();
+        int cornerRadius = (int) (16 / Resources.getSystem().getDisplayMetrics().density);
+        Glide.with(this).load(path).crossFade()
+                .bitmapTransform(new RoundedCornersTransformation(this, cornerRadius, 0))
+                .into(mQuestionImage);
+        Glide.with(this).load(path).crossFade().into(mScaledImage);
+        mQuestionImage.setVisibility(View.VISIBLE);
+        mQuestionLabelBottom.setText(mCurrentQuestion.getTextQuest());
+        mQuestionLabelBottom.setVisibility(View.VISIBLE);
+    }
+
+    private void setUpTextQuestion() {
+        mQuestionLabel.setText(mCurrentQuestion.getTextQuest());
+        mQuestionLabel.setVisibility(View.VISIBLE);
+    }
+
+    private void setQuestionCategory() {
+        mCategoryLabel.setText(mCurrentQuestion.getThemeQuest());
+    }
+
+    private void setEnemiesAnswers() {
+        for (Player enemy : mEnemies) {
+            enemy.setAnswerBy(mRightAnswerPosition);
+        }
+    }
+
+    private void setOptions() {
         List<Integer> positions = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
         Collections.shuffle(positions);
         String[] answers = mCurrentQuestion.getFormattedAnswers();
@@ -84,35 +135,8 @@ public class TourActivityOffline extends TourActivityBase {
         }
 
         mRightAnswerPosition = positions.remove(0);
-
-        for(Player enemy : mEnemies) {
-            enemy.setAnswerBy(mRightAnswerPosition);
-        }
-
-        setUpDefaultRatio();
-        setAnswersRatioCombinations();
-
         TextView rightOption = mOptionLabels.get(mRightAnswerPosition);
         rightOption.setText(mCurrentQuestion.getRightAnswer());
-
-        mCategoryLabel.setText(mCurrentQuestion.getThemeQuest());
-
-        String mediaPath = mCurrentQuestion.getMediaPath();
-        if (mediaPath != null) {
-            int cornerRadius = (int) (12 / Resources.getSystem().getDisplayMetrics().density);
-            String path = getFilesDir() + File.separator + mediaPath;
-            Glide.with(this).load(path).crossFade()
-                    .bitmapTransform(new RoundedCornersTransformation(this, cornerRadius, 0))
-                    .into(mQuestionImage);
-            Glide.with(this).load(path).crossFade().into(mScaledImage);
-            mQuestionImage.setVisibility(View.VISIBLE);
-            mQuestionLabelBottom.setText(mCurrentQuestion.getTextQuest());
-            mQuestionLabelBottom.setVisibility(View.VISIBLE);
-        } else {
-            mQuestionLabel.setText(mCurrentQuestion.getTextQuest());
-            mQuestionLabel.setVisibility(View.VISIBLE);
-        }
-        showQuestion();
     }
 
     private void setUpHints() {
@@ -121,8 +145,8 @@ public class TourActivityOffline extends TourActivityBase {
         if (!mUsedHints.get(2)) mHints.get(2).setOnClickListener(view -> showFiftyFiftyHint());
     }
 
-    private void setUpTimer() {
-        mTimerLabel.setText(String.valueOf(ConstantsManager.ROUND_LENGTH/1000));
+    private void setUpTimerViews() {
+        mTimerLabel.setText(String.valueOf(ConstantsManager.ROUND_LENGTH / 1000));
         mTimerView.setProgress(0);
     }
 
@@ -148,8 +172,9 @@ public class TourActivityOffline extends TourActivityBase {
     }
 
     private void hideQuestion() {
-
+        Timber.d("hide question");
         Animation slideUpQuestionAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_up_fast);
+        slideUpQuestionAnimation.setStartOffset(2000);
 
         List<Integer> visibleOptions = getVisibleOptions(mOptionLabels);
         List<Animation> slideUps = new ArrayList<>(visibleOptions.size());
@@ -157,28 +182,12 @@ public class TourActivityOffline extends TourActivityBase {
             slideUps.add(AnimationUtils.loadAnimation(this, R.anim.slide_up_fast));
         }
 
-        for (int i = 0; i < slideUps.size() - 1; i++) {
-            Animation slideUp = slideUps.get(i);
-            final int visibleOption = i;
-            slideUp.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
+        setOptionSlideUpActions(slideUps,visibleOptions);
+        setQuestionSlideUpAction(slideUpQuestionAnimation,visibleOptions.get(0),slideUps.get(0));
+        toggleQuestion(slideUpQuestionAnimation, View.INVISIBLE);
+    }
 
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    toggleOption(visibleOptions.get(visibleOption + 1), slideUps.get(visibleOption + 1), View.INVISIBLE);
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-        }
-
-
+    private void setQuestionSlideUpAction(Animation slideUpQuestionAnimation, int firstOptionPosition, Animation optionAnimation) {
         slideUpQuestionAnimation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
@@ -187,7 +196,11 @@ public class TourActivityOffline extends TourActivityBase {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                toggleOption(visibleOptions.get(0), slideUps.get(0), View.INVISIBLE);
+                Timber.d("On Question slideUp Finished");
+                mQuestionImage.setVisibility(View.GONE);
+                mQuestionLabelBottom.setVisibility(View.GONE);
+                mQuestionLabel.setVisibility(View.GONE);
+                toggleOption(firstOptionPosition, optionAnimation, View.INVISIBLE);
             }
 
             @Override
@@ -195,86 +208,79 @@ public class TourActivityOffline extends TourActivityBase {
 
             }
         });
+    }
 
-        toggleQuestion(slideUpQuestionAnimation, View.INVISIBLE);
+    private void setOptionSlideUpActions(List<Animation> slideUps, List<Integer> visibleOptions) {
+        for (int i = 0; i < slideUps.size(); i++) {
+            Animation slideUp = slideUps.get(i);
+            final int nextVisibleOption = i + 1;
+            slideUp.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    if(nextVisibleOption == slideUps.size()) {
+                        resetQuestion();
+                    }
+                    else toggleOption(visibleOptions.get(
+                            nextVisibleOption),
+                            slideUps.get(nextVisibleOption),
+                            View.INVISIBLE);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+        }
+    }
+
+    private void setOptionSlideDownActions(List<Animation> slideDowns) {
+        for(int i = 0; i < slideDowns.size(); i++) {
+            Animation slideDown = slideDowns.get(i);
+            int nextOptionPosition = i+1;
+            slideDown.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    if(nextOptionPosition == slideDowns.size()) {
+                        startTimer(COUNTDOWN_INTERVAL_NORMAL);
+                        unBlockOptions();
+                        unBlockImage();
+                        setUpHints();
+                    } else {
+                        toggleOption(nextOptionPosition, slideDowns.get(nextOptionPosition), View.VISIBLE);
+                    }
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+        }
     }
 
     private void showOptions() {
-        Animation slideDownAnimationOne = AnimationUtils.loadAnimation(this, R.anim.slide_down_fast);
-        Animation slideDownAnimationTwo = AnimationUtils.loadAnimation(this, R.anim.slide_down_fast);
-        Animation slideDownAnimationThree = AnimationUtils.loadAnimation(this, R.anim.slide_down_fast);
-        Animation slideDownAnimationFour = AnimationUtils.loadAnimation(this, R.anim.slide_down_fast);
-        slideDownAnimationOne.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                toggleOption(1, slideDownAnimationTwo, View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        slideDownAnimationTwo.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                toggleOption(2, slideDownAnimationThree, View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        slideDownAnimationThree.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                toggleOption(3, slideDownAnimationFour, View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        slideDownAnimationFour.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                unBlockOptions();
-                unBlockImage();
-                setUpHints();
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-        toggleOption(0, slideDownAnimationOne, View.VISIBLE);
+        List<Animation> slideDowns = new ArrayList<>();
+        for (int i = 0; i < mOptionLabels.size(); i++) {
+            slideDowns.add(AnimationUtils.loadAnimation(this,R.anim.slide_down_fast));
+        }
+        setOptionSlideDownActions(slideDowns);
+        toggleOption(0, slideDowns.get(0), View.VISIBLE);
     }
 
     private void toggleQuestion(Animation animation, int visibility) {
         if (visibility == View.INVISIBLE) {
+            Timber.d("toggle question");
             mQuestionArea.startAnimation(animation);
             mQuestionArea.setVisibility(visibility);
         } else {
@@ -289,20 +295,40 @@ public class TourActivityOffline extends TourActivityBase {
         option.startAnimation(animation);
     }
 
-    private Observable<Boolean> onPlayersAnswered(boolean b) {
-
-        mScaledImageArea.setVisibility(View.GONE);
-
-        mTimerView.setProgress(ConstantsManager.ROUND_LENGTH);
-        mTimerLabel.setText("0");
-
+    private void onPlayersAnswered() {
+        showEnemiesResults();
+        hideScaledImage();
         if (!hasUserAnswered()) {
             disableHints();
             blockOptions();
             blockImage();
             showRightAnswer();
         }
+        hidePercentage();
+        hideQuestion();
+    }
 
+    private void resetQuestion() {
+        clearOptions();
+        saveQuestionInfo();
+        clearAnswersRatios();
+        dropEnemiesIndicators();
+        dropTime();
+        dropRightAnsweredCount();
+        clearUserSelection();
+        if (isLastQuestion()) {
+            resetRound();
+            return;
+        }
+        addQuestionCount();
+        bindData();
+    }
+
+    private void dropTime() {
+        mCurrentMillisecond.set(0);
+    }
+
+    private void showEnemiesResults() {
         for (int i = 0; i < enemiesCount; i++) {
             Player enemy = mEnemies.get(i);
             TextView indicator = mEnemyAnswerIndicators.get(mEnemiesPositions[i]);
@@ -311,47 +337,46 @@ public class TourActivityOffline extends TourActivityBase {
                     ? R.drawable.green
                     : R.drawable.red);
         }
-
-        return Observable.just(b);
     }
 
-    private Observable<Boolean> resetQuestion(boolean isLast) {
+    private boolean isLastQuestion() {
+        return mCurrentQuestionNumber == ConstantsManager.ROUND_QUESTIONS_COUNT;
+    }
 
-        hidePercentage();
-        hideQuestion();
-        clearOptions();
+    private void addQuestionCount() {
+        mCurrentQuestionNumber++;
+    }
 
-        if(mCurrentQuestion != null) {
-            mCurrentQuestion.setIsPlayed(1);
-            mCurrentQuestion.setIsRightAnswered(!hasUserAnswered() || !isUserAnswerCorrect() ? 0 : 1);
-            double answerTime = mUser.getAnswerTime();
-            mCurrentQuestion.setAnswerTime(answerTime/1000);
-            mCurrentQuestion.update();
-            mCurrentQuestion = null;
-        }
-
+    private void clearAnswersRatios() {
         mAnswersRatios.clear();
-        mQuestionLabel.setText("");
-        mCategoryLabel.setText("");
+    }
 
+    private void dropRightAnsweredCount() {
+        mPlayersAnsweredCount = 0;
+    }
+
+    private void clearUserSelection() {
+        mUserOptionLabel = null;
+    }
+
+    private void dropEnemiesIndicators() {
         for (int i = 0; i < enemiesCount; i++) {
             TextView indicator = mEnemyAnswerIndicators.get(mEnemiesPositions[i]);
             indicator.setBackgroundResource(R.drawable.status_new);
             indicator.setText("");
             indicator.setVisibility(View.GONE);
         }
+    }
 
-        mQuestionImage.setVisibility(View.GONE);
-        mQuestionLabelBottom.setVisibility(View.GONE);
-        mQuestionLabel.setVisibility(View.GONE);
-
-        mCurrentMillisecond.set(0);
-        mUser.setAnswerTime(0);
-
-        mPlayersAnsweredCount = 0;
-        mUserOptionLabel = null;
-
-        return Observable.just(isLast);
+    private void saveQuestionInfo() {
+        if (mCurrentQuestion != null) {
+            mCurrentQuestion.setIsPlayed(1);
+            mCurrentQuestion.setIsRightAnswered(!hasUserAnswered() || !isUserAnswerCorrect() ? 0 : 1);
+            double answerTime = mUser.getAnswerTime();
+            mCurrentQuestion.setAnswerTime(answerTime / 1000);
+            mCurrentQuestion.update();
+            mCurrentQuestion = null;
+        }
     }
 
     private void resetRound() {
@@ -361,7 +386,7 @@ public class TourActivityOffline extends TourActivityBase {
 
         List<Player> players = new ArrayList<>();
         players.add(new Player(mUser));
-        for(Player enemy:mEnemies) {
+        for (Player enemy : mEnemies) {
             Player player = new Player(enemy);
             players.add(player);
         }
@@ -375,7 +400,7 @@ public class TourActivityOffline extends TourActivityBase {
         Player[] pls = new Player[players.size()];
         pls = players.toArray(pls);
 
-        ResultsActivity_.intent(this).parcelablePlayers(pls).tourNumber(mCurrentTour-1).start();
+        ResultsActivity_.intent(this).parcelablePlayers(pls).tourNumber(mCurrentTour - 1).start();
     }
 
     private void setUpSupportingLabels() {
@@ -383,7 +408,20 @@ public class TourActivityOffline extends TourActivityBase {
         mQuestionNumberLabel.setText(String.format(Locale.getDefault(), "%s %d", mDefaultQuestionText, mCurrentQuestionNumber));
     }
 
-    private Observable<Boolean> onTick(long lap) {
+    private void onTick(long lap) {
+        int interval = hasUserAnswered()
+                ? ConstantsManager.COUNTDOWN_INTERVAL_BOOST * ConstantsManager.SPEED_BOOST
+                : COUNTDOWN_INTERVAL_NORMAL;
+        if (mCurrentMillisecond.addAndGet(interval)/1000 - (mCurrentMillisecond.get() - interval)/1000 > 0) {
+            mTimerLabel.setText(String.valueOf((ConstantsManager.ROUND_LENGTH - mCurrentMillisecond.get()) / 1000));
+        }
+        mTimerView.setProgress(mCurrentMillisecond.get());
+        Timber.d(String.valueOf(mCurrentMillisecond.get()));
+        if (!hasEnemiesAnswered()) checkIfEnemiesAnswered(interval);
+    }
+
+    /*
+        private Observable<Boolean> onTick(long lap) {
         mTimerView.setProgress(mCurrentMillisecond.addAndGet(ConstantsManager.COUNTDOWN_INTERVAL_NORMAL));
         if (mCurrentMillisecond.get() % 1000 == 0) {
             mTimerLabel.setText(String.valueOf((ConstantsManager.ROUND_LENGTH - mCurrentMillisecond.get())/1000));
@@ -398,6 +436,7 @@ public class TourActivityOffline extends TourActivityBase {
         if (!hasEnemiesAnswered()) checkIfEnemiesAnswered(ConstantsManager.COUNTDOWN_INTERVAL_BOOST * ConstantsManager.SPEED_BOOST);
         return Observable.just(isTimeLeft());
     }
+     */
 
     private boolean isTimeLeft() {
         return mCurrentMillisecond.get() < ConstantsManager.ROUND_LENGTH;
@@ -407,7 +446,7 @@ public class TourActivityOffline extends TourActivityBase {
     private void checkIfEnemiesAnswered(int interval) {
         for (int i = 0; i < enemiesCount; i++) {
             Player enemy = mEnemies.get(i);
-            if (enemy.getAnswerTime()/interval == mCurrentMillisecond.get()/interval){
+            if (enemy.getAnswerTime() / interval == mCurrentMillisecond.get() / interval) {
                 TextView indicator = mEnemyAnswerIndicators.get(mEnemiesPositions[i]);
                 indicator.setText(String.valueOf(++mPlayersAnsweredCount));
                 indicator.setVisibility(View.VISIBLE);
@@ -429,6 +468,7 @@ public class TourActivityOffline extends TourActivityBase {
     }
 
     private void setAnswersRatioCombinations() {
+        setUpDefaultAnswersRatio();
         List<Integer> startRatio = new ArrayList<>(Arrays.asList(0, 0, 0, 0));
         List<Player> copyEnemies = new ArrayList<>(mEnemies);
         Collections.sort(copyEnemies);
@@ -439,7 +479,7 @@ public class TourActivityOffline extends TourActivityBase {
 
             List<Integer> outRatio = new ArrayList<>();
             for (int i = 0; i < startRatio.size(); i++) {
-                outRatio.add((startRatio.get(i)  * 100 / (k + 1)));
+                outRatio.add((startRatio.get(i) * 100 / (k + 1)));
             }
 
             mAnswersRatios.add(outRatio);
@@ -508,7 +548,7 @@ public class TourActivityOffline extends TourActivityBase {
     }
 
     private void hidePercentage() {
-        if(mOptionPercents.get(0).getVisibility() == View.VISIBLE) {
+        if (mOptionPercents.get(0).getVisibility() == View.VISIBLE) {
             Animation slideOutLeft = AnimationUtils.loadAnimation(this, R.anim.slide_out_right);
             for (TextView percent : mOptionPercents) {
                 percent.startAnimation(slideOutLeft);
@@ -537,70 +577,17 @@ public class TourActivityOffline extends TourActivityBase {
         }
     }
 
-    private void startQuestion() {
-        mSubscription = getQuestionCycle()
-                .subscribe(isLast -> {},
-                        throwable -> Timber.d(throwable.getLocalizedMessage()),
-                        () -> {
-                            if (mCurrentQuestionNumber == ConstantsManager.ROUND_QUESTIONS_COUNT) {
-                                resetRound();
-                            } else {
-                                mCurrentQuestionNumber++;
-                                startQuestion();
-                            }
-                        });
-    }
-
-    private void continueQuestion() {
-        mSubscription = startTimer(mCurrentQuestion)
-                .subscribe(isLast -> Timber.d("isLast"),
-                        throwable -> Timber.d(throwable.getLocalizedMessage()),
-                        () -> {
-                            if (mCurrentQuestionNumber == ConstantsManager.ROUND_QUESTIONS_COUNT) {
-                                resetRound();
-                            } else {
-                                mCurrentQuestionNumber++;
-                                startQuestion();
-                            }
-                        });
-    }
-
-    private Observable<Boolean> getQuestionCycle() {
-        return getQuestion()
-                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(this::bindData)
-                .delay(2, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread())
-                .flatMap(this::startTimer);
-    }
-
-    private Observable<Boolean> startTimer(Question question) {
-        return Observable
-                .interval(ConstantsManager.COUNTDOWN_INTERVAL_NORMAL, TimeUnit.MILLISECONDS)
+    private void startTimer(int interval) {
+        mSubscription = Observable.interval(interval, TimeUnit.MILLISECONDS)
+                .takeWhile(lap -> isTimeLeft())
                 .observeOn(AndroidSchedulers.mainThread())
-                .flatMap(this::onTick)
-                .takeWhile(userAnswered -> !userAnswered && isTimeLeft())
-                .concatWith(Observable
-                        .interval(ConstantsManager.COUNTDOWN_INTERVAL_BOOST, TimeUnit.MILLISECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .flatMap(this::onBoost))
-                .takeWhile(timeLeft -> isTimeLeft())
-                .concatWith(Observable
-                        .just(true)
-                        .flatMap(this::onPlayersAnswered)
-                        .delay(2, TimeUnit.SECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .flatMap(this::resetQuestion)
-                        .delay(1, TimeUnit.SECONDS)
-                        .observeOn(AndroidSchedulers.mainThread()));
+                .subscribe(this::onTick,throwable -> Timber.d(throwable.getClass().getName()),this::onPlayersAnswered);
     }
 
-    private Observable<Question> getQuestion() {
-        Question question = mQuestions.get((mCurrentTour - 1)
-                *ConstantsManager.ROUND_QUESTIONS_COUNT
+    private void setQuestion() {
+        mCurrentQuestion = mQuestions.get((mCurrentTour - 1)
+                * ConstantsManager.ROUND_QUESTIONS_COUNT
                 + mCurrentQuestionNumber - 1);
-        return question == null
-                ? Observable.error(new RuntimeException("No question"))
-                : Observable.just(question);
     }
 
     private List<Integer> getVisibleOptions(List<TextView> options) {
@@ -613,7 +600,13 @@ public class TourActivityOffline extends TourActivityBase {
     }
 
     @Override
+    protected void boostTimer() {
+        mSubscription.unsubscribe();
+        startTimer(ConstantsManager.COUNTDOWN_INTERVAL_BOOST);
+    }
+
+    @Override
     protected List<Player> getEnemies() {
-        return Player.get(enemiesCount,bet);
+        return Player.get(enemiesCount, bet);
     }
 }

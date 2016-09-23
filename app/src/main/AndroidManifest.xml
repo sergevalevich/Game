@@ -21,6 +21,11 @@
                   android:screenOrientation="portrait">
         </activity>
 
+        <activity android:name=".ui.activities.TestTourActivity_"
+                  android:theme="@style/AppTheme.NoActionBar"
+                  android:screenOrientation="portrait">
+        </activity>
+
         <activity android:name="com.balinasoft.clever.ui.activities.OfflineGameConfigActivity_"
                   android:theme="@style/AppTheme.NoActionBar"
                   android:screenOrientation="portrait"

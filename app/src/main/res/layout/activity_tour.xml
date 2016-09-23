@@ -53,7 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:textColor="@color/white"
                 android:textSize="@dimen/enemy_name_text_size"
                 tools:text="Староста"/>
@@ -99,7 +99,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:textColor="@color/white"
                 android:textSize="@dimen/enemy_name_text_size"
                 tools:text="Плуто"/>
@@ -144,7 +144,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:textColor="@color/white"
                 android:textSize="@dimen/enemy_name_text_size"
                 tools:text="GreenSnake"/>
@@ -189,7 +189,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:textColor="@color/white"
                 android:textSize="@dimen/enemy_name_text_size"
                 tools:text="Староста"/>
@@ -234,7 +234,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:textColor="@color/white"
                 android:textSize="@dimen/enemy_name_text_size"
                 tools:text="Староста"/>
@@ -431,7 +431,7 @@
                             android:maxLength="6"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:singleLine="true"
+                            android:maxLines="1"
                             android:gravity="center"
                             android:textColor="@color/colorAccent"
                             android:textSize="@dimen/score_text_size_small"

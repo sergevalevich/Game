@@ -14,8 +14,8 @@ public interface ConstantsManager {
 
     int ROUND_LENGTH = 25000;//25 seconds
     int COUNTDOWN_INTERVAL_NORMAL = 50;//millis
-    int COUNTDOWN_INTERVAL_BOOST = 20;
-    int SPEED_BOOST = 15;
+    int COUNTDOWN_INTERVAL_BOOST = 25;
+    int SPEED_BOOST = 10;
 
     int MAX_QUESTIONS_COUNT = 21;
     int ROUND_QUESTIONS_COUNT = 7;
@@ -30,12 +30,10 @@ public interface ConstantsManager {
     int INIT_SCORE = 100;
     int MAX_BONUS = 30;
 
-    String QUESTION_STATS_JOB_TAG = "QUESTIONS_STATS_JOB";
-
-    String USERS_STATS_JOB_TAG = "USERS_STATS_JOB";
-
     String AVATAR_DIALOG_TAG = "choose_image";
 
 
     String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+
+    int USER_ID = 1;
 }

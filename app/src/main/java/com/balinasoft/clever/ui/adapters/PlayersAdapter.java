@@ -95,7 +95,7 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayersH
         void bind(Player player) {
             mPlaceLabel.setText(String.valueOf(getAdapterPosition()));
 
-            if (player.getName().equals(getUserName()) && player.getAnswerTime() == 0)
+            if (player.getName().equals(getUserName()) && player.getId() == ConstantsManager.USER_ID)
                 mPlaceLabel.setBackgroundResource(R.drawable.place2);
             mPlayerImage.setBackgroundResource(player.getImageResId());
             mPlayerName.setText(player.getName());

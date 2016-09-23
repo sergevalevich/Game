@@ -1,25 +1,51 @@
 package com.balinasoft.clever.model;
 
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Timer {
 
     private TickHandler mTickHandler;
 
-    private long mCurrentMillis = 0;
+    private int mInterval;
 
-    public void start(long interval, long length) {
-        long startTime = System.currentTimeMillis();
-        long prevMillis = 0;
-        while (mCurrentMillis - startTime < length) {
-            mCurrentMillis = System.currentTimeMillis();
-            if (mCurrentMillis != prevMillis && mCurrentMillis % interval == 0) {
-                mTickHandler.onTick(mCurrentMillis);
-            }
-            prevMillis = mCurrentMillis;
-        }
+    private int mLength;
+
+    private AtomicInteger mCurrentMillis = new AtomicInteger();
+
+    public Timer(TickHandler tickHandler, int interval, int length) {
+        mTickHandler = tickHandler;
+        mInterval = interval;
+        mLength = length;
     }
 
-    public long getCurrentMillis() {
-        return mCurrentMillis;
+    public void start() {
+        long startTime = System.currentTimeMillis();
+        long currentTime;
+        long prevMillis = 0;
+        do {
+            currentTime = System.currentTimeMillis();
+            if (currentTime != prevMillis && currentTime % mInterval == 0) {
+                onTick();
+            }
+            prevMillis = currentTime;
+        } while (currentTime - startTime < mLength);
+    }
+
+    public int getCurrentMillis() {
+        return mCurrentMillis.get();
+    }
+
+    public void setInterval(int interval) {
+        mInterval = interval;
+    }
+
+    public void setLength(int length) {
+        mLength = length;
+    }
+
+    private void onTick() {
+        if(mTickHandler != null) {
+            mTickHandler.onTick(mCurrentMillis.addAndGet(mInterval));
+        }
     }
 }
