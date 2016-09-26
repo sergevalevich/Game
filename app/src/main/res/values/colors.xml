@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#5b3e6d</color>
-    <color name="colorPrimaryDark">#6A1B9A</color>
+    <color name="colorPrimaryDark">#6a1b9a</color>
     <color name="colorAccent">#ffde76</color>
     <color name="colorAccentDark">#fecf05</color>
     <color name="white">#ffffff</color>
     <color name="transparent">#00000000</color>
     <color name="opaque">#ffffffff</color>
     <color name="round_fill">#33000000</color>
+    <color name="input_fill">#BF474747</color>
+    <color name="text_accent_second">#953FCB</color>
+    <color name="text_accent">#963fcc</color>
     <color name="bg_dialog">#212121</color>
     <color name="colorAnswerRight">#71ae40</color>
     <color name="colorAnswerWrong">#F44336</color>
-    <color name="colorAnswerSelected">#FFEB3B</color>
-    <color name="colorButton">#BF9165ac</color>
+    <color name="colorAnswerSelected">#ffeb3b</color>
+    <color name="colorButton">#bf9165ac</color>
     <color name="colorCongrats">#ff7e00</color>
     <color name="dark_gray">#424242</color>
     <color name="transparent_tour">#CC000000</color>

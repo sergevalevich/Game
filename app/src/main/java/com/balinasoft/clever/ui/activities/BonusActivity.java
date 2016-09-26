@@ -9,9 +9,11 @@ import android.widget.TextView;
 
 import com.balinasoft.clever.GameApplication;
 import com.balinasoft.clever.R;
+import com.balinasoft.clever.util.AnimationHelper;
 import com.balinasoft.clever.util.ConstantsManager;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
@@ -38,6 +40,9 @@ public class BonusActivity extends BaseActivity {
     @ViewById(R.id.bonus_label_next)
     TextView mNextBonusLabel;
 
+    @Bean
+    AnimationHelper mAnimationHelper;
+
     @AfterViews
     void setUpViews() {
         setUpBonus();
@@ -60,23 +65,11 @@ public class BonusActivity extends BaseActivity {
     private void showBonus() {
         Animation scaleBonus = AnimationUtils.loadAnimation(this,R.anim.scale);
         Animation scaleNextBonus = AnimationUtils.loadAnimation(this,R.anim.scale);
-        scaleBonus.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
+        mAnimationHelper.setAnimationListener(scaleBonus, () -> {
+            mBonusAreaNext.setVisibility(View.VISIBLE);
+            mBonusAreaNext.startAnimation(scaleNextBonus);
+        },null,null);
 
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                mBonusAreaNext.setVisibility(View.VISIBLE);
-                mBonusAreaNext.startAnimation(scaleNextBonus);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
         mBonusArea.setVisibility(View.VISIBLE);
         mBonusArea.startAnimation(scaleBonus);
     }

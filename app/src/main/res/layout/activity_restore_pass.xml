@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/root"
+                android:background="@drawable/back">
+
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:theme="?attr/actionBarTheme"
+        android:minHeight="?attr/actionBarSize"
+        android:id="@+id/toolbar"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="15"
+        android:gravity="center"
+        android:layout_below="@+id/toolbar">
+
+        <EditText
+            android:layout_weight="1"
+            style="@style/InputStyle"
+            android:hint="@string/email"
+            android:id="@+id/email"
+            android:maxLength="254"
+            android:inputType="textEmailAddress"/>
+
+        <TextView
+            android:layout_weight="1"
+            style="@style/ButtonStyleAuth"
+            android:text="@string/send_pass"
+            android:id="@+id/input_button"/>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/transparent_loading"
+        android:background="@color/round_fill"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
+
+</RelativeLayout>

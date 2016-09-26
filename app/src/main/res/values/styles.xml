@@ -26,20 +26,24 @@
         <item name="android:textSize">@dimen/secondary_text_size</item>
         <item name="android:textStyle">bold|italic</item>
         <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
     </style>
 
-    <style name="OptionStyleSmall" parent="OptionStyle">
-        <item name="android:textSize">@dimen/secondary_text_size_small</item>
-    </style>
-
-    <style name="OptionStyleLarge" parent="OptionStyle">
-        <item name="android:textSize">@dimen/secondary_text_large</item>
-        <item name="android:background">@drawable/round_option_big</item>
-    </style>
-
-    <style name="OptionStyleXLarge" parent="OptionStyle">
-        <item name="android:textSize">@dimen/secondary_text_xlarge</item>
-        <item name="android:background">@drawable/round_option_big</item>
+    <style name="InputStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/round_input</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">@dimen/secondary_text_size</item>
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:paddingLeft">@dimen/input_field_side_padding</item>
+        <item name="android:paddingRight">@dimen/input_field_side_padding</item>
+        <item name="android:alpha">0.70</item>
+        <item name="android:textColorHint">@color/white</item>
+        <item name="android:layout_marginBottom">@dimen/input_bottom_margin</item>
+        <item name="android:layout_marginLeft">@dimen/input_side_margin</item>
+        <item name="android:layout_marginRight">@dimen/input_side_margin</item>
     </style>
 
     <style name="OptionFrameStyle">
@@ -50,40 +54,21 @@
         <item name="android:layout_marginRight">@dimen/option_side_margin</item>
     </style>
 
-    <style name="OptionFrameStyleXLarge" parent="OptionFrameStyle">
-        <item name="android:layout_marginBottom">@dimen/option_bottom_margin_xlarge</item>
-        <item name="android:layout_marginLeft">@dimen/option_side_margin_xlarge</item>
-        <item name="android:layout_marginRight">@dimen/option_side_margin_xlarge</item>
-    </style>
-
-    <!--<style name="ButtonStyle">-->
-    <!--<item name="android:background">@drawable/play_button</item>-->
-    <!--<item name="android:layout_height">@dimen/button_height</item>-->
-    <!--<item name="android:textSize">@dimen/primary_text_size</item>-->
-    <!--<item name="android:layout_width">match_parent</item>-->
-    <!--<item name="android:textColor">@color/white</item>-->
-    <!--<item name="android:textStyle">bold|italic</item>-->
-    <!--<item name="android:gravity">center</item>-->
-    <!--</style>-->
-
     <style name="ButtonStyle">
         <item name="android:background">@drawable/play_button</item>
         <item name="android:layout_height">@dimen/button_height</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:textSize">@dimen/primary_text_size</item>
-        <item name="android:layout_width">0dp</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textStyle">bold|italic</item>
         <item name="android:gravity">center</item>
     </style>
 
-    <style name="ButtonStyleLarge" parent="ButtonStyle">
-        <item name="android:layout_height">@dimen/button_height_large</item>
-        <item name="android:textSize">@dimen/primary_text_size_large</item>
-    </style>
-
-    <style name="ButtonStyleXLarge" parent="ButtonStyle">
-        <item name="android:layout_height">@dimen/button_height_large</item>
-        <item name="android:textSize">@dimen/primary_text_size_xlarge</item>
+    <style name="ButtonStyleAuth" parent="ButtonStyle">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">@dimen/input_bottom_margin</item>
+        <item name="android:layout_marginLeft">@dimen/input_side_margin</item>
+        <item name="android:layout_marginRight">@dimen/input_side_margin</item>
     </style>
 
     <style name="PercentStyle">
@@ -98,15 +83,10 @@
         <item name="android:layout_marginRight">@dimen/option_percent_label_end_margin</item>
     </style>
 
-    <style name="PercentStyleBig" parent="PercentStyle">
-        <item name="android:textSize">@dimen/secondary_text_large</item>
+    <style name="ConfigPlayerIconStyle">
+        <item name="android:layout_width">@dimen/config_players_icon_small</item>
+        <item name="android:layout_height">@dimen/config_players_icon_small</item>
+        <item name="android:layout_marginRight">@dimen/config_players_icon_small_end_margin</item>
     </style>
 
-    <style name="PercentStyleLarge" parent="PercentStyle">
-        <item name="android:textSize">@dimen/secondary_text_xlarge</item>
-    </style>
-
-    <style name="PercentStyleSmall" parent="PercentStyle">
-        <item name="android:textSize">@dimen/secondary_text_size_small</item>
-    </style>
 </resources>

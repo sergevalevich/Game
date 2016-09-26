@@ -9,7 +9,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/stars_1200_1920">
+        android:background="@drawable/stars">
     </FrameLayout>
 
     <TextView
@@ -18,7 +18,7 @@
         android:textSize="@dimen/congrats_text_size"
         android:textColor="@color/colorCongrats"
         android:gravity="center"
-        android:layout_marginTop="@dimen/congrats_top_margin_small"
+        android:layout_marginTop="@dimen/congrats_top_margin"
         android:textStyle="bold|italic"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
@@ -107,9 +107,9 @@
         android:id="@+id/cup"
         android:layout_below="@+id/score_bar"
         android:layout_width="@dimen/cup_width"
-        android:layout_height="@dimen/cup_height_small"
+        android:layout_height="@dimen/cup_height"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/cup_top_margin_small"
+        android:layout_marginTop="@dimen/cup_top_margin"
         tools:src = "@drawable/firstplace"/>
 
 </RelativeLayout>

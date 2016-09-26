@@ -3,9 +3,16 @@
        android:shape="rectangle">
 
     <corners
-        android:radius="@dimen/corner_radius_input_field"/>
+        android:radius="@dimen/default_corner_radius"/>
     <gradient
-        android:startColor="@color/dark_gray"
-        android:endColor="@color/dark_gray"/>
+        android:startColor="@color/input_fill"
+        android:endColor="@color/input_fill"/>
+
+    <stroke
+        android:width="@dimen/default_border_width"
+        android:dashGap="0dp"
+        android:color="@color/colorPrimary">
+
+    </stroke>
 
 </shape>

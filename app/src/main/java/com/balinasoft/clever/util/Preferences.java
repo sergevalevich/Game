@@ -41,4 +41,19 @@ public interface Preferences {
 
     @DefaultLong(value = 0)
     long launchTime();
+
+    @DefaultString(value = "")
+    String vkToken();
+
+    @DefaultString(value = "")
+    String facebookToken();
+
+    @DefaultString(value = "")
+    String deviceToken();
+
+    @DefaultString(value = "")
+    String cleverToken();
+
+    @DefaultString(value = ConstantsManager.DEFAULT_USER_ID)
+    String userId();
 }

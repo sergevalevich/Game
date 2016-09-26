@@ -20,6 +20,7 @@ import org.androidannotations.annotations.res.StringRes;
 
 import java.util.Locale;
 
+import static com.balinasoft.clever.GameApplication.getUserId;
 import static com.balinasoft.clever.GameApplication.getUserName;
 
 @EActivity(R.layout.activity_results)
@@ -107,7 +108,7 @@ public class ResultsActivity extends BaseActivity {
         int points = 0;
         for(int i = 0; i<mPlayers.length; i++) {
             Player player = mPlayers[i];
-            if(player.getName().equals(getUserName()) && player.getId() == ConstantsManager.USER_ID) {
+            if(player.getName().equals(getUserName()) && player.getId().equals(getUserId())) {
                 place = i;
                 coins = player.getCoinsPortion();
                 points = player.getTotalScore();
@@ -146,7 +147,7 @@ public class ResultsActivity extends BaseActivity {
         int playersPlace = 0;
         for(int i = 0; i<mPlayers.length; i++) {
             Player player = mPlayers[i];
-            if(player.getName().equals(getUserName()) && player.getId() == ConstantsManager.USER_ID) playersPlace = i+1;
+            if(player.getName().equals(getUserName()) && player.getId().equals(getUserId())) playersPlace = i+1;
         }
         if(playersPlace == 2) congratsStart += ConstantsManager.CONGRATS_ENDING;
 

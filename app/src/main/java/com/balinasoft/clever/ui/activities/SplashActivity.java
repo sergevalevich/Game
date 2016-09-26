@@ -5,18 +5,17 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
-import com.balinasoft.clever.GameApplication;
 import com.balinasoft.clever.R;
+import com.balinasoft.clever.util.AnimationHelper;
 import com.balinasoft.clever.util.ConstantsManager;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-
-import timber.log.Timber;
 
 import static com.balinasoft.clever.GameApplication.getBonus;
 import static com.balinasoft.clever.GameApplication.getLastAppLaunchDay;
@@ -32,44 +31,18 @@ public class SplashActivity extends BaseActivity {
     @ViewById(R.id.logo)
     ImageView mLogo;
 
+    @Bean
+    AnimationHelper mAnimationHelper;
+
     @AfterViews
     void showLogo() {
         Animation fadeIn = AnimationUtils.loadAnimation(this,R.anim.fade_in_logo);
         Animation fadeOut = AnimationUtils.loadAnimation(this,R.anim.fade_out_logo);
-        fadeIn.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                mLogo.startAnimation(fadeOut);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-
-        fadeOut.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                mLogo.setVisibility(View.INVISIBLE);
-                checkBonus();
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
+        mAnimationHelper.setAnimationListener(fadeIn, () -> mLogo.startAnimation(fadeOut),null,null);
+        mAnimationHelper.setAnimationListener(fadeOut, () -> {
+            mLogo.setVisibility(View.INVISIBLE);
+            checkBonus();
+        },null,null);
 
         mLogo.setVisibility(View.VISIBLE);
         mLogo.startAnimation(fadeIn);

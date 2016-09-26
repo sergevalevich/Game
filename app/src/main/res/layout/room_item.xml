@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/players_places_padding"
+                tools:background="@drawable/back">
+
+    <ImageView
+        android:id="@+id/host_image"
+        android:layout_width="@dimen/results_image_size"
+        android:layout_height="@dimen/results_image_size"
+        android:layout_marginRight="@dimen/config_players_icon_small_end_margin"
+        android:layout_marginEnd="@dimen/config_players_icon_small_end_margin"
+        tools:src="@drawable/first_girl_profile_flat_icon_med"/>
+
+    <LinearLayout
+        android:id="@+id/top_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/host_image"
+        android:layout_toRightOf="@+id/host_image"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_weight="1"
+            android:id="@+id/name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="@dimen/primary_text_size"
+            android:maxLines="1"
+            android:maxLength="11"
+            android:ellipsize="end"
+            tools:text="Новичок1222"/>
+
+        <TextView
+            android:id="@+id/bet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/players_end_margin_default"
+            android:layout_marginRight="@dimen/players_end_margin_default"
+            android:textColor="@color/colorAccentDark"
+            android:textSize="@dimen/place_text_size"
+            android:textStyle="bold"
+            android:maxLength="3"
+            tools:text="100"/>
+
+        <ImageView
+            android:id="@+id/coin"
+            android:layout_width="@dimen/points_size"
+            android:layout_height="@dimen/points_size"
+            android:src="@drawable/clevercoin"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/players_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/host_image"
+        android:layout_toEndOf="@+id/host_image"
+        android:layout_toRightOf="@+id/host_image"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            style="@style/ConfigPlayerIconStyle"
+            tools:src="@drawable/first_girl_profile_flat_icon_med"
+            android:id="@+id/player_one"/>
+
+
+        <ImageView
+            style="@style/ConfigPlayerIconStyle"
+            tools:src="@drawable/first_girl_profile_flat_icon_med"
+            android:id="@+id/player_two"/>
+
+
+        <ImageView
+            style="@style/ConfigPlayerIconStyle"
+            tools:src="@drawable/first_girl_profile_flat_icon_med"
+            android:id="@+id/player_three"/>
+
+
+        <ImageView
+            style="@style/ConfigPlayerIconStyle"
+            tools:src="@drawable/first_girl_profile_flat_icon_med"
+            android:id="@+id/player_four"/>
+
+
+        <ImageView
+            style="@style/ConfigPlayerIconStyle"
+            tools:src="@drawable/first_girl_profile_flat_icon_med"
+            android:id="@+id/player_five"/>
+
+        <TextView
+            android:id="@+id/play_button"
+            android:background="@drawable/round_play_button"
+            android:layout_width="match_parent"
+            android:textColor="@color/white"
+            android:text="@string/play"
+            android:textSize="@dimen/secondary_text_size"
+            android:gravity="center"
+            android:layout_height="@dimen/config_play_button_height"
+            android:layout_marginStart="@dimen/config_players_icon_small_end_margin"
+            android:layout_marginLeft="@dimen/config_players_icon_small_end_margin"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

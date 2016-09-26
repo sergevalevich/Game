@@ -14,7 +14,9 @@ import com.balinasoft.clever.eventbus.events.AvatarSelectedEvent;
 import com.balinasoft.clever.eventbus.events.UserNameSelectedEvent;
 import com.balinasoft.clever.services.QuestionStatsService_;
 import com.balinasoft.clever.services.UserStatsService_;
+import com.balinasoft.clever.ui.dialogs.AvatarDialog;
 import com.balinasoft.clever.ui.dialogs.AvatarDialog_;
+import com.balinasoft.clever.util.AnimationHelper;
 import com.balinasoft.clever.util.ConstantsManager;
 import com.squareup.otto.Subscribe;
 
@@ -32,6 +34,7 @@ import static com.balinasoft.clever.GameApplication.getUserCoins;
 import static com.balinasoft.clever.GameApplication.getUserImage;
 import static com.balinasoft.clever.GameApplication.getUserName;
 import static com.balinasoft.clever.GameApplication.getUserScore;
+import static com.balinasoft.clever.GameApplication.isAuthTokenExists;
 import static com.balinasoft.clever.GameApplication.setSessionTime;
 
 @EActivity(R.layout.activity_enter)
@@ -45,6 +48,9 @@ public class EnterActivity extends BaseActivity {
 
     @ViewById(R.id.offline_game_btn)
     TextView mOfflineGameButton;
+
+    @ViewById(R.id.online_game_btn)
+    TextView mOnlineGameButton;
 
     @ViewById(R.id.user_image)
     ImageView mUserImage;
@@ -67,6 +73,11 @@ public class EnterActivity extends BaseActivity {
     @Bean
     DataManager mDataManager;
 
+    @Bean
+    AnimationHelper mAnimationHelper;
+
+    private AvatarDialog mDialog;
+
     @AfterViews
     void setUpViews() {
         setUpUserImage();
@@ -75,7 +86,13 @@ public class EnterActivity extends BaseActivity {
 
     @Click(R.id.offline_game_btn)
     void onOfflinePicked() {
-        navigateToGameConfig();
+        navigateToOfflineGameConfig();
+    }
+
+    @Click(R.id.online_game_btn)
+    void onOnlinePicked() {
+        if(isAuthTokenExists()) navigateToOnlineGameConfig();
+        else navigateToLogin();
     }
 
     @Click(R.id.user_image)
@@ -103,6 +120,7 @@ public class EnterActivity extends BaseActivity {
         unSubscribeBus();
         mLogo.setVisibility(View.INVISIBLE);
         mOfflineGameButton.setVisibility(View.INVISIBLE);
+        mOnlineGameButton.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -130,10 +148,14 @@ public class EnterActivity extends BaseActivity {
     }
 
     private void showDialog() {
-        AvatarDialog_.builder()
-                .currentName(getUserName())
-                .build()
-                .show(getSupportFragmentManager(), ConstantsManager.AVATAR_DIALOG_TAG);
+        if(mDialog == null)
+            mDialog = createDialog();
+        mDialog.setCurrentName(getUserName());
+        mDialog.show(getSupportFragmentManager(), ConstantsManager.AVATAR_DIALOG_TAG);
+    }
+
+    private AvatarDialog createDialog() {
+        return AvatarDialog_.builder().build();
     }
 
     private void setUpUserPoints() {
@@ -156,50 +178,38 @@ public class EnterActivity extends BaseActivity {
 
         Animation slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
         Animation scaleLogo = AnimationUtils.loadAnimation(this, R.anim.scale);
-        Animation scaleButton = AnimationUtils.loadAnimation(this, R.anim.scale);
+        Animation slideInLeft = AnimationUtils.loadAnimation(this, R.anim.slide_in_left);
+        Animation slideInRight = AnimationUtils.loadAnimation(this, R.anim.slide_in_right);
 
+        mAnimationHelper.setAnimationListener(slideDownAnimation, null, () -> {
+            mToolbar.setVisibility(View.VISIBLE);
+            mLogo.setVisibility(View.VISIBLE);
+            mLogo.startAnimation(scaleLogo);
+        },null);
 
-        slideDownAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                mToolbar.setVisibility(View.VISIBLE);
-                mLogo.setVisibility(View.VISIBLE);
-                mLogo.startAnimation(scaleLogo);
-            }
+        mAnimationHelper.setAnimationListener(scaleLogo, () -> {
+            mOfflineGameButton.setVisibility(View.VISIBLE);
+            mOfflineGameButton.startAnimation(slideInLeft);
+        },null,null);
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-
-        scaleLogo.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                mOfflineGameButton.setVisibility(View.VISIBLE);
-                mOfflineGameButton.startAnimation(scaleButton);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
+        mAnimationHelper.setAnimationListener(slideInLeft, null, () -> {
+            mOnlineGameButton.setVisibility(View.VISIBLE);
+            mOnlineGameButton.startAnimation(slideInRight);
+        },null);
 
         mToolbar.startAnimation(slideDownAnimation);
     }
 
-    private void navigateToGameConfig() {
+    private void navigateToOfflineGameConfig() {
         OfflineGameConfigActivity_.intent(this).start().withAnimation(R.anim.enter_pull_in, R.anim.exit_fade_out);
+    }
+
+    private void navigateToOnlineGameConfig() {
+        OnlineConfigActivity_.intent(this).start().withAnimation(R.anim.enter_pull_in, R.anim.exit_fade_out);
+    }
+
+    private void navigateToLogin() {
+        LoginActivity_.intent(this).start();
     }
 
     private void sendStats() {

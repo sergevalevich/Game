@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:orientation="vertical"
+                android:id="@+id/root"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/back">
+
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:theme="?attr/actionBarTheme"
+        android:minHeight="?attr/actionBarSize"
+        android:id="@+id/toolbar"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:id="@+id/register_area"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:gravity="center"
+        android:paddingLeft="@dimen/register_area_hor_pad"
+        android:paddingRight="@dimen/register_area_hor_pad"
+        android:layout_height="@dimen/reister_area_height">
+
+        <TextView
+            android:id="@+id/reg_prompt"
+            android:text="@string/are_you_registered"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/secondary_text_size"
+            android:maxLines="1"/>
+
+        <TextView
+            android:id="@+id/reg_action"
+            android:text="@string/register_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/text_accent"
+            android:textSize="@dimen/secondary_text_size"
+            android:maxLines="1"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="13"
+        android:gravity="center"
+        android:layout_below="@+id/toolbar"
+        android:layout_above="@+id/register_area"
+        android:paddingTop="@dimen/login_top_padding">
+
+        <EditText
+            android:layout_weight="1"
+            style="@style/InputStyle"
+            android:hint="@string/email"
+            android:id="@+id/email"
+            android:maxLength="254"
+            android:inputType="textEmailAddress"/>
+
+        <EditText
+            android:layout_weight="1"
+            style="@style/InputStyle"
+            android:hint="@string/password"
+            android:id="@+id/password"
+            android:inputType="textPassword"/>
+
+        <TextView
+            android:layout_weight="1"
+            style="@style/ButtonStyleAuth"
+            android:text="@string/login"
+            android:id="@+id/input_button"/>
+
+        <LinearLayout
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_width="@dimen/social_image_size"
+                android:layout_height="@dimen/social_image_size"
+                app:srcCompat="@drawable/facebook"
+                android:layout_marginRight="@dimen/social_divider"
+                android:layout_marginEnd="@dimen/social_divider"
+                android:id="@+id/facebook"/>
+
+            <ImageView
+                android:layout_width="@dimen/social_image_size"
+                android:layout_height="@dimen/social_image_size"
+                app:srcCompat="@drawable/vk"
+                android:id="@+id/vk"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/password_restore"
+            android:text="@string/forgot_pass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal|bottom"
+            android:textSize="@dimen/secondary_text_size"
+            android:textColor="@color/text_accent_second"
+            android:maxLines="1"/>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/transparent_loading"
+        android:background="@color/round_fill"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
+
+</RelativeLayout>

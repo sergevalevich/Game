@@ -1,13 +1,14 @@
 package com.balinasoft.clever;
 
 import android.content.Context;
-import android.provider.Settings;
 
 import com.balinasoft.clever.network.RestService;
+import com.balinasoft.clever.network.model.DefaultResponseModel;
 import com.balinasoft.clever.network.model.LastUpdateModel;
+import com.balinasoft.clever.network.model.LogInModel;
 import com.balinasoft.clever.network.model.QuestionApiModel;
 import com.balinasoft.clever.network.model.QuestionsStatsModel;
-import com.balinasoft.clever.network.model.StatsResponseModel;
+import com.balinasoft.clever.network.model.RegisterModel;
 import com.balinasoft.clever.storage.model.Question;
 import com.balinasoft.clever.util.ConstantsManager;
 import com.balinasoft.clever.util.NetworkStateChecker;
@@ -33,6 +34,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Response;
 import rx.Observable;
 
+import static com.balinasoft.clever.GameApplication.getDeviceToken;
 import static com.balinasoft.clever.GameApplication.getLaunchTime;
 import static com.balinasoft.clever.GameApplication.getSessionLength;
 import static com.balinasoft.clever.GameApplication.getUserCoins;
@@ -80,11 +82,11 @@ public class DataManager {
                 .flatMap(statsResponse -> statsResponse.body().getSuccess() == 1 ? setQuestionsSent() : Observable.empty());
     }
 
-    public Observable<Response<StatsResponseModel>> sendUserStats() {
+    public Observable<Response<DefaultResponseModel>> sendUserStats() {
         return isUserCheckedIn() ? sendUserData() : checkInAndSendUserStats();
     }
 
-    private Observable<Response<StatsResponseModel>> sendUserData() {
+    private Observable<Response<DefaultResponseModel>> sendUserData() {
         return mRestService.sendUserStats(getDeviceToken(),
                 getSessionLength(),
                 getUserCoins(),
@@ -92,15 +94,15 @@ public class DataManager {
                 mTimeFormatter.formatTime(getLaunchTime()));
     }
 
-    private Observable<Response<StatsResponseModel>> checkInAndSendUserStats() {
+    private Observable<Response<DefaultResponseModel>> checkInAndSendUserStats() {
         return mRestService.checkIn(getDeviceToken())
                 .flatMap(statsResponse ->
-                        statsResponse.body().getSuccess() == 1
+                        statsResponse.body().getSuccess() == 1 || statsResponse.body().getMessage().equals(ConstantsManager.DEVICE_ALREADY_CHECKED_IN_MSG)
                                 ? setUserCheckedIn(statsResponse).flatMap(response -> sendUserData())
                                 : Observable.empty());
     }
 
-    private Observable<Response<StatsResponseModel>> setUserCheckedIn(Response<StatsResponseModel> responseModel) {
+    private Observable<Response<DefaultResponseModel>> setUserCheckedIn(Response<DefaultResponseModel> responseModel) {
         GameApplication.setUserCheckedIn(true);
         return Observable.just(responseModel);
     }
@@ -244,6 +246,19 @@ public class DataManager {
         }
     }
 
+    ///////////////////AUTH///////////////////////
+
+    public Observable<LogInModel> logIn(String email, String password) {
+        return mRestService.logIn(email,password);
+    }
+
+    public Observable<RegisterModel> register(String deviceToken, String email, String password) {
+        return mRestService.register(deviceToken, email, password);
+    }
+
+    public Observable<DefaultResponseModel> restore(String email) {
+        return mRestService.restore(email);
+    }
     ///////////////////STATS//////////////////////
 
     private Observable<Question> setQuestionsSent() {
@@ -273,12 +288,8 @@ public class DataManager {
         mFreshAnsweredQuestions = questions;
     }
 
-    private String getDeviceToken() {
-        return Settings.Secure.getString(mContext.getContentResolver(),
-                Settings.Secure.ANDROID_ID);
-    }
-
     private boolean isNetworkAvailable() {
         return mNetworkStateChecker.isNetworkAvailable();
     }
+
 }

@@ -14,14 +14,17 @@ import android.widget.TextView;
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.model.Player;
 import com.balinasoft.clever.storage.model.Question;
+import com.balinasoft.clever.util.AnimationHelper;
 import com.balinasoft.clever.util.ConstantsManager;
 
 import org.androidannotations.annotations.AfterExtras;
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.ViewsById;
+import org.androidannotations.annotations.res.DimensionRes;
 import org.androidannotations.annotations.res.StringRes;
 
 import java.util.ArrayList;
@@ -124,6 +127,9 @@ public abstract class TourActivityBase extends BaseActivity {
     @StringRes(R.string.question_label_text)
     String mDefaultQuestionText;
 
+    @DimensionRes(R.dimen.default_corner_radius)
+    float mCornerRadius;
+
     @Extra
     int enemiesCount;
 
@@ -132,6 +138,9 @@ public abstract class TourActivityBase extends BaseActivity {
 
     @Extra
     Parcelable[] parcelableQuestions;
+
+    @Bean
+    AnimationHelper mAnimationHelper;
 
     int[] mEnemiesPositions;
 
@@ -201,6 +210,7 @@ public abstract class TourActivityBase extends BaseActivity {
     private void setUpOptions() {
         for (TextView option : mOptionLabels) {
             option.setOnClickListener(view -> acceptAnswer(option));
+            option.setClickable(false);
         }
     }
 

@@ -14,6 +14,7 @@ import com.balinasoft.clever.util.ConstantsManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.balinasoft.clever.GameApplication.getUserId;
 import static com.balinasoft.clever.GameApplication.getUserName;
 
 
@@ -92,10 +93,10 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayersH
             ButterKnife.bind(this, itemView);
         }
 
-        void bind(Player player) {
+        private void bind(Player player) {
             mPlaceLabel.setText(String.valueOf(getAdapterPosition()));
 
-            if (player.getName().equals(getUserName()) && player.getId() == ConstantsManager.USER_ID)
+            if (player.getName().equals(getUserName()) && player.getId().equals(getUserId()))
                 mPlaceLabel.setBackgroundResource(R.drawable.place2);
             mPlayerImage.setBackgroundResource(player.getImageResId());
             mPlayerName.setText(player.getName());

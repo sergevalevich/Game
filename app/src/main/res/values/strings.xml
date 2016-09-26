@@ -5,10 +5,11 @@
     <string name="tour_label_text">Тур</string>
     <string name="question_label_text">Вопрос</string>
     <string name="network_error_message">Ошибка при загрузке данных</string>
+    <string name="auth_error_message">Ошибка при авторизации</string>
     <string name="network_unavailbale_message">Сеть недоступна</string>
     <string name="try_again_message">Повторить</string>
     <string name="enter_title_text">Вход</string>
-    <string name="offline">Играть</string>
+    <string name="offline">Игра Offline</string>
     <string name="online">Игра Online</string>
     <string name="players_number_label">Количество соперников:</string>
     <string name="players_min">1</string>
@@ -35,4 +36,23 @@
     <string name="get_yesterday">Завтра вы сможете получить уже</string>
     <string name="play_every_day">Играйте каждый день!</string>
     <string name="support_head">Завтра мы вам подарим</string>
+    <string name="are_you_registered">Вы ещё не зарегистрированы ?</string>
+    <string name="register_action">Регистрация</string>
+    <string name="email">Введите ваш E-mail</string>
+    <string name="password">Введите пароль</string>
+    <string name="login">Войти</string>
+    <string name="forgot_pass">Забыли пароль ?</string>
+    <string name="password_repeat">Повторите пароль</string>
+    <string name="sign_up">Зарегистрироваться</string>
+    <string name="send_pass">Выслать новый пароль</string>
+    <string name="sign_up_title">Регистрация</string>
+    <string name="login_title">Вход</string>
+    <string name="restore">Восстановление пароля</string>
+    <string name="vk_fail">Не удалось войти с помощью VK</string>
+    <string name="facebook_fail">Не удалось войти с помощью facebook</string>
+    <integer name="com_vk_sdk_AppId">5642338</integer>
+    <string name="facebook_app_id">1205436472847362</string>
+    <string name="fb_login_protocol_scheme">fb1205436472847362</string>
+    <string name="restore_error">Ошибка при восстановлении пароля</string>
+    <string name="play">Играть</string>
 </resources>

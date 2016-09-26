@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.EditText;
 
-import com.balinasoft.clever.GameApplication;
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.eventbus.EventBus;
 import com.balinasoft.clever.eventbus.events.AvatarSelectedEvent;
@@ -23,7 +22,6 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
-import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
 import static com.balinasoft.clever.GameApplication.setUserImage;
@@ -35,13 +33,12 @@ public class AvatarDialog extends DialogFragment implements DialogInterface.OnDi
     @ViewById(R.id.userName_field)
     EditText mUserNameField;
 
-    @FragmentArg
-    String currentName;
-
     @Bean
     EventBus mEventBus;
 
     private int mCurrentSelection;
+
+    private String mCurrentName;
 
     @Click(R.id.avatar_one)
     void onFirstAvatarSelected() {
@@ -70,7 +67,7 @@ public class AvatarDialog extends DialogFragment implements DialogInterface.OnDi
 
     @AfterViews
     void setUpDialog() {
-        mUserNameField.setText(currentName);
+        mUserNameField.setText(mCurrentName);
     }
 
     @Nullable
@@ -105,5 +102,9 @@ public class AvatarDialog extends DialogFragment implements DialogInterface.OnDi
     private void onAvatarSelected(int selectedResId) {
         mCurrentSelection = selectedResId;
         mEventBus.post(new AvatarSelectedEvent(mCurrentSelection));
+    }
+
+    public void setCurrentName(String userName) {
+        mCurrentName = userName;
     }
 }

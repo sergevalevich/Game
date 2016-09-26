@@ -2,8 +2,10 @@ package com.balinasoft.clever.network;
 
 
 import com.balinasoft.clever.network.model.LastUpdateModel;
+import com.balinasoft.clever.network.model.LogInModel;
 import com.balinasoft.clever.network.model.QuestionApiModel;
-import com.balinasoft.clever.network.model.StatsResponseModel;
+import com.balinasoft.clever.network.model.DefaultResponseModel;
+import com.balinasoft.clever.network.model.RegisterModel;
 import com.balinasoft.clever.util.ConstantsManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -67,20 +69,31 @@ public class RestService {
         return mGameApi.getLastUpdate();
     }
 
-    public Observable<Response<StatsResponseModel>> sendQuestionsStats(String json) {
+    public Observable<Response<DefaultResponseModel>> sendQuestionsStats(String json) {
         return mGameApi.sendQuestionsStats(json);
     }
 
-    public Observable<Response<StatsResponseModel>> sendUserStats(String token,
-                                                                  long sessionTime,
-                                                                  int userCoins,
-                                                                  int userScore,
-                                                                  String launchTime) {
+    public Observable<Response<DefaultResponseModel>> sendUserStats(String token,
+                                                                    long sessionTime,
+                                                                    int userCoins,
+                                                                    int userScore,
+                                                                    String launchTime) {
         return mGameApi.sendUserStats(token, sessionTime, userCoins, userScore, launchTime);
     }
 
-    public Observable<Response<StatsResponseModel>> checkIn(String token) {
+    public Observable<Response<DefaultResponseModel>> checkIn(String token) {
         return mGameApi.checkIn(token);
     }
 
+    public Observable<LogInModel> logIn(String email, String password) {
+        return mGameApi.logIn(email,password);
+    }
+
+    public Observable<RegisterModel> register(String deviceToken, String email, String password) {
+        return mGameApi.register(deviceToken, email, password);
+    }
+
+    public Observable<DefaultResponseModel> restore(String email) {
+        return mGameApi.restore(email);
+    }
 }

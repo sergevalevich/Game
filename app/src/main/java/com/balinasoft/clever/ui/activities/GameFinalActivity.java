@@ -1,6 +1,5 @@
 package com.balinasoft.clever.ui.activities;
 
-import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;

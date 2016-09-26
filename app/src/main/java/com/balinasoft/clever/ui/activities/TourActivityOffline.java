@@ -40,13 +40,13 @@ public class TourActivityOffline extends TourActivityBase {
     protected void onResume() {
         super.onResume();
         if (mCurrentQuestion == null) bindData();
-        else startTimer(hasUserAnswered() ? ConstantsManager.COUNTDOWN_INTERVAL_BOOST : ConstantsManager.COUNTDOWN_INTERVAL_NORMAL);
+        else startTimer();
     }
 
     @Override
-    protected void onStop() {
+    protected void onPause() {
         if (mSubscription != null && !mSubscription.isUnsubscribed()) mSubscription.unsubscribe();
-        super.onStop();
+        super.onPause();
     }
 
     @Click(R.id.question_image)
@@ -100,7 +100,7 @@ public class TourActivityOffline extends TourActivityBase {
 
     private void setUpMediaQuestion() {
         String path = getFilesDir() + File.separator + mCurrentQuestion.getMediaPath();
-        int cornerRadius = (int) (16 / Resources.getSystem().getDisplayMetrics().density);
+        int cornerRadius = (int) (mCornerRadius / Resources.getSystem().getDisplayMetrics().density);
         Glide.with(this).load(path).crossFade()
                 .bitmapTransform(new RoundedCornersTransformation(this, cornerRadius, 0))
                 .into(mQuestionImage);
@@ -152,22 +152,7 @@ public class TourActivityOffline extends TourActivityBase {
 
     private void showQuestion() {
         Animation slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
-        slideDownAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                showOptions();
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
+        mAnimationHelper.setAnimationListener(slideDownAnimation, this::showOptions,null,null);
         toggleQuestion(slideDownAnimation, View.VISIBLE);
     }
 
@@ -188,54 +173,26 @@ public class TourActivityOffline extends TourActivityBase {
     }
 
     private void setQuestionSlideUpAction(Animation slideUpQuestionAnimation, int firstOptionPosition, Animation optionAnimation) {
-        slideUpQuestionAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                Timber.d("On Question slideUp Finished");
-                mQuestionImage.setVisibility(View.GONE);
-                mQuestionLabelBottom.setVisibility(View.GONE);
-                mQuestionLabel.setVisibility(View.GONE);
-                toggleOption(firstOptionPosition, optionAnimation, View.INVISIBLE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
+        mAnimationHelper.setAnimationListener(slideUpQuestionAnimation, () -> {
+            mQuestionImage.setVisibility(View.GONE);
+            mQuestionLabelBottom.setVisibility(View.GONE);
+            mQuestionLabel.setVisibility(View.GONE);
+            toggleOption(firstOptionPosition, optionAnimation, View.INVISIBLE);
+        },null,null);
     }
 
     private void setOptionSlideUpActions(List<Animation> slideUps, List<Integer> visibleOptions) {
         for (int i = 0; i < slideUps.size(); i++) {
             Animation slideUp = slideUps.get(i);
             final int nextVisibleOption = i + 1;
-            slideUp.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
+            mAnimationHelper.setAnimationListener(slideUp, () -> {
+                if(nextVisibleOption == slideUps.size()) {
+                    resetQuestion();
                 }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    if(nextVisibleOption == slideUps.size()) {
-                        resetQuestion();
-                    }
-                    else toggleOption(visibleOptions.get(
-                            nextVisibleOption),
-                            slideUps.get(nextVisibleOption),
-                            View.INVISIBLE);
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
+                else toggleOption(visibleOptions.get(nextVisibleOption),
+                        slideUps.get(nextVisibleOption),
+                        View.INVISIBLE);
+            },null,null);
         }
     }
 
@@ -243,29 +200,16 @@ public class TourActivityOffline extends TourActivityBase {
         for(int i = 0; i < slideDowns.size(); i++) {
             Animation slideDown = slideDowns.get(i);
             int nextOptionPosition = i+1;
-            slideDown.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
+            mAnimationHelper.setAnimationListener(slideDown, () -> {
+                if(nextOptionPosition == slideDowns.size()) {
+                    startTimer();
+                    unBlockOptions();
+                    unBlockImage();
+                    setUpHints();
+                } else {
+                    toggleOption(nextOptionPosition, slideDowns.get(nextOptionPosition), View.VISIBLE);
                 }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    if(nextOptionPosition == slideDowns.size()) {
-                        startTimer(COUNTDOWN_INTERVAL_NORMAL);
-                        unBlockOptions();
-                        unBlockImage();
-                        setUpHints();
-                    } else {
-                        toggleOption(nextOptionPosition, slideDowns.get(nextOptionPosition), View.VISIBLE);
-                    }
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
+            },null,null);
         }
     }
 
@@ -420,28 +364,9 @@ public class TourActivityOffline extends TourActivityBase {
         if (!hasEnemiesAnswered()) checkIfEnemiesAnswered(interval);
     }
 
-    /*
-        private Observable<Boolean> onTick(long lap) {
-        mTimerView.setProgress(mCurrentMillisecond.addAndGet(ConstantsManager.COUNTDOWN_INTERVAL_NORMAL));
-        if (mCurrentMillisecond.get() % 1000 == 0) {
-            mTimerLabel.setText(String.valueOf((ConstantsManager.ROUND_LENGTH - mCurrentMillisecond.get())/1000));
-        }
-        if (!hasEnemiesAnswered()) checkIfEnemiesAnswered(ConstantsManager.COUNTDOWN_INTERVAL_NORMAL);
-        return Observable.just(hasUserAnswered());
-    }
-
-    private Observable<Boolean> onBoost(long lap) {
-        mTimerView.setProgress(mCurrentMillisecond.addAndGet(ConstantsManager.COUNTDOWN_INTERVAL_BOOST * ConstantsManager.SPEED_BOOST));
-        mTimerLabel.setText(String.valueOf((ConstantsManager.ROUND_LENGTH - (mCurrentMillisecond.get()))/1000));
-        if (!hasEnemiesAnswered()) checkIfEnemiesAnswered(ConstantsManager.COUNTDOWN_INTERVAL_BOOST * ConstantsManager.SPEED_BOOST);
-        return Observable.just(isTimeLeft());
-    }
-     */
-
     private boolean isTimeLeft() {
         return mCurrentMillisecond.get() < ConstantsManager.ROUND_LENGTH;
     }
-
 
     private void checkIfEnemiesAnswered(int interval) {
         for (int i = 0; i < enemiesCount; i++) {
@@ -577,8 +502,8 @@ public class TourActivityOffline extends TourActivityBase {
         }
     }
 
-    private void startTimer(int interval) {
-        mSubscription = Observable.interval(interval, TimeUnit.MILLISECONDS)
+    private void startTimer() {
+        mSubscription = Observable.interval(getInterval(), TimeUnit.MILLISECONDS)
                 .takeWhile(lap -> isTimeLeft())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::onTick,throwable -> Timber.d(throwable.getClass().getName()),this::onPlayersAnswered);
@@ -599,10 +524,16 @@ public class TourActivityOffline extends TourActivityBase {
         return visibleOptions;
     }
 
+    private int getInterval() {
+        return hasUserAnswered()
+                ? ConstantsManager.COUNTDOWN_INTERVAL_BOOST
+                : ConstantsManager.COUNTDOWN_INTERVAL_NORMAL;
+    }
+
     @Override
     protected void boostTimer() {
         mSubscription.unsubscribe();
-        startTimer(ConstantsManager.COUNTDOWN_INTERVAL_BOOST);
+        startTimer();
     }
 
     @Override
