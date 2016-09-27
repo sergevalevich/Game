@@ -1,11 +1,16 @@
 package com.balinasoft.clever.ui.activities;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.support.design.widget.Snackbar;
+import android.util.Base64;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.balinasoft.clever.DataManager;
 import com.balinasoft.clever.R;
@@ -18,6 +23,7 @@ import com.balinasoft.clever.ui.dialogs.AvatarDialog;
 import com.balinasoft.clever.ui.dialogs.AvatarDialog_;
 import com.balinasoft.clever.util.AnimationHelper;
 import com.balinasoft.clever.util.ConstantsManager;
+import com.crashlytics.android.Crashlytics;
 import com.squareup.otto.Subscribe;
 
 import org.androidannotations.annotations.AfterViews;
@@ -25,6 +31,10 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.Signature;
 
 import timber.log.Timber;
 

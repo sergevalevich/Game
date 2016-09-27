@@ -6,7 +6,6 @@ import android.widget.EditText;
 
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.network.model.LogInModel;
-import com.jakewharton.rxbinding.widget.RxTextView;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -35,12 +34,15 @@ public class SignUpActivity extends AuthActivity {
     }
 
     @Override
-    Observable<Boolean> getFieldsChanges() {
-        return Observable.combineLatest(
-                RxTextView.textChanges(mEmailField).map(email -> email.toString().trim()),
-                RxTextView.textChanges(mPasswordField).map(pass -> pass.toString().trim()),
-                RxTextView.textChanges(mPasswordRepeatField).map(pass -> pass.toString().trim()),
-                (email, password, repeatedPass) -> mInputFieldValidator.isEmailValid(email) && mInputFieldValidator.isPasswordValid(password) && password.equals(repeatedPass));
+    boolean isInputValid() {
+        return mInputFieldValidator.isEmailValid(mEmailField.getText().toString().trim())
+                && mInputFieldValidator.isPasswordValid(mPasswordField.getText().toString().trim())
+                && mPasswordField.getText().toString().trim().equals(mPasswordRepeatField.getText().toString().trim());
+    }
+
+    @Override
+    void onInputInvalid() {
+        notifyUserWith(mInvalidInputMessage);
     }
 
     @Override

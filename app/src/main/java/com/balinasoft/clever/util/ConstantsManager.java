@@ -53,5 +53,9 @@ public interface ConstantsManager {
             new Room(Player.get(2,30),30,Player.getUser(30)),
             new Room(Player.get(4,10),10,Player.getUser(10)),
             new Room(Player.get(2,30),30,Player.getUser(30)),
+            new Room(Player.get(4,10),10,Player.getUser(10)),
+            new Room(Player.get(2,30),30,Player.getUser(30)),
+            new Room(Player.get(2,30),30,Player.getUser(30)),
+            new Room(Player.get(4,10),10,Player.getUser(10)),
             new Room(Player.get(3,20),20,Player.getUser(20))));
 }

@@ -55,4 +55,6 @@
     <string name="fb_login_protocol_scheme">fb1205436472847362</string>
     <string name="restore_error">Ошибка при восстановлении пароля</string>
     <string name="play">Играть</string>
+    <string name="auth_success">Авторизация прошла успешно!</string>
+    <string name="invalid_input">Проверьте введённые данные!</string>
 </resources>

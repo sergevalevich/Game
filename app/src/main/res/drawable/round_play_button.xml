@@ -6,7 +6,7 @@
         android:radius="@dimen/default_corner_radius"/>
 
     <gradient
-        android:startColor="@color/colorButton"
-        android:endColor="@color/colorButton"/>
+        android:startColor="@color/purple_light"
+        android:endColor="@color/purple_light"/>
 
 </shape>

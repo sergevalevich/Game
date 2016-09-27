@@ -5,6 +5,7 @@ import android.support.design.widget.Snackbar;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.balinasoft.clever.DataManager;
 import com.balinasoft.clever.R;
@@ -67,6 +68,9 @@ public abstract class AuthActivity extends InputActivity {
     @StringRes(R.string.auth_error_message)
     String mAuthErrorMessage;
 
+    @StringRes(R.string.auth_success)
+    String mAuthSuccessMessage;
+
     @Bean
     DataManager mDataManager;
 
@@ -87,9 +91,27 @@ public abstract class AuthActivity extends InputActivity {
         super.onResume();
     }
 
-    @Click(R.id.input_button)
-    void auth() {
-        hideKeyBoard();
+    @Click(R.id.vk)
+    void logInWithVk() {
+        if(mIsInteractionAllowed) {
+            disableInteraction();
+            showTransparentBg();
+            VKSdk.login(this);
+        }
+    }
+
+    @Click(R.id.facebook)
+    void logInWithFacebook() {
+        if(mIsInteractionAllowed) {
+            disableInteraction();
+            showTransparentBg();
+            if (mFbLoginManager == null) configureFacebookLogIn();
+            mFbLoginManager.logInWithReadPermissions(AuthActivity.this, ConstantsManager.FACEBOOK_PERMISSIONS);
+        }
+    }
+
+    @Override
+    void handleInput() {
         if(mIsInteractionAllowed) {
             if (mNetworkStateChecker.isNetworkAvailable()) {
                 disableInteraction();
@@ -117,31 +139,6 @@ public abstract class AuthActivity extends InputActivity {
                 notifyUserWith(mNetworkUnavailableMessage);
             }
         }
-    }
-
-    @Click(R.id.vk)
-    void logInWithVk() {
-        if(mIsInteractionAllowed) {
-            disableInteraction();
-            showTransparentBg();
-            VKSdk.login(this);
-        }
-    }
-
-    @Click(R.id.facebook)
-    void logInWithFacebook() {
-        if(mIsInteractionAllowed) {
-            disableInteraction();
-            showTransparentBg();
-            if (mFbLoginManager == null) configureFacebookLogIn();
-            mFbLoginManager.logInWithReadPermissions(AuthActivity.this, ConstantsManager.FACEBOOK_PERMISSIONS);
-        }
-    }
-
-    @Override
-    void unSubscribe() {
-        super.unSubscribe();
-        if (mAuthSub != null && !mAuthSub.isUnsubscribed()) mAuthSub.unsubscribe();
     }
 
     @Override
@@ -193,12 +190,18 @@ public abstract class AuthActivity extends InputActivity {
         });
     }
 
+
+    private void unSubscribe() {
+        if (mAuthSub != null && !mAuthSub.isUnsubscribed()) mAuthSub.unsubscribe();
+    }
+
     void notifyUserWith(String message) {
         Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG).show();
     }
 
     private void enter() {
-        EnterActivity_.intent(this)
+        Toast.makeText(this,mAuthSuccessMessage,Toast.LENGTH_LONG).show();
+        EnterActivity_.intent(AuthActivity.this)
                 .flags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 .start();
     }

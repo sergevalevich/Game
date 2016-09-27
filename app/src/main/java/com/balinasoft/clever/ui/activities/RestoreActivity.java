@@ -8,16 +8,13 @@ import android.widget.RelativeLayout;
 
 import com.balinasoft.clever.DataManager;
 import com.balinasoft.clever.R;
-import com.jakewharton.rxbinding.widget.RxTextView;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
-import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.StringRes;
 
-import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -65,15 +62,17 @@ public class RestoreActivity extends InputActivity {
     }
 
     @Override
-    Observable<Boolean> getFieldsChanges() {
-        return RxTextView.textChanges(mEmailField)
-                .map(email -> email.toString().trim())
-                .map(email -> mInputFieldValidator.isEmailValid(email));
+    boolean isInputValid() {
+        return mInputFieldValidator.isEmailValid(mEmailField.getText().toString().trim());
     }
 
-    @Click(R.id.input_button)
-    void sendPass() {
-        hideKeyBoard();
+    @Override
+    void onInputInvalid() {
+        notifyUserWith(mInvalidInputMessage);
+    }
+
+    @Override
+    void handleInput() {
         if(mIsInteractionAllowed) {
             if (mNetworkStateChecker.isNetworkAvailable()) {
                 disableInteraction();
@@ -98,9 +97,7 @@ public class RestoreActivity extends InputActivity {
         }
     }
 
-    @Override
-    void unSubscribe() {
-        super.unSubscribe();
+    private void unSubscribe() {
         if (mRestoreSub != null && !mRestoreSub.isUnsubscribed()) mRestoreSub.unsubscribe();
     }
 

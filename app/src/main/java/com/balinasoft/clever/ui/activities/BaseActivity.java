@@ -23,6 +23,8 @@ public class BaseActivity extends AppCompatActivity {
     @Bean
     NetworkStateChecker mNetworkStateChecker;
 
+    boolean mIsInteractionAllowed;
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -43,6 +45,14 @@ public class BaseActivity extends AppCompatActivity {
 
     private void sendUserStats() {
         if(mNetworkStateChecker.isNetworkAvailable()) UserStatsService_.intent(this).start();
+    }
+
+    void disableInteraction() {
+        mIsInteractionAllowed = false;
+    }
+
+    void enableInteraction() {
+        mIsInteractionAllowed = true;
     }
 
 }

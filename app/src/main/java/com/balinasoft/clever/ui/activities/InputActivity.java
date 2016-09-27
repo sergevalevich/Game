@@ -11,11 +11,10 @@ import com.balinasoft.clever.R;
 import com.balinasoft.clever.util.InputFieldValidator;
 
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
-
-import rx.Observable;
-import rx.Subscription;
+import org.androidannotations.annotations.res.StringRes;
 
 @EActivity
 public abstract class InputActivity extends BaseActivity {
@@ -29,28 +28,23 @@ public abstract class InputActivity extends BaseActivity {
     @Bean
     InputFieldValidator mInputFieldValidator;
 
-    boolean mIsInteractionAllowed;
-
-    private Subscription mFieldsSub;
-
-    void unSubscribe() {
-        if (mFieldsSub != null && !mFieldsSub.isUnsubscribed()) mFieldsSub.unsubscribe();
-    }
+    @StringRes(R.string.invalid_input)
+    String mInvalidInputMessage;
 
     @Override
     protected void onResume() {
         super.onResume();
-        setUpAuthFields();
         hideTransparentBg();
         enableInteraction();
     }
 
-    void disableInteraction() {
-        mIsInteractionAllowed = false;
-    }
-
-    void enableInteraction() {
-        mIsInteractionAllowed = true;
+    @Click(R.id.input_button)
+    void processInput() {
+        hideKeyBoard();
+        if(mIsInteractionAllowed) {
+            if (isInputValid()) handleInput();
+            else onInputInvalid();
+        }
     }
 
     void showTransparentBg() {
@@ -61,7 +55,7 @@ public abstract class InputActivity extends BaseActivity {
         mTransparentBg.setVisibility(View.GONE);
     }
 
-    void hideKeyBoard() {
+    private void hideKeyBoard() {
         View view = this.getCurrentFocus();
         if (view != null) {
             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -69,13 +63,9 @@ public abstract class InputActivity extends BaseActivity {
         }
     }
 
-    abstract Observable<Boolean> getFieldsChanges();
+    abstract boolean isInputValid();
 
-    private void setUpAuthFields() {
-        mFieldsSub = getFieldsChanges().subscribe(this::setAuthButtonEnabled);
-    }
+    abstract void onInputInvalid();
 
-    private void setAuthButtonEnabled(boolean isInputValid) {
-        mInputButton.setEnabled(isInputValid);
-    }
+    abstract void handleInput();
 }

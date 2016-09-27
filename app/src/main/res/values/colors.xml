@@ -19,4 +19,5 @@
     <color name="colorCongrats">#ff7e00</color>
     <color name="dark_gray">#424242</color>
     <color name="transparent_tour">#CC000000</color>
+    <color name="purple_light">#9163AB</color>
 </resources>

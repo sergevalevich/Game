@@ -32,7 +32,8 @@
     <dimen name="game_config_general_padding_small">4dp</dimen>
     <dimen name="game_config_icon_side_padding_side">36dp</dimen>
     <dimen name="game_config_icon_side_padding_side_small">16dp</dimen>
-    <dimen name="config_top_margin">16dp</dimen>
+    <dimen name="config_top_margin">12dp</dimen>
+    <dimen name="config_bottom_margin">12dp</dimen>
     <dimen name="items_bar_top_margin">2dp</dimen>
     <dimen name="items_bar_padding">16dp</dimen>
     <dimen name="man_num_icon">48dp</dimen>
