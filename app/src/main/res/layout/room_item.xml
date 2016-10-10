@@ -100,7 +100,7 @@
             android:layout_width="match_parent"
             android:textColor="@color/white"
             android:text="@string/play"
-            android:textSize="@dimen/secondary_text_size"
+            android:textSize="@dimen/room_join_text_size"
             android:gravity="center"
             android:layout_height="@dimen/config_play_button_height"
             android:layout_marginStart="@dimen/config_players_icon_small_end_margin"

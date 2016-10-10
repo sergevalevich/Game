@@ -7,17 +7,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/back">
+    tools:background="@drawable/back">
+
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/start_game_button_size"
         android:layout_marginBottom="@dimen/start_game_button_size">
 
         <android.support.design.widget.AppBarLayout
-            android:layout_width="match_parent"
             android:id="@+id/config_area"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/toolbar"
             android:background="@color/transparent"
@@ -43,8 +43,8 @@
 
                     <LinearLayout
                         android:id="@+id/players_number_bar"
-                        android:layout_height="wrap_content"
                         android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical">
 
 
@@ -140,8 +140,8 @@
 
                     <LinearLayout
                         android:id="@+id/bet_bar"
-                        android:layout_height="wrap_content"
                         android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical">
 
 
@@ -241,49 +241,46 @@
 
             </android.support.v7.widget.Toolbar>
 
+            <FrameLayout
+                android:id="@+id/empty_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/config_area"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/empty_rooms_top_margin"
+                    android:gravity="center"
+                    android:text="@string/rooms_empty"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/primary_text_size"/>
+
+            </FrameLayout>
+
 
         </android.support.design.widget.AppBarLayout>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/rooms_list"
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/swipe"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/config_area"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        </android.support.v7.widget.RecyclerView>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rooms_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/config_area"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            </android.support.v7.widget.RecyclerView>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
 
     </android.support.design.widget.CoordinatorLayout>
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/start_game_button_size"
-        android:layout_gravity="top"
-        android:background="@color/colorPrimary"
-        android:minHeight="@dimen/start_game_button_size"
-        app:popupTheme="@style/AppTheme.PopupOverlay"
-        app:theme="@style/AppTheme.AppBarOverlay">
-
-    </android.support.v7.widget.Toolbar>
-
-    <!--<com.balinasoft.clever.custom.FooterBarLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="bottom">-->
-
-        <!--<TextView-->
-            <!--android:id="@+id/create_game_button"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="@dimen/start_game_button_size"-->
-            <!--android:layout_gravity="bottom"-->
-            <!--android:background="@drawable/start_game_button"-->
-            <!--android:gravity="center"-->
-            <!--android:text="@string/start_game_title"-->
-            <!--android:textColor="@color/white"-->
-            <!--android:textSize="@dimen/config_text_size"-->
-            <!--android:textStyle="bold|italic"/>-->
-
-    <!--</com.balinasoft.clever.custom.FooterBarLayout>-->
     <TextView
         android:id="@+id/create_game_button"
         android:layout_width="match_parent"
@@ -291,28 +288,29 @@
         android:layout_gravity="bottom"
         android:background="@drawable/start_game_button"
         android:gravity="center"
-        android:text="@string/start_game_title"
+        android:text="@string/create_game_title"
         android:textColor="@color/white"
         android:textSize="@dimen/config_text_size"
         android:textStyle="bold|italic"/>
 
     <FrameLayout
         android:id="@+id/transparent_loading"
-        android:background="@color/round_fill"
-        android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/round_fill"
+        android:visibility="gone">
 
         <me.zhanghai.android.materialprogressbar.MaterialProgressBar
             android:id="@+id/progress_bar"
             style="@style/Widget.MaterialProgressBar.ProgressBar.Large"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:indeterminate="true"
             android:tint="@color/white"
-            android:visibility="gone"
-            android:layout_gravity="center"/>
+            android:visibility="gone"/>
 
     </FrameLayout>
+
 
 </FrameLayout>

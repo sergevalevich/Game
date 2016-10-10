@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout android:id="@+id/root"
+             xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="@drawable/back"
+             android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/back"
+        android:orientation="vertical">
+
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/start_game_button_size"
+            android:background="@color/colorPrimary"
+            android:minHeight="@dimen/start_game_button_size"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:theme="@style/AppTheme.AppBarOverlay">
+
+        </android.support.v7.widget.Toolbar>
+
+
+        <TextView
+            android:id="@+id/connected"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/room_title_top_margin"
+            android:gravity="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/room_title"
+            android:textStyle="bold|italic"
+            tools:text="Подключилось 5 из 6"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@id/players_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <TextView
+            android:id="@+id/start_game_button"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/start_game_button_size"
+            android:background="@drawable/start_game_button"
+            android:gravity="center"
+            android:text="@string/start_game_title"
+            android:textColor="@color/white"
+            android:textSize="@dimen/config_text_size"
+            android:textStyle="bold|italic"/>
+
+
+    </LinearLayout>
+
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/countDownLabel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textColor="@color/colorAccent"
+        android:gravity="center"
+        android:textSize="@dimen/place_text_size_large"
+        tools:text="3"/>
+
+</FrameLayout>

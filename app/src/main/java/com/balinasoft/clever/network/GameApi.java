@@ -5,6 +5,7 @@ import com.balinasoft.clever.network.model.LastUpdateModel;
 import com.balinasoft.clever.network.model.LogInModel;
 import com.balinasoft.clever.network.model.QuestionApiModel;
 import com.balinasoft.clever.network.model.DefaultResponseModel;
+import com.balinasoft.clever.network.model.RatingModel;
 import com.balinasoft.clever.network.model.RegisterModel;
 
 import java.util.List;
@@ -19,7 +20,7 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 import rx.Observable;
 
-public interface GameApi {
+interface GameApi {
     @GET("quests/get")
     Observable<List<QuestionApiModel>> loadQuestions();
 
@@ -37,27 +38,47 @@ public interface GameApi {
 
     @FormUrlEncoded
     @POST("users/stat")
-    Observable<Response<DefaultResponseModel>> sendUserStats(@Field("device_token") String token,
+    Observable<Response<DefaultResponseModel>> sendUserStats(@Field("email") String email,
+                                                             @Field("username") String userName,
                                                              @Field("time_session") long sessionTime,
                                                              @Field("coins") int userCoins,
                                                              @Field("score") int userScore,
                                                              @Field("entry_time") String launchTime);
 
     @FormUrlEncoded
-    @POST("users/check_in")
-    Observable<Response<DefaultResponseModel>> checkIn(@Field("device_token") String token);
+    @POST("users/mobile_login")
+    Observable<LogInModel> logIn(@Field("os") String os,
+                                 @Field("device_token") String token,
+                                 @Field("email") String email,
+                                 @Field("password") String password);
 
     @FormUrlEncoded
     @POST("users/mobile_login")
-    Observable<LogInModel> logIn(@Field("email") String email, @Field("password") String password);
+    Observable<LogInModel> logInWithFb(@Field("os") String os,
+                                       @Field("device_token") String deviceToken,
+                                       @Field("fb_token") String fbToken,
+                                       @Field("email") String email,
+                                       @Field("username") String username);
+
+    @FormUrlEncoded
+    @POST("users/mobile_login")
+    Observable<LogInModel> logInWithVk(@Field("os") String os,
+                                       @Field("device_token") String deviceToken,
+                                       @Field("vk_token") String vkToken,
+                                       @Field("email") String email,
+                                       @Field("username") String username);
 
     @FormUrlEncoded
     @POST("users/register")
-    Observable<RegisterModel> register(@Field("device_token") String token,
+    Observable<RegisterModel> register(@Field("os") String os,
+                                       @Field("device_token") String token,
                                        @Field("email") String email,
                                        @Field("password") String password);
 
     @FormUrlEncoded
     @POST("users/restore")
     Observable<DefaultResponseModel> restore(@Field("email") String email);
+
+    @GET("users/rating")
+    Observable<RatingModel> getRating(@Query("filter") String filter);
 }

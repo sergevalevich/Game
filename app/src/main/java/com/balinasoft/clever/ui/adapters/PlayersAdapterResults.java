@@ -18,7 +18,7 @@ import static com.balinasoft.clever.GameApplication.getUserId;
 import static com.balinasoft.clever.GameApplication.getUserName;
 
 
-public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayersHolder> {
+public class PlayersAdapterResults extends RecyclerView.Adapter<PlayersAdapterResults.PlayersHolder> {
 
     private Player[] mPlayers;
 
@@ -26,7 +26,7 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayersH
 
     private boolean mIsGameFinished = false;
 
-    public PlayersAdapter(Player[] players, int tourNumber) {
+    public PlayersAdapterResults(Player[] players, int tourNumber) {
         mTourNumber = tourNumber;
         Player[] pl = new Player[players.length + 1];
         pl[0] = null;
@@ -96,7 +96,7 @@ public class PlayersAdapter extends RecyclerView.Adapter<PlayersAdapter.PlayersH
         private void bind(Player player) {
             mPlaceLabel.setText(String.valueOf(getAdapterPosition()));
 
-            if (player.getName().equals(getUserName()) && player.getId().equals(getUserId()))
+            if (player.getId().equals(getUserId()))
                 mPlaceLabel.setBackgroundResource(R.drawable.place2);
             mPlayerImage.setBackgroundResource(player.getImageResId());
             mPlayerName.setText(player.getName());

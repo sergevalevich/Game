@@ -89,4 +89,9 @@
         <item name="android:layout_marginRight">@dimen/config_players_icon_small_end_margin</item>
     </style>
 
+    <style name="NavigationTheme" parent="AppTheme">
+        <item name="android:textSize">@dimen/menu_text_size</item>
+        <item name="android:listPreferredItemHeightSmall">@dimen/menu_item_size</item>
+    </style>
+
 </resources>

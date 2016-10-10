@@ -1,10 +1,8 @@
-package com.balinasoft.clever.ui.activities;
+package com.balinasoft.clever.ui.fragments;
 
 import android.graphics.Color;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
+import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -18,7 +16,7 @@ import com.balinasoft.clever.util.ConstantsManager;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
-import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.ViewsById;
 import org.androidannotations.annotations.res.StringRes;
@@ -28,16 +26,11 @@ import java.util.List;
 
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 
-import static com.balinasoft.clever.GameApplication.getUserCoins;
-
-@EActivity
-public abstract class ConfigActivityBase extends BaseActivity {
+@EFragment
+public abstract class ConfigFragmentBase extends Fragment {
 
     @ViewById(R.id.root)
     FrameLayout mRootView;
-
-    @ViewById(R.id.toolbar)
-    Toolbar mToolbar;
 
     @ViewsById({R.id.coin_one, R.id.coin_five, R.id.coin_ten, R.id.coin_twenty, R.id.coin_fifty})
     List<ImageView> mCoins;
@@ -82,7 +75,6 @@ public abstract class ConfigActivityBase extends BaseActivity {
 
     @AfterViews
     void setUpViews() {
-        setupActionBar();
         setUpCoins();
         setUpManIcons();
         setUpOtherViews();
@@ -90,34 +82,16 @@ public abstract class ConfigActivityBase extends BaseActivity {
 
     abstract void setUpOtherViews();
 
-
     @Click(R.id.create_game_button)
     void onCreateGamePressed() {
         if (areEnoughCoins()) createGame();
-        else notifyUserWith(mNotEnoughCoinsMessage);
+        else if(getActivity()!=null) notifyUserWith(mNotEnoughCoinsMessage);
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        overridePendingTransition(R.anim.enter_fade_in, R.anim.exit_push_out);
-    }
-
-    private boolean areEnoughCoins() {
-        return getUserCoins() >= mBet;
-    }
+    abstract boolean areEnoughCoins();
 
     void clearQuestions() {
         mQuestions.clear();
-    }
-
-    private void setupActionBar() {
-        setSupportActionBar(mToolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            setTitle("");
-        }
     }
 
     private void setUpCoins() {
@@ -171,7 +145,6 @@ public abstract class ConfigActivityBase extends BaseActivity {
             mBetValueLabel.setText(String.valueOf(mBet));
         }
     }
-
 
     private int getImageResAt(int position, boolean isHighlighted) {
         switch (position) {

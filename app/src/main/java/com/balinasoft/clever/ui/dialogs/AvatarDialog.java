@@ -24,6 +24,8 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 
+import static com.balinasoft.clever.GameApplication.isAuthTokenExists;
+import static com.balinasoft.clever.GameApplication.setOnlineName;
 import static com.balinasoft.clever.GameApplication.setUserImage;
 import static com.balinasoft.clever.GameApplication.setUserName;
 
@@ -39,6 +41,8 @@ public class AvatarDialog extends DialogFragment implements DialogInterface.OnDi
     private int mCurrentSelection;
 
     private String mCurrentName;
+
+    private boolean mIsAfterOffline;
 
     @Click(R.id.avatar_one)
     void onFirstAvatarSelected() {
@@ -94,9 +98,13 @@ public class AvatarDialog extends DialogFragment implements DialogInterface.OnDi
     private void saveSelections() {
         if(mCurrentSelection != 0) setUserImage(mCurrentSelection);
         String userName = mUserNameField.getText().toString();
-        if(userName.isEmpty()) userName = ConstantsManager.DEFAULT_USER_NAME;
+        boolean isOfflineMode = !isAuthTokenExists() || mIsAfterOffline;
+        if(userName.isEmpty()) userName = isOfflineMode
+                ? ConstantsManager.DEFAULT_USER_NAME
+                : ConstantsManager.DEFAULT_USER_NAME_ONLINE;
         mEventBus.post(new UserNameSelectedEvent(userName));
-        setUserName(userName);
+        if(isOfflineMode) setUserName(userName);
+        else setOnlineName(userName);
     }
 
     private void onAvatarSelected(int selectedResId) {
@@ -106,5 +114,9 @@ public class AvatarDialog extends DialogFragment implements DialogInterface.OnDi
 
     public void setCurrentName(String userName) {
         mCurrentName = userName;
+    }
+
+    public void setAfterOffline(boolean isAfterOffline) {
+        mIsAfterOffline = isAfterOffline;
     }
 }

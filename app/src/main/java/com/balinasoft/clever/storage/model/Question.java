@@ -3,6 +3,7 @@ package com.balinasoft.clever.storage.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.balinasoft.clever.model.IQuestion;
 import com.balinasoft.clever.network.model.QuestionApiModel;
 import com.balinasoft.clever.storage.GameDatabase;
 import com.balinasoft.clever.util.UrlFormatter;
@@ -26,7 +27,7 @@ import rx.Observable;
 @Table(
         database = GameDatabase.class,
         uniqueColumnGroups = {@UniqueGroup(groupNumber = 0, uniqueConflict = ConflictAction.IGNORE)})
-public class Question extends BaseModel implements Parcelable {
+public class Question extends BaseModel implements Parcelable,IQuestion {
 
     @PrimaryKey(autoincrement = true)
     long id;
@@ -149,7 +150,7 @@ public class Question extends BaseModel implements Parcelable {
         return answers;
     }
 
-    public String[] getFormattedAnswers() {
+    public String[] getOptions() {
         return answers.split(",");
     }
 

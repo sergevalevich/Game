@@ -1,6 +1,7 @@
 package com.balinasoft.clever.ui.activities;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -14,18 +15,27 @@ import com.balinasoft.clever.util.ConstantsManager;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.Profile;
+import com.facebook.ProfileTracker;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.vk.sdk.VKAccessToken;
 import com.vk.sdk.VKCallback;
 import com.vk.sdk.VKSdk;
+import com.vk.sdk.api.VKApi;
 import com.vk.sdk.api.VKError;
+import com.vk.sdk.api.VKRequest;
+import com.vk.sdk.api.VKResponse;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.StringRes;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import rx.Observable;
 import rx.Subscription;
@@ -33,10 +43,14 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
-import static com.balinasoft.clever.GameApplication.saveCleverToken;
+import static com.balinasoft.clever.GameApplication.getDeviceToken;
+import static com.balinasoft.clever.GameApplication.getFacebookToken;
+import static com.balinasoft.clever.GameApplication.getUserEmail;
+import static com.balinasoft.clever.GameApplication.getVKToken;
 import static com.balinasoft.clever.GameApplication.saveFacebookToken;
-import static com.balinasoft.clever.GameApplication.saveUserId;
 import static com.balinasoft.clever.GameApplication.saveVkToken;
+import static com.balinasoft.clever.GameApplication.setUserEmail;
+import static com.facebook.Profile.getCurrentProfile;
 
 @EActivity
 public abstract class AuthActivity extends InputActivity {
@@ -96,7 +110,7 @@ public abstract class AuthActivity extends InputActivity {
         if(mIsInteractionAllowed) {
             disableInteraction();
             showTransparentBg();
-            VKSdk.login(this);
+            VKSdk.login(this, ConstantsManager.VK_PERMISSIONS);
         }
     }
 
@@ -111,34 +125,8 @@ public abstract class AuthActivity extends InputActivity {
     }
 
     @Override
-    void handleInput() {
-        if(mIsInteractionAllowed) {
-            if (mNetworkStateChecker.isNetworkAvailable()) {
-                disableInteraction();
-                showTransparentBg();
-                mAuthSub = getAuthStream()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(logInModel -> {
-                            if (logInModel.getSuccess() == 1) {
-                                saveLogInData(logInModel);
-                                enter();
-                            } else {
-                                hideTransparentBg();
-                                enableInteraction();
-                                notifyUserWith(logInModel.getMessage());
-                            }
-                        }, throwable -> {
-                            hideTransparentBg();
-                            enableInteraction();
-                            notifyUserWith(throwable.getLocalizedMessage().isEmpty()
-                                    ? mAuthErrorMessage
-                                    : throwable.getLocalizedMessage());
-                        });
-            } else {
-                notifyUserWith(mNetworkUnavailableMessage);
-            }
-        }
+    void onInputValid() {
+        if (mIsInteractionAllowed) auth(getAuthStream());
     }
 
     @Override
@@ -147,7 +135,8 @@ public abstract class AuthActivity extends InputActivity {
             @Override
             public void onResult(VKAccessToken res) {
                 saveVkToken(res.accessToken);
-                enter();
+                setUserEmail(res.email);
+                getVkFirstName();
             }
 
             @Override
@@ -163,15 +152,87 @@ public abstract class AuthActivity extends InputActivity {
         }
     }
 
+    private void getVkFirstName() {
+        VKRequest request = VKApi.users().get();
+        request.executeWithListener(new VKRequest.VKRequestListener() {
+            @Override
+            public void onComplete(VKResponse response) {
+                auth(logInWithVK(getVkFirstName(response.json)));
+            }
+
+            @Override
+            public void onError(VKError error) {
+                auth(logInWithVK(ConstantsManager.DEFAULT_USER_NAME));
+            }
+        });
+    }
+
+    private String getVkFirstName(JSONObject json) {
+        String firstName = ConstantsManager.DEFAULT_USER_NAME;
+        try {
+            JSONArray array = json.getJSONArray("response");
+            JSONObject user = array.getJSONObject(0);
+            firstName = user.getString("first_name");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return firstName;
+    }
+
+    private void auth(Observable<LogInModel> authStream) {
+        if (mNetworkStateChecker.isNetworkAvailable()) {
+            disableInteraction();
+            showTransparentBg();
+            mAuthSub = authStream
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(logInModel -> {
+                        enter();
+                    }, throwable -> {
+                        hideTransparentBg();
+                        enableInteraction();
+                        notifyUserWith(throwable.getLocalizedMessage().isEmpty()
+                                ? mAuthErrorMessage
+                                : throwable.getLocalizedMessage());
+                    });
+        } else {
+            notifyUserWith(mNetworkUnavailableMessage);
+        }
+    }
+
+    private Observable<LogInModel> logInWithFB(String firstName) {
+        return mDataManager.logInWithFB(getDeviceToken(), getFacebookToken(), getUserEmail(),firstName);
+    }
+
+    private Observable<LogInModel> logInWithVK(String firstName) {
+        return mDataManager.logInWithVK(getDeviceToken(), getVKToken(), getUserEmail(),firstName);
+    }
+
     private void configureFacebookLogIn() {
         mFbLoginManager = LoginManager.getInstance();
         mFbCallbackManager = CallbackManager.Factory.create();
         mFbLoginManager.registerCallback(mFbCallbackManager, new FacebookCallback<LoginResult>() {
+
+            private ProfileTracker mProfileTracker;
+
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Timber.d(loginResult.getAccessToken().getToken());
                 saveFacebookToken(loginResult.getAccessToken().getToken());
-                enter();
+
+                if(Profile.getCurrentProfile() == null) {
+                    Timber.d("PROFILE IS NULL");
+                    mProfileTracker = new ProfileTracker() {
+                        @Override
+                        protected void onCurrentProfileChanged(Profile profile, Profile profile2) {
+                            getFbEmail(loginResult,profile2.getFirstName());
+                            mProfileTracker.stopTracking();
+                        }
+                    };
+                } else {
+                    Timber.d("PROFILE IS NOT NULL");
+                    getFbEmail(loginResult,getCurrentProfile().getFirstName());
+                }
             }
 
             @Override
@@ -190,6 +251,28 @@ public abstract class AuthActivity extends InputActivity {
         });
     }
 
+    private void getFbEmail(LoginResult loginResult, String userName) {
+        GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), (object, response) -> {
+            Bundle facebookData = getFacebookData(object);
+            setUserEmail(facebookData.getString("email"));
+            auth(logInWithFB(userName));
+        });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "email");
+        request.setParameters(parameters);
+        request.executeAsync();
+    }
+
+    private Bundle getFacebookData(JSONObject object) {
+        Bundle bundle = new Bundle();
+        if (object.has("email"))
+            try {
+                bundle.putString("email", object.getString("email"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        return bundle;
+    }
 
     private void unSubscribe() {
         if (mAuthSub != null && !mAuthSub.isUnsubscribed()) mAuthSub.unsubscribe();
@@ -201,14 +284,9 @@ public abstract class AuthActivity extends InputActivity {
 
     private void enter() {
         Toast.makeText(this,mAuthSuccessMessage,Toast.LENGTH_LONG).show();
-        EnterActivity_.intent(AuthActivity.this)
+        MainActivity_.intent(AuthActivity.this)
                 .flags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 .start();
-    }
-
-    private void saveLogInData(LogInModel logInModel) {
-        saveCleverToken(logInModel.getToken());
-        saveUserId(logInModel.getId());
     }
 
     abstract Observable<LogInModel> getAuthStream();

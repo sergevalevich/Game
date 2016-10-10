@@ -1,5 +1,6 @@
 package com.balinasoft.clever.ui.activities;
 
+import android.content.res.Resources;
 import android.os.Parcelable;
 import android.util.SparseBooleanArray;
 import android.view.View;
@@ -12,14 +13,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.balinasoft.clever.R;
+import com.balinasoft.clever.model.IQuestion;
 import com.balinasoft.clever.model.Player;
-import com.balinasoft.clever.storage.model.Question;
 import com.balinasoft.clever.util.AnimationHelper;
 import com.balinasoft.clever.util.ConstantsManager;
+import com.bumptech.glide.Glide;
 
 import org.androidannotations.annotations.AfterExtras;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
@@ -28,10 +31,22 @@ import org.androidannotations.annotations.res.DimensionRes;
 import org.androidannotations.annotations.res.StringRes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
+import rx.Observable;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import timber.log.Timber;
+
+import static com.balinasoft.clever.GameApplication.getUserId;
+import static com.balinasoft.clever.util.ConstantsManager.COUNTDOWN_INTERVAL_NORMAL;
 
 @EActivity(R.layout.activity_tour)
 public abstract class TourActivityBase extends BaseActivity {
@@ -131,170 +146,551 @@ public abstract class TourActivityBase extends BaseActivity {
     float mCornerRadius;
 
     @Extra
-    int enemiesCount;
+    int bet;//////////////////
 
     @Extra
-    int bet;
+    Parcelable[] parcelableQuestions;/////////////
 
     @Extra
-    Parcelable[] parcelableQuestions;
+    Parcelable[] parcelablePlayers;//////////////////
 
     @Bean
-    AnimationHelper mAnimationHelper;
+    AnimationHelper mAnimationHelper;/////////////////
 
-    int[] mEnemiesPositions;
+    int[] mEnemiesPositions;////////////////////
 
-    List<Question> mQuestions = new ArrayList<>();
+    List<Player> mEnemies; ////////////
 
-    Question mCurrentQuestion;
+    int mEnemiesCount;////////
 
-    List<Player> mEnemies;
+    Player mUser; //////////////////
 
-    Player mUser;
+    List<IQuestion> mQuestions;///////////
 
-    int mPlayersAnsweredCount = 0;
+    IQuestion mCurrentQuestion;///////////
 
-    int mRightAnswerPosition;
+    int mPlayersAnsweredCount = 0;////////
 
-    TextView mUserOptionLabel;
+    int mRightAnswerPosition;///////////
 
-    AtomicInteger mCurrentMillisecond = new AtomicInteger(0);
+    TextView mUserOptionLabel;//////////
 
-    SparseBooleanArray mUsedHints = new SparseBooleanArray();
+    AtomicInteger mCurrentMillisecond = new AtomicInteger(0);//////////////
 
-    List<List<Integer>> mAnswersRatios = new ArrayList<>();
+    SparseBooleanArray mUsedHints = new SparseBooleanArray();//////////////
 
-    int mCurrentQuestionNumber = 1;
+    int mCurrentQuestionNumber = 1;////////////
 
-    int mCurrentTour = 1;
+    int mCurrentTour = 1;///////////////
 
-    Subscription mSubscription;
+    Subscription mSubscription;//////////////
+
+    @Override
+    protected void onDestroy() {
+        if (mSubscription != null && !mSubscription.isUnsubscribed()) mSubscription.unsubscribe();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onBackPressed() {}
 
     @AfterExtras
     void setPlayers() {
-        setUser();
-        setEnemies();
-        setEnemiesPositions();
-        setQuestions();
+        mUser = createUser();///////////////////
+        mEnemies = createEnemies();/////////////
+        mEnemiesPositions = getEnemiesPositions();////////////////
+        mQuestions = createQuestions();///////////////
     }
 
     @AfterViews
     void setUpViews() {
-        setUpEnemiesBar();
-        showEnemiesBar();
-        setUpOptions();
+        takeCoins();
+        setUpEnemiesBar();////////
+        showEnemiesBar();////////
+        setUpOptions();/////////
     }
 
-    private void setEnemiesPositions() {
-        switch (enemiesCount) {
-            case 1:
-                mEnemiesPositions = ConstantsManager.ENEMY_ONE;
-                break;
-            case 2:
-                mEnemiesPositions = ConstantsManager.ENEMY_TWO;
-                break;
-            case 3:
-                mEnemiesPositions = ConstantsManager.ENEMY_THREE;
-                break;
-            case 4:
-                mEnemiesPositions = ConstantsManager.ENEMY_FOUR;
-                break;
-            case 5:
-                mEnemiesPositions = ConstantsManager.ENEMY_FIVE;
-                break;
-            default:
-                throw new RuntimeException("Wrong enemies count!");
+    @Click(R.id.question_image)
+    void onImageClicked() {
+        if (mQuestionImage.getVisibility() == View.VISIBLE) showScaledImage();
+    }
+
+    @Click(R.id.scaled_image_area)
+    void onScaledAreaClicked() {
+        hideScaledImage();
+    }
+
+    void acceptAnswer(TextView option) {////////////////
+        setUserAnswerTime();/////////////
+        setUserOptionLabel(option);///////
+        blockOptions();//////////////
+        disableHints();//////////////
+        blockImage();////////////////
+        showRightAnswer();///////////
+        addAnsweredPlayer();////////
+
+
+        if (!isUserAnswerCorrect()) {////////////
+            showWrongAnswer();/////////////////
+        } else {
+            addRightAnswerToUser();///////////////
+            addUserPoints();////////////////////
+            updateScoreLabel();/////////////////
         }
     }
 
-    private void setUpOptions() {
-        for (TextView option : mOptionLabels) {
-            option.setOnClickListener(view -> acceptAnswer(option));
-            option.setClickable(false);
-        }
-    }
-
-    private void acceptAnswer(TextView option) {
-        setUserAnswerTime();
-        setUserOptionLabel(option);
-        addRightAnsweredUsersCount();
-        blockOptions();
-        disableHints();
-        blockImage();
-        showRightAnswer();
-
-
-        boostTimer();
-
-        if (!isUserAnswerCorrect()) {
-            showWrongAnswer();
-            return;
-        }
-        addRightAnswerToUser();
-        addUserPoints();
-        updateScoreLabel();
-    }
-
-    protected abstract void boostTimer();
-
-    protected void blockOptions() {
+    void blockOptions() {//////////////
         for (TextView option : mOptionLabels) {
             option.setClickable(false);
         }
     }
 
-    protected void disableHints() {
+    void disableHints() {/////////////
         for (ImageView hint : mHints) {
             hint.setOnClickListener(null);
         }
     }
 
-    protected void blockImage() {
-        mQuestionImage.setClickable(false);
+    boolean hasEnemiesAnswered() {
+        return mPlayersAnsweredCount == mEnemies.size() && !hasUserAnswered();
     }
 
-    protected boolean isUserAnswerCorrect() {
+    boolean hasUserAnswered() {
+        return mUserOptionLabel != null;
+    }
+
+    boolean haveAllAnswered() {
+        return (mPlayersAnsweredCount == mEnemies.size() + 1) || (mPlayersAnsweredCount == 1 && mEnemiesCount == 0);
+    }
+
+    void boostTimer() {
+        mSubscription.unsubscribe();
+        startTimer();
+    }
+
+    void bindData() {
+        setUpDefaultAnswersRatio();
+        setUpSupportingLabels();
+        setUpTimerViews();
+        setQuestion();
+        setQuestionCategory();
+        setOptions();
+        setQuestionContent();
+        showQuestion();
+    }
+
+    void onTick(long lap) {
+        int interval = isBoost()
+                ? ConstantsManager.COUNTDOWN_INTERVAL_BOOST * ConstantsManager.SPEED_BOOST
+                : COUNTDOWN_INTERVAL_NORMAL;
+        if (mCurrentMillisecond.addAndGet(interval)/1000 - (mCurrentMillisecond.get() - interval)/1000 > 0) {
+            mTimerLabel.setText(String.valueOf((ConstantsManager.ROUND_LENGTH - mCurrentMillisecond.get()) / 1000));
+        }
+        mTimerView.setProgress(mCurrentMillisecond.get());
+    }
+
+    void hideScaledImage() {
+        mScaledImageArea.setVisibility(View.GONE);
+    }
+
+    void resetQuestion() {
+        clearOptions();//
+        dropEnemiesIndicators();//
+        dropTime();//
+        dropRightAnsweredCount();//
+        clearUserSelection();//
+        if (isLastQuestion()) {
+            resetRound();
+            return;
+        }
+        addQuestionCount();
+        if (RESUMED_ACTIVITIES_COUNT > 0) bindData();
+    }
+
+    void startTimer() {
+        mSubscription = Observable.interval(getInterval(), TimeUnit.MILLISECONDS)
+                .takeWhile(lap -> isTimeLeft())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::onTick, throwable -> Timber.d(throwable.getClass().getName()), this::onPlayersAnswered);
+    }
+
+    void onPlayersAnswered() {
+        showEnemiesResults();
+        hideScaledImage();
+        if (!hasUserAnswered()) {
+            disableHints();
+            blockOptions();
+            blockImage();
+            showRightAnswer();
+        }
+        hidePercentage();
+        hideQuestion();
+    }
+
+    private void resetRound() {
+        mCurrentQuestionNumber = 1;
+        mCurrentTour++;
+        onRoundReset();
+    }
+
+    private void clearOptions() {
+        for (TextView option : mOptionLabels) {
+            option.setBackgroundResource(R.drawable.round_option);
+        }
+    }
+
+    private void showScaledImage() {
+        mScaledImageArea.setVisibility(View.VISIBLE);
+    }
+
+    private void dropEnemiesIndicators() {
+        for (int i = 0; i < mEnemies.size(); i++) {
+            TextView indicator = mEnemyAnswerIndicators.get(mEnemiesPositions[i]);
+            indicator.setBackgroundResource(R.drawable.status_new);
+            indicator.setText("");
+            indicator.setVisibility(View.GONE);
+        }
+    }
+
+    private void dropRightAnsweredCount() {
+        mPlayersAnsweredCount = 0;
+    }
+
+    private void clearUserSelection() {
+        mUserOptionLabel = null;
+    }
+
+    private void dropTime() {
+        mCurrentMillisecond.set(0);
+    }
+
+    private boolean isLastQuestion() {
+        return mCurrentQuestionNumber == ConstantsManager.ROUND_QUESTIONS_COUNT;
+    }
+
+    private void addQuestionCount() {
+        mCurrentQuestionNumber++;
+    }
+
+    private void setUpDefaultAnswersRatio() {
+        for (TextView percent : mOptionPercents) {
+            percent.setText("0%");
+        }
+    }
+
+    private void setUpSupportingLabels() {
+        mTourNumberLabel.setText(String.format(Locale.getDefault(), "%s %d", mDefaultTourText, mCurrentTour));
+        mQuestionNumberLabel.setText(String.format(Locale.getDefault(), "%s %d", mDefaultQuestionText, mCurrentQuestionNumber));
+    }
+
+    private void setUpTimerViews() {
+        mTimerLabel.setText(String.valueOf(ConstantsManager.ROUND_LENGTH / 1000));
+        mTimerView.setProgress(0);
+    }
+
+    private void showQuestion() {
+        Animation slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
+        mAnimationHelper.setAnimationListener(slideDownAnimation, this::showOptions, null, null);
+        toggleQuestion(slideDownAnimation, View.VISIBLE);
+    }
+
+    private void showOptions() {
+        List<Animation> slideDowns = new ArrayList<>();
+        for (int i = 0; i < mOptionLabels.size(); i++) {
+            slideDowns.add(AnimationUtils.loadAnimation(this,R.anim.slide_down_fast));
+        }
+        setOptionSlideDownActions(slideDowns);
+        toggleOption(0, slideDowns.get(0), View.VISIBLE);
+    }
+
+    private void setOptionSlideDownActions(List<Animation> slideDowns) {
+        for (int i = 0; i < slideDowns.size(); i++) {
+            Animation slideDown = slideDowns.get(i);
+            int nextOptionPosition = i + 1;
+            mAnimationHelper.setAnimationListener(slideDown, () -> {
+                if (nextOptionPosition == slideDowns.size()) {
+                    startTimer();
+                    unBlockOptions();
+                    unBlockImage();
+                    setUpHints();
+                } else {
+                    toggleOption(nextOptionPosition, slideDowns.get(nextOptionPosition), View.VISIBLE);
+                }
+            }, null, null);
+        }
+    }
+
+    private boolean isTimeLeft() {
+        return mCurrentMillisecond.get() < ConstantsManager.ROUND_LENGTH;
+    }
+
+    private int getInterval() {
+        return isBoost()
+                ? ConstantsManager.COUNTDOWN_INTERVAL_BOOST
+                : ConstantsManager.COUNTDOWN_INTERVAL_NORMAL;
+    }
+
+    private void showPercentage() {
+        Animation slideInRight = AnimationUtils.loadAnimation(this, R.anim.slide_in_right);
+        for (TextView percent : mOptionPercents) {
+            percent.setVisibility(View.VISIBLE);
+            percent.startAnimation(slideInRight);
+        }
+    }
+
+    private void hidePercentage() {
+        if (mOptionPercents.get(0).getVisibility() == View.VISIBLE) {
+            Animation slideOutLeft = AnimationUtils.loadAnimation(this, R.anim.slide_out_right);
+            for (TextView percent : mOptionPercents) {
+                percent.startAnimation(slideOutLeft);
+                percent.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private void hideQuestion() {
+        Animation slideUpQuestionAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_up_fast);
+        slideUpQuestionAnimation.setStartOffset(2000);
+
+        List<Integer> visibleOptions = getVisibleOptions(mOptionLabels);
+        List<Animation> slideUps = new ArrayList<>(visibleOptions.size());
+        for (int i = 0; i < visibleOptions.size(); i++) {
+            slideUps.add(AnimationUtils.loadAnimation(this, R.anim.slide_up_fast));
+        }
+
+        setOptionSlideUpActions(slideUps, visibleOptions);
+        setQuestionSlideUpAction(slideUpQuestionAnimation, visibleOptions.get(0), slideUps.get(0));
+        toggleQuestion(slideUpQuestionAnimation, View.INVISIBLE);
+    }
+
+    private List<Integer> getVisibleOptions(List<TextView> options) {
+        List<Integer> visibleOptions = new ArrayList<>();
+        for (int i = 0; i < options.size(); i++) {
+            TextView option = options.get(i);
+            if (option.getVisibility() == View.VISIBLE) visibleOptions.add(i);
+        }
+        return visibleOptions;
+    }
+
+    private void setQuestionSlideUpAction(Animation slideUpQuestionAnimation, int firstOptionPosition, Animation optionAnimation) {
+        mAnimationHelper.setAnimationListener(slideUpQuestionAnimation, () -> {
+            mQuestionImage.setVisibility(View.GONE);
+            mQuestionLabelBottom.setVisibility(View.GONE);
+            mQuestionLabel.setVisibility(View.GONE);
+            toggleOption(firstOptionPosition, optionAnimation, View.INVISIBLE);
+        }, null, null);
+    }
+
+    private void setOptionSlideUpActions(List<Animation> slideUps, List<Integer> visibleOptions) {
+        for (int i = 0; i < slideUps.size(); i++) {
+            Animation slideUp = slideUps.get(i);
+            final int nextVisibleOption = i + 1;
+            mAnimationHelper.setAnimationListener(slideUp, () -> {
+                if (nextVisibleOption == slideUps.size()) {
+                    resetQuestion();
+                } else toggleOption(visibleOptions.get(nextVisibleOption),
+                        slideUps.get(nextVisibleOption),
+                        View.INVISIBLE);
+            }, null, null);
+        }
+    }
+
+    private void showEnemiesResults() {
+        for (int i = 0; i < mEnemies.size(); i++) {
+            Player enemy = mEnemies.get(i);
+            TextView indicator = mEnemyAnswerIndicators.get(mEnemiesPositions[i]);
+            indicator.setText("");
+            indicator.setBackgroundResource(enemy.getAnswerOption() == mRightAnswerPosition
+                    ? R.drawable.green
+                    : R.drawable.red);
+        }
+    }
+
+    private void unBlockOptions() {
+        for (TextView option : mOptionLabels) {
+            option.setClickable(true);
+        }
+    }
+
+    private void setUpHints() {
+        if (!mUsedHints.get(0)) mHints.get(0).setOnClickListener(view -> showRightAnswerHint());
+        if (!mUsedHints.get(1)) mHints.get(1).setOnClickListener(view -> showAudienceHelpHint());
+        if (!mUsedHints.get(2)) mHints.get(2).setOnClickListener(view -> showFiftyFiftyHint());
+    }
+
+    private void unBlockImage() {
+        mQuestionImage.setClickable(true);
+    }
+
+    private void showRightAnswerHint() {
+        ImageView hint = mHints.get(0);
+        hint.setClickable(false);
+        mUsedHints.append(0, true);
+        hint.setImageResource(R.drawable.right2);
+        Animation slideOutLeft = AnimationUtils.loadAnimation(this, R.anim.slide_out_left);
+        Animation slideOutRight = AnimationUtils.loadAnimation(this, R.anim.slide_out_right);
+        List<TextView> options = new ArrayList<>();
+        options.addAll(mOptionLabels);
+        options.remove(mRightAnswerPosition);
+        List<Integer> visibleOptions = getVisibleOptions(options);
+        for (int i = 0; i < visibleOptions.size(); i++) {
+            TextView option = options.get(visibleOptions.get(i));
+            option.startAnimation(i == 0 ? slideOutLeft : slideOutRight);
+            option.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void showAudienceHelpHint() {
+        if (getVisibleOptions(mOptionLabels).size() > 2) {
+            ImageView hint = mHints.get(1);
+            hint.setClickable(false);
+            mUsedHints.append(1, true);
+            hint.setImageResource(R.drawable.zal2);
+            showPercentage();
+        }
+    }
+
+    private void showFiftyFiftyHint() {
+        if (getVisibleOptions(mOptionLabels).size() > 1) {
+            ImageView hint = mHints.get(2);
+            hint.setClickable(false);
+            mUsedHints.append(2, true);
+            hint.setImageResource(R.drawable.fifty_fifty_second);
+            Animation slideOutLeft = AnimationUtils.loadAnimation(this, R.anim.slide_out_left);
+            Animation slideOutRight = AnimationUtils.loadAnimation(this, R.anim.slide_out_right);
+            List<TextView> options = new ArrayList<>();
+            options.addAll(mOptionLabels);
+            options.remove(mRightAnswerPosition);
+            options.remove(new Random().nextInt(3));
+            for (int i = 0; i < options.size(); i++) {
+                TextView option = options.get(i);
+                option.startAnimation(i == 0 ? slideOutLeft : slideOutRight);
+                option.setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+    private void toggleOption(int position, Animation animation, int visibility) {
+        TextView option = mOptionLabels.get(position);
+        option.setVisibility(visibility);
+        option.startAnimation(animation);
+    }
+
+    private void toggleQuestion(Animation animation, int visibility) {
+        if (visibility == View.INVISIBLE) {
+            mQuestionArea.startAnimation(animation);
+            mQuestionArea.setVisibility(visibility);
+        } else {
+            mQuestionArea.setVisibility(visibility);
+            mQuestionArea.startAnimation(animation);
+        }
+    }
+
+    boolean isUserAnswerCorrect() {/////////////////
         return mUserOptionLabel
                 .getText()
                 .toString()
                 .equals(mCurrentQuestion.getRightAnswer());
     }
 
-    protected void showRightAnswer() {
+    private void setQuestionContent() {////////////////
+        if (isMediaQuestion()) setUpMediaQuestion();
+        else setUpTextQuestion();
+    }
+
+    private boolean isMediaQuestion() {////////////////
+        String url = mCurrentQuestion.getMediaPath();
+        Timber.d("Media url %s",url);
+        return url != null && !url.isEmpty();
+    }
+
+    private void setUpMediaQuestion() {////////////////
+        String mediaLocation = getMediaLocation();
+        int cornerRadius = (int) (mCornerRadius / Resources.getSystem().getDisplayMetrics().density);
+        Glide.with(this).load(mediaLocation).crossFade()
+                .bitmapTransform(new RoundedCornersTransformation(this, cornerRadius, 0))
+                .into(mQuestionImage);
+        Glide.with(this).load(mediaLocation).crossFade().into(mScaledImage);
+        mQuestionImage.setVisibility(View.VISIBLE);
+        mQuestionLabelBottom.setText(mCurrentQuestion.getTextQuest());
+        mQuestionLabelBottom.setVisibility(View.VISIBLE);
+    }
+
+    private void setUpTextQuestion() {/////////////////
+        mQuestionLabel.setText(mCurrentQuestion.getTextQuest());
+        mQuestionLabel.setVisibility(View.VISIBLE);
+    }
+
+    private void setQuestionCategory() {//////////////////
+        mCategoryLabel.setText(mCurrentQuestion.getThemeQuest());
+    }
+
+    private void setOptions() {///////////////////
+        List<Integer> positions = new ArrayList<>(Arrays.asList(0, 1, 2, 3));
+        Collections.shuffle(positions);
+        String[] answers = mCurrentQuestion.getOptions();
+        for (int i = 0; i < mOptionLabels.size() - 1; i++) {
+            TextView option = mOptionLabels.get(positions.remove(0));
+            option.setText(answers[i]);
+        }
+
+        mRightAnswerPosition = positions.remove(0);
+        TextView rightOption = mOptionLabels.get(mRightAnswerPosition);
+        rightOption.setText(mCurrentQuestion.getRightAnswer());
+    }
+
+    private void setUpOptions() {//////////////////////////
+        for (TextView option : mOptionLabels) {
+            option.setOnClickListener(view -> acceptAnswer(option));
+            option.setClickable(false);
+        }
+    }
+
+    private void setQuestion() { ////////////////////////////////////
+        mCurrentQuestion = mQuestions.get((mCurrentTour - 1)
+                * ConstantsManager.ROUND_QUESTIONS_COUNT
+                + mCurrentQuestionNumber - 1);
+    }
+
+    private void addAnsweredPlayer() {/////////
+        mPlayersAnsweredCount++;
+    }
+
+    private void blockImage() {
+        mQuestionImage.setClickable(false);
+    }//////////////////
+
+    private void showRightAnswer() {/////////////////////////
         TextView rightOption = mOptionLabels.get(mRightAnswerPosition);
         rightOption.setBackgroundResource(R.drawable.right_answer);
     }
 
-    private void showWrongAnswer() {
+    private void showWrongAnswer() {///////////////////////
         mUserOptionLabel.setBackgroundResource(R.drawable.wrong_answer);
     }
 
-    private void setUserAnswerTime() {
+    private void setUserAnswerTime() {///////////////////////////
         mUser.setAnswerTime(mCurrentMillisecond.get());
     }
 
-    private void addRightAnsweredUsersCount() {
-        mPlayersAnsweredCount++;
-    }
-
-    private void setUserOptionLabel(TextView option) {
+    private void setUserOptionLabel(TextView option) {//////////////////////////
         mUserOptionLabel = option;
     }
 
-    private void addRightAnswerToUser() {
+    private void addRightAnswerToUser() {/////////////////
         mUser.addRightAnswer();
     }
 
-    private void addUserPoints() {
+    private void addUserPoints() {//////////////////////
         mUser.addPoints((ConstantsManager.ROUND_LENGTH - mUser.getAnswerTime())/100);
     }
 
-    private void updateScoreLabel() {
+    private void updateScoreLabel() {///////////////////
         mScoreLabel.setText(String.valueOf(mUser.getTotalScore()));
     }
 
-    private void setUpEnemiesBar() {
-        for (int i = 0; i < enemiesCount; i++) {
+    private void setUpEnemiesBar() {/////////////////////////////////
+        for (int i = 0; i < mEnemies.size(); i++) {
             int position = mEnemiesPositions[i];
             ImageView image = mEnemyImages.get(position);
             TextView name = mEnemyNameLabels.get(position);
@@ -306,25 +702,57 @@ public abstract class TourActivityBase extends BaseActivity {
         }
     }
 
-    private void showEnemiesBar() {
+    private void showEnemiesBar() {//////////////////////////
         Animation slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
         mEnemiesBar.setVisibility(View.VISIBLE);
         mEnemiesBar.startAnimation(slideDownAnimation);
     }
 
-    private void setEnemies() {
-        mEnemies = getEnemies();
+    private List<Player> createEnemies() {//////////////
+        List<Player> players = new ArrayList<>();
+        for (Parcelable parcelablePlayer : parcelablePlayers) {
+            Player player = (Player) parcelablePlayer;
+            if (!player.getId().equals(getUserId()))
+                players.add(player);
+        }
+        mEnemiesCount = players.size();
+        return players;
     }
 
-    private void setUser() {
-        mUser = Player.getUser(bet);
-    }
 
-    private void setQuestions() {
-        for (Parcelable parcelableQuestion : parcelableQuestions) {
-            mQuestions.add((Question) parcelableQuestion);
+
+    private int[] getEnemiesPositions() {///////////////
+        switch (mEnemies.size()) {
+            case 1:
+                return ConstantsManager.ENEMY_ONE;
+            case 2:
+                return ConstantsManager.ENEMY_TWO;
+            case 3:
+                return ConstantsManager.ENEMY_THREE;
+            case 4:
+                return ConstantsManager.ENEMY_FOUR;
+            case 5:
+                return ConstantsManager.ENEMY_FIVE;
+            default:
+                throw new RuntimeException("Wrong enemies count!");
         }
     }
 
-    protected abstract List<Player> getEnemies();
+    private List<IQuestion> createQuestions() {///////////////////
+        List<IQuestion> questions = new ArrayList<>();
+        for (Parcelable parcelableQuestion : parcelableQuestions) {
+            questions.add((IQuestion) parcelableQuestion);
+        }
+        return questions;
+    }
+
+    abstract Player createUser();//////////////////////
+
+    abstract String getMediaLocation();
+
+    abstract boolean isBoost();
+
+    abstract void onRoundReset();
+
+    abstract void takeCoins();
 }

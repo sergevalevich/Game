@@ -17,6 +17,7 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0.0"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -39,7 +40,7 @@ final rxJavaVer = '1.1.5'
 final rxAndroidVer = '1.2.0'
 
 //Rest
-final okHttpVer = '3.3.1'
+final okHttpVer = '3.4.1'
 final retrofitVer = '2.1.0'
 final gsonVer = '2.6.2'
 
@@ -79,9 +80,15 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.6.3@aar') {
         transitive = true;
     }
+    compile 'com.android.support:multidex:1.0.1'
     compile 'com.vk:androidsdk:1.6.5'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
-    compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
+    compile 'com.google.android.gms:play-services:9.6.1'
+    compile 'com.google.firebase:firebase-messaging:9.6.1'
+    compile 'com.google.firebase:firebase-core:9.6.0'
+    compile ('io.socket:socket.io-client:0.8.0') {
+        exclude group: 'org.json', module: 'json'
+    }
 }
 
 apt {
@@ -89,3 +96,4 @@ apt {
         trace 'true'
     }
 }
+apply plugin: 'com.google.gms.google-services'

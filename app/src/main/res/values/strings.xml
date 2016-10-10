@@ -1,4 +1,6 @@
 <resources>
+    <string name="navigation_drawer_open" translatable="false">Open Navigation</string>
+    <string name="navigation_drawer_close" translatable="false">Close Navigation</string>
     <string name="app_name">Clever</string>
     <string name="round_length">25</string>
     <string name="start_score">0</string>
@@ -14,7 +16,8 @@
     <string name="players_number_label">Количество соперников:</string>
     <string name="players_min">1</string>
     <string name="players_max">5</string>
-    <string name="start_game_title">Создать игру</string>
+    <string name="create_game_title">Создать игру</string>
+    <string name="start_game_title">Начать игру</string>
     <string name="bet_number_label">Размер ставки:</string>
     <string name="bet_min">1</string>
     <string name="bet_max">10</string>
@@ -32,7 +35,7 @@
     <string name="name_enter_prompt">Введите новое имя</string>
     <string name="take">Получите</string>
     <string name="daily_bonus">Бонус за посещение</string>
-    <string name="not_enough_coins">Недостаточно монет !</string>
+    <string name="not_enough_coins">Недостаточно монет!</string>
     <string name="get_yesterday">Завтра вы сможете получить уже</string>
     <string name="play_every_day">Играйте каждый день!</string>
     <string name="support_head">Завтра мы вам подарим</string>
@@ -57,4 +60,29 @@
     <string name="play">Играть</string>
     <string name="auth_success">Авторизация прошла успешно!</string>
     <string name="invalid_input">Проверьте введённые данные!</string>
+    <string name="log_out">Выход</string>
+    <string name="connected">Подключено</string>
+    <string name="room_title_default">Комната</string>
+    <string name="unknown_error_message">Неизвестная ошибка. Попробуйте позже</string>
+    <string name="nav_drawer_game">Игра</string>
+    <string name="nav_drawer_stats">Рейтинг</string>
+    <string name="nav_drawer_news">Новости</string>
+    <string name="nav_drawer_rules">Правила</string>
+    <string name="nav_drawer_exit">Выйти</string>
+    <string name="by_coins">По монетам</string>
+    <string name="by_points">По очкам</string>
+    <string name="_0">0</string>
+    <string name="socket_error">Соединение с сервером разорвано</string>
+    <string name="socket_connect_error">Не удалось установить соединение с сервером</string>
+    <string name="room_creation_error">Не удалось создать комнату</string>
+    <string name="confirm_exit">Покинуть комнату?</string>
+    <string name="yes">Да</string>
+    <string name="room_connection_success">Вы успешно подключились к комнате.</string>
+    <string name="room_connection_fail">Не удалось подключиться к комнате</string>
+    <string name="room_creation_success">Вы успешно создали комнату.</string>
+    <string name="rooms_empty">Список комнат пуст</string>
+    <string name="new_player">К комнате присоединился новый игрок.</string>
+    <string name="player_left">Игрок отключился от комнаты.</string>
+    <string name="connected_start">Подключилось</string>
+    <string name="connected_end">из 6</string>
 </resources>

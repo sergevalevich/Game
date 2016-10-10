@@ -72,7 +72,7 @@ public class RestoreActivity extends InputActivity {
     }
 
     @Override
-    void handleInput() {
+    void onInputValid() {
         if(mIsInteractionAllowed) {
             if (mNetworkStateChecker.isNetworkAvailable()) {
                 disableInteraction();

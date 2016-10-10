@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical|start"
+                android:paddingTop="@dimen/header_vertical_padding"
+                android:paddingBottom="@dimen/header_vertical_padding"
+                android:background="@color/colorPrimary">
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="@dimen/results_image_size"
+        android:layout_height="@dimen/results_image_size"
+        android:layout_marginEnd="@dimen/menu_image_end_margin"
+        android:layout_marginRight="@dimen/menu_image_end_margin"
+        android:layout_marginLeft="@dimen/menu_image_start_margin"
+        android:layout_marginStart="@dimen/menu_image_start_margin"
+        tools:src="@drawable/first_man_profile_flat_icon_game"
+        tools:text="1"/>
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/players_name_vertical_margin"
+        android:layout_toEndOf="@+id/image"
+        android:layout_toRightOf="@+id/image"
+        android:ellipsize="end"
+        android:maxLength="11"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:textSize="@dimen/primary_text_size"
+        tools:text="Новичок1222"/>
+
+    <LinearLayout
+        android:id="@+id/score_board"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/image"
+        android:layout_marginBottom="@dimen/players_name_vertical_margin"
+        android:layout_toEndOf="@+id/image"
+        android:layout_toRightOf="@+id/image"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/players_end_margin_default"
+            android:layout_marginRight="@dimen/players_end_margin_default"
+            android:maxLength="6"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/place_text_size"
+            android:textStyle="bold"
+            android:text="@string/_0"
+            tools:text = "1234"/>
+
+
+        <ImageView
+            android:id="@+id/star"
+            android:layout_width="@dimen/points_size"
+            android:layout_height="@dimen/points_size"
+            android:src="@drawable/sstar"
+            android:layout_marginRight="@dimen/header_score_divider"
+            android:layout_marginEnd="@dimen/header_score_divider"/>
+
+        <TextView
+            android:id="@+id/coins"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/players_end_margin_default"
+            android:layout_marginRight="@dimen/players_end_margin_default"
+            android:maxLength="5"
+            android:textColor="@color/colorAccentDark"
+            android:textSize="@dimen/place_text_size"
+            android:textStyle="bold"
+            android:text="@string/_0"
+            tools:text = "12345"/>
+
+        <ImageView
+            android:id="@+id/coin"
+            android:layout_width="@dimen/points_size"
+            android:layout_height="@dimen/points_size"
+            android:src="@drawable/clevercoin"/>
+
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -8,6 +8,7 @@ import com.balinasoft.clever.network.model.LastUpdateModel;
 import com.balinasoft.clever.network.model.LogInModel;
 import com.balinasoft.clever.network.model.QuestionApiModel;
 import com.balinasoft.clever.network.model.QuestionsStatsModel;
+import com.balinasoft.clever.network.model.RatingModel;
 import com.balinasoft.clever.network.model.RegisterModel;
 import com.balinasoft.clever.storage.model.Question;
 import com.balinasoft.clever.util.ConstantsManager;
@@ -36,10 +37,19 @@ import rx.Observable;
 
 import static com.balinasoft.clever.GameApplication.getDeviceToken;
 import static com.balinasoft.clever.GameApplication.getLaunchTime;
+import static com.balinasoft.clever.GameApplication.getOnlineCoins;
+import static com.balinasoft.clever.GameApplication.getOnlineName;
+import static com.balinasoft.clever.GameApplication.getOnlineScore;
 import static com.balinasoft.clever.GameApplication.getSessionLength;
-import static com.balinasoft.clever.GameApplication.getUserCoins;
-import static com.balinasoft.clever.GameApplication.getUserScore;
-import static com.balinasoft.clever.GameApplication.isUserCheckedIn;
+import static com.balinasoft.clever.GameApplication.getUserEmail;
+import static com.balinasoft.clever.GameApplication.isNewAccount;
+import static com.balinasoft.clever.GameApplication.saveCleverToken;
+import static com.balinasoft.clever.GameApplication.saveUserId;
+import static com.balinasoft.clever.GameApplication.setNewAccount;
+import static com.balinasoft.clever.GameApplication.setOnlineCoins;
+import static com.balinasoft.clever.GameApplication.setOnlineName;
+import static com.balinasoft.clever.GameApplication.setOnlineScore;
+import static com.balinasoft.clever.GameApplication.setUserEmail;
 
 @EBean
 public class DataManager {
@@ -83,28 +93,16 @@ public class DataManager {
     }
 
     public Observable<Response<DefaultResponseModel>> sendUserStats() {
-        return isUserCheckedIn() ? sendUserData() : checkInAndSendUserStats();
-    }
-
-    private Observable<Response<DefaultResponseModel>> sendUserData() {
-        return mRestService.sendUserStats(getDeviceToken(),
+        return mRestService.sendUserStats(getUserEmail(),
+                getOnlineName(),
                 getSessionLength(),
-                getUserCoins(),
-                getUserScore(),
+                getOnlineCoins(),
+                getOnlineScore(),
                 mTimeFormatter.formatTime(getLaunchTime()));
     }
 
-    private Observable<Response<DefaultResponseModel>> checkInAndSendUserStats() {
-        return mRestService.checkIn(getDeviceToken())
-                .flatMap(statsResponse ->
-                        statsResponse.body().getSuccess() == 1 || statsResponse.body().getMessage().equals(ConstantsManager.DEVICE_ALREADY_CHECKED_IN_MSG)
-                                ? setUserCheckedIn(statsResponse).flatMap(response -> sendUserData())
-                                : Observable.empty());
-    }
-
-    private Observable<Response<DefaultResponseModel>> setUserCheckedIn(Response<DefaultResponseModel> responseModel) {
-        GameApplication.setUserCheckedIn(true);
-        return Observable.just(responseModel);
+    public Observable<RatingModel> getRatings(String filter) {
+        return sendUserStats().flatMap(model -> mRestService.getRating(filter));
     }
 
     private Observable<Question> checkLastUpdate() {
@@ -248,16 +246,59 @@ public class DataManager {
 
     ///////////////////AUTH///////////////////////
 
-    public Observable<LogInModel> logIn(String email, String password) {
-        return mRestService.logIn(email,password);
+    public Observable<LogInModel> logIn(String email, String password, String token) {
+        return mRestService.logIn(email, password, token).flatMap(logInModel -> onLogin(logInModel, email));
     }
 
-    public Observable<RegisterModel> register(String deviceToken, String email, String password) {
-        return mRestService.register(deviceToken, email, password);
+    public Observable<LogInModel> register(String deviceToken, String email, String password) {
+        return mRestService.register(deviceToken, email, password)
+                .flatMap(registerModel -> onRegister(registerModel, email, password));
     }
 
     public Observable<DefaultResponseModel> restore(String email) {
         return mRestService.restore(email);
+    }
+
+    public Observable<LogInModel> logInWithFB(String deviceToken, String fbToken, String email,String username) {
+        return mRestService.register(deviceToken, email, ConstantsManager.SOCIAL_PASS)
+                .doOnNext(registerModel -> {if(registerModel.getSuccess() == 1) setNewAccount(true);})
+                .flatMap(model -> mRestService.logInWithFB(deviceToken, fbToken, email,username)
+                        .flatMap(logInModel -> onLogin(logInModel, email)));
+    }
+
+    public Observable<LogInModel> logInWithVK(String deviceToken, String vkToken, String email, String username) {
+        return mRestService.register(deviceToken, email, ConstantsManager.SOCIAL_PASS)
+                .doOnNext(registerModel -> {if(registerModel.getSuccess() == 1) setNewAccount(true);})
+                .flatMap(model -> mRestService.logInWithVK(deviceToken, vkToken, email,username)
+                        .flatMap(logInModel -> onLogin(logInModel, email)));
+    }
+
+    private Observable<LogInModel> onLogin(LogInModel logInModel, String email) {
+        return logInModel.getSuccess() == 1
+                ? Observable.just(logInModel).doOnNext(model -> saveUserData(model, email))
+                : Observable.error(new RuntimeException(logInModel.getMessage()));
+    }
+
+    private Observable<LogInModel> onRegister(RegisterModel registerModel, String email, String password) {
+        return registerModel.getSuccess() == 1
+                ? Observable.just(registerModel).doOnNext(model -> setNewAccount(true)).flatMap(regModel -> logIn(email, password, getDeviceToken()))
+                : Observable.error(new RuntimeException(registerModel.getMessage()));
+    }
+
+    private void saveUserData(LogInModel logInModel, String email) {
+        saveCleverToken(logInModel.getToken());
+        saveUserId(logInModel.getId());
+        setUserEmail(email);
+        setOnlineName(logInModel.getName());
+        int coins = logInModel.getCoins();
+        int score = logInModel.getScore();
+        if (isNewAccount()) {
+            coins = ConstantsManager.INIT_COINS;
+            score = ConstantsManager.INIT_SCORE;
+            setNewAccount(false);
+        }
+        setOnlineCoins(coins);
+        setOnlineScore(score);
     }
     ///////////////////STATS//////////////////////
 

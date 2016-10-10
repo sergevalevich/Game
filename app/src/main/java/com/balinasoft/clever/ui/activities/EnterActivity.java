@@ -1,16 +1,15 @@
 package com.balinasoft.clever.ui.activities;
 
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.design.widget.Snackbar;
-import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.balinasoft.clever.DataManager;
 import com.balinasoft.clever.R;
@@ -23,23 +22,24 @@ import com.balinasoft.clever.ui.dialogs.AvatarDialog;
 import com.balinasoft.clever.ui.dialogs.AvatarDialog_;
 import com.balinasoft.clever.util.AnimationHelper;
 import com.balinasoft.clever.util.ConstantsManager;
-import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.squareup.otto.Subscribe;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.Signature;
 
 import timber.log.Timber;
 
 import static com.balinasoft.clever.GameApplication.getCurrentTime;
 import static com.balinasoft.clever.GameApplication.getLaunchTime;
+import static com.balinasoft.clever.GameApplication.getOnlineCoins;
+import static com.balinasoft.clever.GameApplication.getOnlineName;
+import static com.balinasoft.clever.GameApplication.getOnlineScore;
 import static com.balinasoft.clever.GameApplication.getUserCoins;
 import static com.balinasoft.clever.GameApplication.getUserImage;
 import static com.balinasoft.clever.GameApplication.getUserName;
@@ -47,7 +47,7 @@ import static com.balinasoft.clever.GameApplication.getUserScore;
 import static com.balinasoft.clever.GameApplication.isAuthTokenExists;
 import static com.balinasoft.clever.GameApplication.setSessionTime;
 
-@EActivity(R.layout.activity_enter)
+@EActivity
 public class EnterActivity extends BaseActivity {
 
     @ViewById(R.id.root)
@@ -86,22 +86,36 @@ public class EnterActivity extends BaseActivity {
     @Bean
     AnimationHelper mAnimationHelper;
 
+    @Extra
+    boolean isAfterOfflineGame;
+
+    @Extra
+    String message;
+
     private AvatarDialog mDialog;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_enter);
+        checkGooglePlayServices();
+    }
 
     @AfterViews
     void setUpViews() {
+        if(message != null && !message.isEmpty()) notifyUserWith(message);
         setUpUserImage();
         setUpUserName();
     }
 
     @Click(R.id.offline_game_btn)
     void onOfflinePicked() {
-        navigateToOfflineGameConfig();
+        playOffline();
     }
 
     @Click(R.id.online_game_btn)
     void onOnlinePicked() {
-        if(isAuthTokenExists()) navigateToOnlineGameConfig();
+        if (isAuthTokenExists()) playOnline();
         else navigateToLogin();
     }
 
@@ -160,7 +174,8 @@ public class EnterActivity extends BaseActivity {
     private void showDialog() {
         if(mDialog == null)
             mDialog = createDialog();
-        mDialog.setCurrentName(getUserName());
+        mDialog.setCurrentName(!isAuthTokenExists() || isAfterOfflineGame ? getUserName() : getOnlineName());
+        mDialog.setAfterOffline(isAfterOfflineGame);
         mDialog.show(getSupportFragmentManager(), ConstantsManager.AVATAR_DIALOG_TAG);
     }
 
@@ -169,15 +184,21 @@ public class EnterActivity extends BaseActivity {
     }
 
     private void setUpUserPoints() {
-        mPointsLabel.setText(String.valueOf(getUserScore()));
+        mPointsLabel.setText(!isAuthTokenExists() || isAfterOfflineGame
+                ? String.valueOf(getUserScore())
+                : String.valueOf(getOnlineScore()));
     }
 
     private void setUpUserCoins() {
-        mCoinsLabel.setText(String.valueOf(getUserCoins()));
+        mCoinsLabel.setText(!isAuthTokenExists() || isAfterOfflineGame
+                ? String.valueOf(getUserCoins())
+                : String.valueOf(getOnlineCoins()));
     }
 
     private void setUpUserName() {
-        mUserNameLabel.setText(getUserName());
+        mUserNameLabel.setText(!isAuthTokenExists() || isAfterOfflineGame
+                ? getUserName()
+                : getOnlineName());
     }
 
     private void setUpUserImage() {
@@ -210,12 +231,14 @@ public class EnterActivity extends BaseActivity {
         mToolbar.startAnimation(slideDownAnimation);
     }
 
-    private void navigateToOfflineGameConfig() {
+    private void playOffline() {
         OfflineGameConfigActivity_.intent(this).start().withAnimation(R.anim.enter_pull_in, R.anim.exit_fade_out);
+        finish();
     }
 
-    private void navigateToOnlineGameConfig() {
-        OnlineConfigActivity_.intent(this).start().withAnimation(R.anim.enter_pull_in, R.anim.exit_fade_out);
+    private void playOnline() {
+        MainActivity_.intent(this).start().withAnimation(R.anim.enter_pull_in, R.anim.exit_fade_out);
+        finish();
     }
 
     private void navigateToLogin() {
@@ -239,6 +262,22 @@ public class EnterActivity extends BaseActivity {
 
     private void sendUserStats() {
         UserStatsService_.intent(this).start();
+    }
+
+    private void notifyUserWith(String message) {
+        Snackbar.make(mRootView,message,Snackbar.LENGTH_LONG).show();
+    }
+
+    private boolean checkGooglePlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.makeGooglePlayServicesAvailable(this);
+            } else {finish();}
+            return false;
+        }
+        return true;
     }
 
 }

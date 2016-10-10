@@ -1,16 +1,13 @@
 package com.balinasoft.clever.util;
 
 
-import com.balinasoft.clever.model.Player;
-import com.balinasoft.clever.model.Room;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public interface ConstantsManager {
-    String BASE_URL = "https://clever.balinasoft.com/";
+    //String BASE_URL = "https://clever.balinasoft.com/";
+    String BASE_URL = "http://91.107.105.245:3000/";
     int CONNECTION_TIME_OUT = 30;
     int READ_TIME_OUT = 50;
 
@@ -28,14 +25,16 @@ public interface ConstantsManager {
     int MAX_QUESTIONS_COUNT = 21;
     int ROUND_QUESTIONS_COUNT = 7;
 
-    String DEFAULT_USER_NAME = "No_Name";
+    String DEFAULT_USER_NAME = "No_Name(OF)";
+    String DEFAULT_USER_NAME_ONLINE = "No_Name(ON)";
     String CONGRATS_START = "Поздравляем с";
     String CONGRATS_END = "местом!";
     String CONGRATS_ENDING = "о";
 
     int DEFAULT_ENEMIES_COUNT = 3;
     int DEFAULT_BET = 1;
-    int INIT_SCORE = 100;
+    int INIT_COINS = 100;
+    int INIT_SCORE = 0;
     int MAX_BONUS = 30;
 
     String AVATAR_DIALOG_TAG = "choose_image";
@@ -44,18 +43,27 @@ public interface ConstantsManager {
 
     String DEFAULT_USER_ID = "user_id";
 
-    String DEVICE_ALREADY_CHECKED_IN_MSG = "Это устройство уже отмечено на сервере.";
+    List<String> FACEBOOK_PERMISSIONS = new ArrayList<>(Arrays.asList("public_profile","email"));
 
-    List<String> FACEBOOK_PERMISSIONS = new ArrayList<>(Collections.singletonList("public_profile"));
+    String[] VK_PERMISSIONS = new String[]{"email"};
 
-    List<Room> STUB_ROOMS = new ArrayList<>(Arrays.asList(
-            new Room(Player.get(4,10),10,Player.getUser(10)),
-            new Room(Player.get(2,30),30,Player.getUser(30)),
-            new Room(Player.get(4,10),10,Player.getUser(10)),
-            new Room(Player.get(2,30),30,Player.getUser(30)),
-            new Room(Player.get(4,10),10,Player.getUser(10)),
-            new Room(Player.get(2,30),30,Player.getUser(30)),
-            new Room(Player.get(2,30),30,Player.getUser(30)),
-            new Room(Player.get(4,10),10,Player.getUser(10)),
-            new Room(Player.get(3,20),20,Player.getUser(20))));
+    String JOIN_ROOM_EVENT = "joinRoom";
+    String ROOM_MESSAGE_EVENT = "roomMessage";
+    String ROOM_INFO_EVENT = "roomInfo";
+    String AUTH_EVENT = "auth";
+    String CREATE_ROOM_EVENT = "createRoom";
+    String ROOMS_LIST_GET_EVENT = "listRooms";
+    String ROOM_LEAVING_EVENT = "leaveRoom";
+    String START_GAME_EVENT = "startGame";
+    String QUEST_ANSWER_EVENT = "answerTheQuest";
+    String ROUND_FINISHED_EVENT = "roundResult";
+    String GAME_FINISHED_EVENT = "gameResult";
+
+    String SOCIAL_PASS = "socialpasswordforcheckingifuserisregisteredwithsocialnetworks";
+
+    String OS_NAME = "android";
+
+    String DEFAULT_PLAYER_ID = "player_id";
+    String COINS_FILTER = "coins";
+    String SCORE_FILTER = "score";
 }

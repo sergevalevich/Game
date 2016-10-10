@@ -16,11 +16,17 @@ public class LogInModel {
     @SerializedName("token")
     private String mToken;
 
-    @SerializedName("name")
+    @SerializedName("username")
     private String mName;
 
     @SerializedName("id")
     private String mId;
+
+    @SerializedName("coins")
+    private int mCoins;
+
+    @SerializedName("score")
+    private int mScore;
 
     public int getSuccess() {
         return mSuccess;
@@ -30,8 +36,12 @@ public class LogInModel {
         return mMessage;
     }
 
-    public int getError() {
-        return mError;
+    public int getCoins() {
+        return mCoins;
+    }
+
+    public int getScore() {
+        return mScore;
     }
 
     public String getToken() {

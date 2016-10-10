@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
@@ -134,4 +134,27 @@
     <dimen name="config_players_icon_small_end_margin">4dp</dimen>
     <dimen name="game_modes_buttons_divider">16dp</dimen>
     <dimen name="buttons_side_margin">22dp</dimen>
+    <dimen name="room_title">18sp</dimen>
+    <dimen name="room_title_top_margin">8dp</dimen>
+    <dimen name="player_item_room_padding">8dp</dimen>
+    <dimen name="drawer_header_layout_height">124dp</dimen>
+    <dimen name="header_score_divider">12dp</dimen>
+    <dimen name="image_size_bottom_bar">40dp</dimen>
+    <dimen name="bottom_bar_text_size">18sp</dimen>
+    <dimen name="bottom_image_end_margin">16dp</dimen>
+    <dimen name="bottom_bar_side_padding">12dp</dimen>
+    <dimen name="place_label_size_bottom">36dp</dimen>
+    <dimen name="place_text_size_bottom">13sp</dimen>
+    <dimen name="menu_image_start_margin">8dp</dimen>
+    <dimen name="menu_image_end_margin">8dp</dimen>
+    <dimen name="tabs_top_margin">6dp</dimen>
+    <dimen name="room_join_text_size">13sp</dimen>
+    <dimen name="place_label_size_top">28dp</dimen>
+    <dimen name="place_text_size_top">12sp</dimen>
+    <dimen name="design_navigation_icon_size" tools:override="true">36dp</dimen>
+    <dimen name="header_vertical_padding">24dp</dimen>
+    <dimen name="nav_menu_width">280dp</dimen>
+    <dimen name="menu_text_size">14sp</dimen>
+    <dimen name="menu_item_size">48dp</dimen>
+    <dimen name="empty_rooms_top_margin">56dp</dimen>
 </resources>

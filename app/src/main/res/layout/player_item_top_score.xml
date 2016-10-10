@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:gravity="center"
+              android:padding="@dimen/player_item_room_padding"
+              tools:background="@drawable/back">
+
+
+    <TextView
+        android:id="@+id/place_label"
+        android:layout_width="@dimen/place_label_size_top"
+        android:layout_height="@dimen/place_label_size_top"
+        android:layout_marginEnd="@dimen/players_place_end_margin"
+        android:layout_marginRight="@dimen/players_place_end_margin"
+        android:background="@drawable/place"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="@dimen/place_text_size_top"
+        tools:text="1"/>
+
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="@dimen/results_image_size"
+        android:layout_height="@dimen/results_image_size"
+        android:layout_marginEnd="@dimen/players_image_end_margin_default"
+        android:layout_marginRight="@dimen/players_image_end_margin_default"
+        tools:src="@drawable/first_man_profile_flat_icon_game"
+        tools:text="1"/>
+
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLength="11"
+        android:maxLines="1"
+        android:textColor="@color/white"
+        android:textSize="@dimen/primary_text_size"
+        tools:text="Новичок1222"/>
+
+    <TextView
+        android:id="@+id/points"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/place_text_size"
+        android:layout_marginEnd="@dimen/players_end_margin_default"
+        android:layout_marginRight="@dimen/players_end_margin_default"
+        android:maxLength="6"
+        android:textStyle="bold"
+        tools:text="4878"/>
+
+
+    <ImageView
+        android:id="@+id/star"
+        android:layout_width="@dimen/points_size"
+        android:layout_height="@dimen/points_size"
+        android:src="@drawable/sstar"/>
+
+
+</LinearLayout>

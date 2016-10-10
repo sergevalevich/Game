@@ -49,10 +49,7 @@ public class SignUpActivity extends AuthActivity {
     Observable<LogInModel> getAuthStream() {
         String email = mEmailField.getText().toString();
         String password = mPasswordField.getText().toString();
-        return mDataManager.register(getDeviceToken(), email, password)
-                .flatMap(registerModel -> registerModel.getSuccess() == 1
-                        ? mDataManager.logIn(email, password)
-                        : Observable.error(new RuntimeException(registerModel.getMessage())));
+        return mDataManager.register(getDeviceToken(), email, password);
     }
 
     private void setUpActionBar() {

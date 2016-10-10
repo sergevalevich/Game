@@ -49,4 +49,19 @@
     <dimen name="config_players_icon_small_end_margin">16dp</dimen>
     <dimen name="game_modes_buttons_divider">48dp</dimen>
     <dimen name="buttons_side_margin">88dp</dimen>
+    <dimen name="room_title">44sp</dimen>
+    <dimen name="header_score_divider">36dp</dimen>
+    <dimen name="image_size_bottom_bar">76dp</dimen>
+    <dimen name="bottom_bar_text_size">32sp</dimen>
+    <dimen name="bottom_image_end_margin">48dp</dimen>
+    <dimen name="bottom_bar_side_padding">36dp</dimen>
+    <dimen name="place_label_size_bottom">56dp</dimen>
+    <dimen name="place_text_size_bottom">18sp</dimen>
+    <dimen name="menu_image_start_margin">18dp</dimen>
+    <dimen name="menu_image_end_margin">24dp</dimen>
+    <dimen name="room_join_text_size">22sp</dimen>
+    <dimen name="place_label_size_top">48dp</dimen>
+    <dimen name="place_text_size_top">19sp</dimen>
+    <dimen name="header_vertical_padding">64dp</dimen>
+    <dimen name="empty_rooms_top_margin">156dp</dimen>
 </resources>

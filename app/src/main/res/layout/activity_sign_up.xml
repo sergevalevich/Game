@@ -36,6 +36,7 @@
             style="@style/InputStyle"
             android:hint="@string/password"
             android:id="@+id/password"
+            android:maxLength="50"
             android:inputType="textPassword"/>
 
         <EditText
@@ -43,6 +44,7 @@
             style="@style/InputStyle"
             android:hint="@string/password_repeat"
             android:id="@+id/password_repeat"
+            android:maxLength="50"
             android:inputType="textPassword"/>
 
         <TextView

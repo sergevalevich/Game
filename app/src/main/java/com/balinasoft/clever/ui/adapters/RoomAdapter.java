@@ -1,8 +1,6 @@
 package com.balinasoft.clever.ui.adapters;
 
 
-import android.content.Context;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +11,7 @@ import android.widget.TextView;
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.model.Player;
 import com.balinasoft.clever.model.Room;
-import com.balinasoft.clever.ui.activities.TourActivityOffline_;
+import com.balinasoft.clever.util.RoomsClickListener;
 
 import java.util.List;
 
@@ -25,11 +23,11 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomHolder> {
 
     private List<Room> mRooms;
 
-    private Context mContext;
+    private RoomsClickListener mRoomsClickListener;
 
-    public RoomAdapter(List<Room> rooms, Context context) {
+    public RoomAdapter(List<Room> rooms, RoomsClickListener clickListener) {
         mRooms = rooms;
-        mContext = context;
+        mRoomsClickListener = clickListener;
     }
 
     @Override
@@ -48,6 +46,12 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomHolder> {
     public int getItemCount() {
         return mRooms.size();
     }
+
+//    public void refresh(List<Room> rooms) {
+//        mRooms.clear();
+//        mRooms.addAll(rooms);
+//        notifyDataSetChanged();
+//    }
 
     class RoomHolder extends RecyclerView.ViewHolder {
 
@@ -73,18 +77,20 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomHolder> {
 
         private void bind(Room room) {
             List<Player> players = room.getPlayers();
-            Player host = room.getHost();
+            Player host = players.get(0);
             mHostImage.setImageResource(host.getImageResId());
             mHostName.setText(host.getName());
             mBetLabel.setText(String.valueOf(room.getBet()));
             for (int i = 0; i < mPlayersImages.size(); i++) {
-                if(i >= players.size()) {
+                if(i >= players.size() - 1) {
                     mPlayersImages.get(i).setImageResource(R.drawable.newgamer);
                 } else {
-                    mPlayersImages.get(i).setImageResource(players.get(i).getImageResId());
+                    mPlayersImages.get(i).setImageResource(players.get(i+1).getImageResId());
                 }
             }
-            //mPlayButton.setOnClickListener(view -> TourActivityOffline_.intent(mContext).bet(room.getBet()).enemiesCount(players.size() + 1).start());
+            mPlayButton.setOnClickListener(view -> mRoomsClickListener.onRoomClicked(
+                    room.getNumber(),
+                    room.getBet()));
         }
 
     }

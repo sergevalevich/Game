@@ -12,6 +12,7 @@ import timber.log.Timber;
 
 import static com.balinasoft.clever.GameApplication.getCurrentTime;
 import static com.balinasoft.clever.GameApplication.getLaunchTime;
+import static com.balinasoft.clever.GameApplication.isAuthTokenExists;
 import static com.balinasoft.clever.GameApplication.setLaunchTime;
 import static com.balinasoft.clever.GameApplication.setSessionTime;
 
@@ -26,16 +27,14 @@ public class BaseActivity extends AppCompatActivity {
     boolean mIsInteractionAllowed;
 
     @Override
-    protected void onResume() {
+    protected void onStart() {
         super.onResume();
-        Timber.d("onResume %s",String.valueOf(RESUMED_ACTIVITIES_COUNT));
         if(RESUMED_ACTIVITIES_COUNT++ == 0) setLaunchTime(getCurrentTime());
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Timber.d("onStop %s",String.valueOf(RESUMED_ACTIVITIES_COUNT));
         if(--RESUMED_ACTIVITIES_COUNT == 0) {
             setSessionTime(getCurrentTime() - getLaunchTime());
             sendUserStats();
@@ -44,7 +43,8 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     private void sendUserStats() {
-        if(mNetworkStateChecker.isNetworkAvailable()) UserStatsService_.intent(this).start();
+        if (mNetworkStateChecker.isNetworkAvailable() && isAuthTokenExists())
+            UserStatsService_.intent(this).start();
     }
 
     void disableInteraction() {

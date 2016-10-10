@@ -42,7 +42,7 @@ public abstract class InputActivity extends BaseActivity {
     void processInput() {
         hideKeyBoard();
         if(mIsInteractionAllowed) {
-            if (isInputValid()) handleInput();
+            if (isInputValid()) onInputValid();
             else onInputInvalid();
         }
     }
@@ -67,5 +67,5 @@ public abstract class InputActivity extends BaseActivity {
 
     abstract void onInputInvalid();
 
-    abstract void handleInput();
+    abstract void onInputValid();
 }

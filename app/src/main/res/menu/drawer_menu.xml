@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:id="@+id/group_feature"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/drawer_game"
+            android:title="@string/nav_drawer_game"
+            android:icon="@drawable/playstation"
+            android:checked="true">
+        </item>
+
+        <item
+            android:id="@+id/drawer_stats"
+            android:title="@string/nav_drawer_stats"
+            android:icon="@drawable/stats"
+            android:checked="true">
+        </item>
+
+        <item
+            android:id="@+id/drawer_news"
+            android:title="@string/nav_drawer_news"
+            android:icon="@drawable/news"
+            android:checked="true">
+        </item>
+
+        <item
+            android:id="@+id/drawer_rules"
+            android:title="@string/nav_drawer_rules"
+            android:icon="@drawable/rules"
+            android:checked="true">
+        </item>
+
+    </group>
+
+    <group
+        android:id="@+id/group_exit"
+        android:checkableBehavior="single">
+        <item
+            android:id = "@+id/drawer_exit"
+            android:title="@string/nav_drawer_exit"
+            android:icon="@drawable/exit"
+            android:checkable="false">
+        </item>
+    </group>
+</menu>

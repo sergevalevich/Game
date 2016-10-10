@@ -5,6 +5,7 @@ import com.balinasoft.clever.network.model.LastUpdateModel;
 import com.balinasoft.clever.network.model.LogInModel;
 import com.balinasoft.clever.network.model.QuestionApiModel;
 import com.balinasoft.clever.network.model.DefaultResponseModel;
+import com.balinasoft.clever.network.model.RatingModel;
 import com.balinasoft.clever.network.model.RegisterModel;
 import com.balinasoft.clever.util.ConstantsManager;
 import com.google.gson.Gson;
@@ -73,27 +74,36 @@ public class RestService {
         return mGameApi.sendQuestionsStats(json);
     }
 
-    public Observable<Response<DefaultResponseModel>> sendUserStats(String token,
+    public Observable<Response<DefaultResponseModel>> sendUserStats(String email,
+                                                                    String userName,
                                                                     long sessionTime,
                                                                     int userCoins,
                                                                     int userScore,
                                                                     String launchTime) {
-        return mGameApi.sendUserStats(token, sessionTime, userCoins, userScore, launchTime);
+        return mGameApi.sendUserStats(email, userName, sessionTime, userCoins, userScore, launchTime);
     }
 
-    public Observable<Response<DefaultResponseModel>> checkIn(String token) {
-        return mGameApi.checkIn(token);
-    }
-
-    public Observable<LogInModel> logIn(String email, String password) {
-        return mGameApi.logIn(email,password);
+    public Observable<LogInModel> logIn(String email, String password, String token) {
+        return mGameApi.logIn(ConstantsManager.OS_NAME,token,email,password);
     }
 
     public Observable<RegisterModel> register(String deviceToken, String email, String password) {
-        return mGameApi.register(deviceToken, email, password);
+        return mGameApi.register(ConstantsManager.OS_NAME,deviceToken, email, password);
     }
 
     public Observable<DefaultResponseModel> restore(String email) {
         return mGameApi.restore(email);
+    }
+
+    public Observable<LogInModel> logInWithFB(String deviceToken, String fbToken, String email,String userName) {
+        return mGameApi.logInWithFb(ConstantsManager.OS_NAME, deviceToken, fbToken, email, userName);
+    }
+
+    public Observable<LogInModel> logInWithVK(String deviceToken,String vkToken,String email,String username) {
+        return mGameApi.logInWithVk(ConstantsManager.OS_NAME, deviceToken, vkToken, email,username);
+    }
+
+    public Observable<RatingModel> getRating(String filter) {
+        return mGameApi.getRating(filter);
     }
 }

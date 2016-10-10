@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <dimen name="input_field_side_padding">16dp</dimen>
     <dimen name="default_corner_radius">18dp</dimen>
     <dimen name="secondary_text_size">22sp</dimen>
@@ -65,4 +65,25 @@
     <dimen name="config_players_icon_small_end_margin">8dp</dimen>
     <dimen name="game_modes_buttons_divider">32dp</dimen>
     <dimen name="buttons_side_margin">64dp</dimen>
+    <dimen name="room_title">36sp</dimen>
+    <dimen name="player_item_room_padding">24dp</dimen>
+    <dimen name="header_score_divider">24dp</dimen>
+    <dimen name="image_size_bottom_bar">64dp</dimen>
+    <dimen name="bottom_bar_text_size">28sp</dimen>
+    <dimen name="bottom_image_end_margin">36dp</dimen>
+    <dimen name="bottom_bar_side_padding">24dp</dimen>
+    <dimen name="place_label_size_bottom">48dp</dimen>
+    <dimen name="place_text_size_bottom">16sp</dimen>
+    <dimen name="menu_image_start_margin">12dp</dimen>
+    <dimen name="menu_image_end_margin">16dp</dimen>
+    <dimen name="tabs_top_margin">16dp</dimen>
+    <dimen name="room_join_text_size">20sp</dimen>
+    <dimen name="place_label_size_top">40dp</dimen>
+    <dimen name="place_text_size_top">16sp</dimen>
+    <dimen name="header_vertical_padding">48dp</dimen>
+    <dimen name="nav_menu_width">480dp</dimen>
+    <dimen name="menu_text_size">24sp</dimen>
+    <dimen name="menu_item_size">64dp</dimen>
+    <dimen name="design_navigation_icon_size" tools:override="true">48dp</dimen>
+    <dimen name="empty_rooms_top_margin">108dp</dimen>
 </resources>

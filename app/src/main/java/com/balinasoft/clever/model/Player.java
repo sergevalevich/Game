@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import static com.balinasoft.clever.GameApplication.getOnlineName;
 import static com.balinasoft.clever.GameApplication.getUserCoins;
 import static com.balinasoft.clever.GameApplication.getUserId;
 import static com.balinasoft.clever.GameApplication.getUserImage;
@@ -44,6 +45,10 @@ public class Player implements Comparable<Player> , Parcelable{
 
     private String mId;
 
+    private String mIdInRoom;
+
+    private String mTextAnswer;
+
     private static Random mAnswerOptionRandom = new Random();
     private static Random mAnswerTimeRandom = new Random();
 
@@ -64,9 +69,10 @@ public class Player implements Comparable<Player> , Parcelable{
         mBet = player.getBet();
         mCoinsPortion = player.getCoinsPortion();
         mId = player.getId();
+        mTextAnswer = player.getTextAnswer();
     }
 
-    private Player() {}
+    public Player() {}
 
     private Player(Parcel in) {
         mName = in.readString();
@@ -78,6 +84,7 @@ public class Player implements Comparable<Player> , Parcelable{
         mBet = in.readInt();
         mCoinsPortion = in.readInt();
         mId = in.readString();
+        mTextAnswer = in.readString();
     }
 
     public static List<Player> get(int count,int bet) {
@@ -93,9 +100,9 @@ public class Player implements Comparable<Player> , Parcelable{
         return enemies;
     }
 
-    public static Player getUser(int bet) {
+    public static Player getUser(int bet, boolean isOnline) {
         Player user = new Player();
-        user.setName(getUserName());
+        user.setName(isOnline ? getOnlineName() : getUserName());
         user.setImageResId(getUserImage());
         user.setBet(bet);
         user.setId(getUserId());
@@ -114,8 +121,24 @@ public class Player implements Comparable<Player> , Parcelable{
         }
     };
 
+    public String getTextAnswer() {
+        return mTextAnswer == null ? "" : mTextAnswer;
+    }
+
+    public void setTextAnswer(String textAnswer) {
+        mTextAnswer = textAnswer;
+    }
+
+    public String getIdInRoom() {
+        return mIdInRoom;
+    }
+
+    public void setIdInRoom(String idInRoom) {
+        mIdInRoom = idInRoom;
+    }
+
     public String getId() {
-        return mId;
+        return mId == null ? ConstantsManager.DEFAULT_PLAYER_ID : mId;
     }
 
     public void setId(String id) {
@@ -130,7 +153,7 @@ public class Player implements Comparable<Player> , Parcelable{
         return mAnswerTime;
     }
 
-    private void setAnswerOption(int answerOption) {
+    public void setAnswerOption(int answerOption) {
         mAnswerOption = answerOption;
     }
 
@@ -150,7 +173,7 @@ public class Player implements Comparable<Player> , Parcelable{
         mName = name;
     }
 
-    private void setImageResId(int imageResId) {
+    public void setImageResId(int imageResId) {
         mImageResId = imageResId;
     }
 
@@ -191,8 +214,16 @@ public class Player implements Comparable<Player> , Parcelable{
         return mCoinsPortion;
     }
 
-    private void setCoinsPortion(int coinsPortion) {
+    public void setTotalScore(int totalScore) {
+        mTotalScore = totalScore;
+    }
+
+    public void setCoinsPortion(int coinsPortion) {
         mCoinsPortion = coinsPortion;
+    }
+
+    public void setRightAnswersCount(int rightAnswersCount) {
+        mRightAnswersCount = rightAnswersCount;
     }
 
     public static void countCoins(List<Player> players) {
@@ -213,12 +244,16 @@ public class Player implements Comparable<Player> , Parcelable{
                 portion = Math.round((player.getTotalRightAnswersCount() * totalBet) / totalRightAnswers);
                 portionSum += portion;
             }
-            if(player.getName().equals(getUserName()) && player.getId().equals(getUserId())) {
-                setUserCoins(getUserCoins() + portion - player.getBet());
+            if(player.getId().equals(getUserId())) {
+                setUserCoins(getUserCoins() + portion);
                 setUserScore(getUserScore() + player.getTotalScore());
             }
             player.setCoinsPortion(portion);
         }
+    }
+
+    public static int getRandomImage() {
+        return IMAGES_BY_NAME.get(new Random().nextInt(5)).getValue();
     }
 
     @Override
@@ -242,6 +277,21 @@ public class Player implements Comparable<Player> , Parcelable{
         parcel.writeInt(mBet);
         parcel.writeInt(mCoinsPortion);
         parcel.writeString(mId);
+        parcel.writeString(mTextAnswer);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (obj == null) {
+            return false;
+        }
+        if (!Player.class.isAssignableFrom(obj.getClass())) {
+            return false;
+        }
+        final Player other = (Player) obj;
+
+        return mId.equals(other.getId());
     }
 
     private void setRandomAnswer(int rightAnswerPosition) {
