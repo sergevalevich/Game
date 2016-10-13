@@ -25,8 +25,8 @@ public interface ConstantsManager {
     int MAX_QUESTIONS_COUNT = 21;
     int ROUND_QUESTIONS_COUNT = 7;
 
-    String DEFAULT_USER_NAME = "No_Name(OF)";
-    String DEFAULT_USER_NAME_ONLINE = "No_Name(ON)";
+    String DEFAULT_USER_NAME = "OFFLINE";
+    String DEFAULT_USER_NAME_ONLINE = "ONLINE";
     String CONGRATS_START = "Поздравляем с";
     String CONGRATS_END = "местом!";
     String CONGRATS_ENDING = "о";
@@ -66,4 +66,15 @@ public interface ConstantsManager {
     String DEFAULT_PLAYER_ID = "player_id";
     String COINS_FILTER = "coins";
     String SCORE_FILTER = "score";
+    int QUESTION_MAX_LENGTH = 240;
+    int QUESTION_MAX_LENGTH_BIG = 280;
+    int QUESTION_MAX_LENGTH_LARGE = 320;
+    int OPTION_MAX_LENGTH = 20;
+    int OPTION_MAX_LENGTH_BIG = 30;
+    int OPTION_MAX_LENGTH_LARGE = 40;
+
+    String LOREM = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
+    String CAT = "http://www.unionsnobs.com/assets/images/cat-image2.png";
+
+    String GOOGLE_PLAY_LINK = "https://play.google.com/store/apps/details?id=com.balinasoft.clever";
 }

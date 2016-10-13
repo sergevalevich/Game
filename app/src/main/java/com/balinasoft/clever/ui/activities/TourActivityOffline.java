@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import timber.log.Timber;
+
 import static com.balinasoft.clever.GameApplication.getUserCoins;
 import static com.balinasoft.clever.GameApplication.setUserCoins;
 import static com.balinasoft.clever.util.ConstantsManager.COUNTDOWN_INTERVAL_NORMAL;
@@ -65,8 +67,8 @@ public class TourActivityOffline extends TourActivityBase {
     @Override
     void bindData() {
         setAnswersRatioCombinations();
-        setEnemiesAnswers();
         super.bindData();
+        setEnemiesAnswers();
     }
 
     @Override
@@ -109,6 +111,7 @@ public class TourActivityOffline extends TourActivityBase {
     }
 
     private void setEnemiesAnswers() {
+        Timber.d("SETTING ANSWERS");
         for (Player enemy : mEnemies) {
             enemy.setAnswerBy(mRightAnswerPosition);
         }

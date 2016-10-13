@@ -7,13 +7,10 @@ import android.support.v4.view.ViewPager;
 
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.ui.adapters.SectionsPagerAdapter;
-import com.balinasoft.clever.util.OnPageSelectedListener;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
-
-import timber.log.Timber;
 
 import static com.balinasoft.clever.R.id.pager;
 import static com.balinasoft.clever.R.id.tabLayout;
@@ -32,31 +29,11 @@ public class StatsFragment extends Fragment {
         setupViewPager();
     }
 
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-
     private void setupViewPager() {
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager(), getActivity());
-        mPager.setAdapter(mSectionsPagerAdapter);
+        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager(), getActivity());
+        mPager.setAdapter(sectionsPagerAdapter);
         mTabLayout.setupWithViewPager(mPager);
         mTabLayout.setTabTextColors(Color.WHITE, Color.WHITE);
         mTabLayout.setSelectedTabIndicatorHeight(0);
-        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                Timber.d("onPageSelected");
-                OnPageSelectedListener fragment = (OnPageSelectedListener) mSectionsPagerAdapter.getItem(position);
-                fragment.onPageSelected();
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
     }
 }

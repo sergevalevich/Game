@@ -67,6 +67,7 @@ public class PlayersAdapterTopCoins extends RecyclerView.Adapter<PlayersAdapterT
             mPlayerName.setText(player.getName());
             mCoinsLabel.setText(String.valueOf(player.getCoinsPortion()));
             if (player.getId().equals(getUserId())) mPlaceLabel.setBackgroundResource(R.drawable.place2);
+            else mPlaceLabel.setBackgroundResource(R.drawable.place);
         }
 
     }

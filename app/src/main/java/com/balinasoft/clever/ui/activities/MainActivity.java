@@ -3,7 +3,6 @@ package com.balinasoft.clever.ui.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -20,9 +19,17 @@ import android.widget.Toast;
 import com.balinasoft.clever.DataManager;
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.eventbus.EventBus;
+import com.balinasoft.clever.eventbus.events.AvatarSelectedEvent;
+import com.balinasoft.clever.eventbus.events.UserNameSelectedEvent;
+import com.balinasoft.clever.storage.model.News;
+import com.balinasoft.clever.ui.dialogs.AvatarDialog;
+import com.balinasoft.clever.ui.dialogs.AvatarDialog_;
+import com.balinasoft.clever.ui.fragments.NewsFragment_;
 import com.balinasoft.clever.ui.fragments.OnlineConfigFragment_;
 import com.balinasoft.clever.ui.fragments.StatsFragment_;
+import com.balinasoft.clever.util.ConstantsManager;
 import com.balinasoft.clever.util.SocketErrorListener;
+import com.squareup.otto.Subscribe;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -31,23 +38,10 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.StringRes;
 
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
-
-import static com.balinasoft.clever.GameApplication.getCurrentTime;
-import static com.balinasoft.clever.GameApplication.getLaunchTime;
 import static com.balinasoft.clever.GameApplication.getOnlineCoins;
 import static com.balinasoft.clever.GameApplication.getOnlineName;
 import static com.balinasoft.clever.GameApplication.getOnlineScore;
 import static com.balinasoft.clever.GameApplication.getUserImage;
-import static com.balinasoft.clever.GameApplication.saveCleverToken;
-import static com.balinasoft.clever.GameApplication.saveFacebookToken;
-import static com.balinasoft.clever.GameApplication.saveVkToken;
-import static com.balinasoft.clever.GameApplication.setOnlineCoins;
-import static com.balinasoft.clever.GameApplication.setOnlineName;
-import static com.balinasoft.clever.GameApplication.setOnlineScore;
-import static com.balinasoft.clever.GameApplication.setSessionTime;
-import static com.balinasoft.clever.GameApplication.setUserEmail;
 
 @EActivity
 public class MainActivity extends BaseActivity implements
@@ -81,6 +75,9 @@ public class MainActivity extends BaseActivity implements
     @StringRes(R.string.unknown_error_message)
     String mUnknownErrorMessage;
 
+    @Extra
+    boolean fromNotification;
+
     @Bean
     DataManager mDataManager;
 
@@ -89,15 +86,50 @@ public class MainActivity extends BaseActivity implements
 
     private FragmentManager mFragmentManager;
 
+    private AvatarDialog mDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        News news = new News();
+        news.setDate("11.11.2011");
+        news.setDescription(ConstantsManager.LOREM);
+        news.setTopic("Обновление игры");
+        news.setImageUrl(ConstantsManager.CAT);
+        news.save();
         if (savedInstanceState == null) {
-            replaceFragment(new OnlineConfigFragment_());
+            replaceFragment(fromNotification ? new NewsFragment_() : new OnlineConfigFragment_());
         }
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        subscribeBus();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unSubscribeBus();
+    }
+
+    @Subscribe
+    public void onAvatarSelected(AvatarSelectedEvent event) {
+        ((ImageView) mNavigationView
+                .getHeaderView(0)
+                .findViewById(R.id.image))
+                .setImageResource(event.getAvatarResId());
+    }
+
+    @Subscribe
+    public void onUserNameSelected(UserNameSelectedEvent event) {
+        ((TextView) mNavigationView
+                .getHeaderView(0)
+                .findViewById(R.id.name))
+                .setText(event.getUserName());
     }
 
     @AfterViews
@@ -112,7 +144,7 @@ public class MainActivity extends BaseActivity implements
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else if (mFragmentManager.getBackStackEntryCount() == 1) {
-            exit();
+            finish();
         } else {
             super.onBackPressed();
         }
@@ -133,21 +165,26 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     public void onSocketError(String message) {
-        getExitIntent().message(message).start();
-    }
-
-    private EnterActivity_.IntentBuilder_ getExitIntent() {
-        return EnterActivity_.intent(this)
-                .flags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
     }
 
     private void exit() {
-        getExitIntent().start();
+        EnterActivity_.intent(this)
+                .flags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                .start();
     }
 
-    private void prepareLogout() {
-        if (mNetworkStateChecker.isNetworkAvailable()) sendUserStatsImmediately();
-        else notifyUserWith(mNetworkUnavailableMessage);
+//    private void prepareLogout() {
+//        if (mNetworkStateChecker.isNetworkAvailable()) sendUserStatsImmediately();
+//        else notifyUserWith(mNetworkUnavailableMessage);
+//    }
+
+    private void subscribeBus() {
+        mEventBus.register(this);
+    }
+
+    private void unSubscribeBus() {
+        mEventBus.unregister(this);
     }
 
     private void setupNavigationContent() {
@@ -161,7 +198,7 @@ public class MainActivity extends BaseActivity implements
                     replaceFragment(new OnlineConfigFragment_());
                     break;
                 case R.id.drawer_news:
-                    Toast.makeText(this, mNewsTitle, Toast.LENGTH_SHORT).show();
+                    replaceFragment(new NewsFragment_());
                     break;
                 case R.id.drawer_rules:
                     Toast.makeText(this, mRulesTitle, Toast.LENGTH_SHORT).show();
@@ -170,7 +207,7 @@ public class MainActivity extends BaseActivity implements
                     replaceFragment(new StatsFragment_());
                     break;
                 case R.id.drawer_exit:
-                    prepareLogout();
+                    exit();
                     break;
             }
             return true;
@@ -180,6 +217,7 @@ public class MainActivity extends BaseActivity implements
 
     private void setUpHeader() {
         View headerView = mNavigationView.getHeaderView(0);
+        headerView.setOnClickListener(view -> showDialog());
         ImageView profileImage = (ImageView) headerView.findViewById(R.id.image);
         TextView coins = (TextView) headerView.findViewById(R.id.coins);
         TextView points = (TextView) headerView.findViewById(R.id.points);
@@ -190,6 +228,17 @@ public class MainActivity extends BaseActivity implements
         points.setText(String.valueOf(getOnlineScore()));
     }
 
+    private void showDialog() {
+        if(mDialog == null)
+            mDialog = createDialog();
+        mDialog.setCurrentName(getOnlineName());
+        mDialog.show(getSupportFragmentManager(), ConstantsManager.AVATAR_DIALOG_TAG);
+    }
+
+    private AvatarDialog createDialog() {
+        return AvatarDialog_.builder().isOfflineMode(false).build();
+    }
+
     private void changeToolbarTitle(String backStackEntryName) {
         if (backStackEntryName.equals(OnlineConfigFragment_.class.getName())) {
             setTitle(mGameTitle);
@@ -197,11 +246,10 @@ public class MainActivity extends BaseActivity implements
         } else if (backStackEntryName.equals(StatsFragment_.class.getName())) {
             setTitle(mStatsTitle);
             mNavigationView.setCheckedItem(R.id.drawer_stats);
+        } else if (backStackEntryName.equals(NewsFragment_.class.getName())) {
+            setTitle(mNewsTitle);
+            mNavigationView.setCheckedItem(R.id.drawer_news);
         }
-//        else if (backStackEntryName.equals(SettingsFragment_.class.getName())) {
-//            setTitle(mSettingsTitle);
-//            mNavigationView.setCheckedItem(R.id.drawer_settings);
-//        }
 //        else {
 //            setTitle(mStatisticsTitle);
 //            mNavigationView.setCheckedItem(R.id.drawer_statistics);
@@ -248,33 +296,33 @@ public class MainActivity extends BaseActivity implements
         mFragmentManager.addOnBackStackChangedListener(this);
     }
 
-    private void notifyUserWith(String message) {
-        Snackbar.make(mDrawerLayout, message, Snackbar.LENGTH_LONG).show();
-    }
+//    private void notifyUserWith(String message) {
+//        Snackbar.make(mDrawerLayout, message, Snackbar.LENGTH_LONG).show();
+//    }
 
-    private void sendUserStatsImmediately() {
-        setSessionTime(getCurrentTime() - getLaunchTime());
-        mDataManager.sendUserStats()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(response -> {
-                    if (response.body().getSuccess() == 1) {
-                        clearAccountData();
-                        exit();
-                    } else notifyUserWith(response.body().getMessage());
-                }, throwable -> {
-                    notifyUserWith(mUnknownErrorMessage);
-                });
-    }
+//    private void sendUserStatsImmediately() {
+//        setSessionTime(getCurrentTime() - getLaunchTime());
+//        mDataManager.sendUserStats()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(response -> {
+//                    if (response.body().getSuccess() == 1) {
+//                        clearAccountData();
+//                        exit();
+//                    } else notifyUserWith(response.body().getMessage());
+//                }, throwable -> {
+//                    notifyUserWith(mUnknownErrorMessage);
+//                });
+//    }
 
-    private void clearAccountData() {
-        saveCleverToken("");
-        saveFacebookToken("");
-        saveVkToken("");
-        setUserEmail("");
-        setOnlineName("");
-        setOnlineCoins(0);
-        setOnlineScore(0);
-        Toast.makeText(this, "Вы вышли из учётной записи", Toast.LENGTH_SHORT).show();
-    }
+//    private void clearAccountData() {
+//        saveCleverToken("");
+//        saveFacebookToken("");
+//        saveVkToken("");
+//        setUserEmail("");
+//        setOnlineName("");
+//        setOnlineCoins(0);
+//        setOnlineScore(0);
+//        Toast.makeText(this, "Вы вышли из учётной записи", Toast.LENGTH_SHORT).show();
+//    }
 }

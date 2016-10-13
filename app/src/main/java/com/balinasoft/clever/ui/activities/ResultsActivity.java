@@ -100,11 +100,11 @@ public class ResultsActivity extends BaseActivity {
         if(isOnline && tourNumber < 3) startTimer();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        //if(isOnline) stopSocketListening();
-    }
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        if(isOnline) stopSocketListening();
+//    }
 
     @Override
     protected void onDestroy() {
@@ -126,6 +126,22 @@ public class ResultsActivity extends BaseActivity {
 
     }
 
+//    @UiThread
+//    void onMessageReceived(Object... args) {
+//        JSONObject data = (JSONObject) args[0];
+//        try {
+//            String message = data.getString("message");
+//            Timber.d("Message in tour");
+//            if(message.equals(mUserLeftMessage)) {
+//                mEnemiesCount--;
+//            }
+//            int success = data.getInt("success");
+//            if(success == 1 && haveAllAnswered()) boostTimer();
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
     private void exit() {
         if(isOnline) navigateToLobby();
         else navigateToEnter();
@@ -134,7 +150,6 @@ public class ResultsActivity extends BaseActivity {
     private void navigateToEnter() {
         EnterActivity_.intent(this)
                 .flags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                .isAfterOfflineGame(true)
                 .start();
     }
 
@@ -145,11 +160,11 @@ public class ResultsActivity extends BaseActivity {
     }
 
 //    private void startSocketListening() {
-//        mSocket.on(Socket.EVENT_DISCONNECT, args -> onDisconnect());
+//        mSocket.on(ConstantsManager.ROOM_MESSAGE_EVENT, this::onMessageReceived);
 //    }
 //
 //    private void stopSocketListening() {
-//        mSocket.off(Socket.EVENT_DISCONNECT, args -> onDisconnect());
+//        mSocket.off(ConstantsManager.ROOM_MESSAGE_EVENT, this::onMessageReceived);
 //    }
 
     private void showUserResults() {
@@ -211,9 +226,9 @@ public class ResultsActivity extends BaseActivity {
     }
 
     private void startTimer() {
-        Toast.makeText(this,"Следующий раунд начнётся через 5 секунд",Toast.LENGTH_SHORT).show();
-        mSubscription = Observable.interval(5,TimeUnit.SECONDS)
-                .take(2)
+        Toast.makeText(this,"Следующий раунд начнётся через 10 секунд",Toast.LENGTH_SHORT).show();
+        mSubscription = Observable.interval(10,TimeUnit.SECONDS)
+                .take(1)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(tick -> Timber.d("tick"),
                         throwable -> Timber.d("error %s",throwable.getLocalizedMessage()),

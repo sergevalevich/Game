@@ -68,4 +68,17 @@
     <dimen name="header_vertical_padding">36dp</dimen>
     <dimen name="empty_rooms_top_margin">64dp</dimen>
     <dimen name="nav_menu_width">300dp</dimen>
+    <dimen name="question_text_size_small">17sp</dimen>
+    <dimen name="question_text_size_x_small">16sp</dimen>
+    <dimen name="question_text_size_x_x_small">15sp</dimen>
+    <dimen name="option_text_size_small">15sp</dimen>
+    <dimen name="option_text_size_x_small">14sp</dimen>
+    <dimen name="option_text_size_x_x_small">13sp</dimen>
+    <dimen name="news_card_padding">8dp</dimen>
+    <dimen name="news_title_text_size">21sp</dimen>
+    <dimen name="news_bar_padding">8dp</dimen>
+    <dimen name="news_card_padding_side">16dp</dimen>
+    <dimen name="news_image_height">188dp</dimen>
+    <dimen name="news_bar_padding_side">12dp</dimen>
+    <dimen name="news_description_size">14sp</dimen>
 </resources>

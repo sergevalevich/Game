@@ -86,4 +86,20 @@
     <dimen name="menu_item_size">64dp</dimen>
     <dimen name="design_navigation_icon_size" tools:override="true">48dp</dimen>
     <dimen name="empty_rooms_top_margin">108dp</dimen>
+    <dimen name="question_text_size_small">24sp</dimen>
+    <dimen name="question_text_size_x_small">24sp</dimen>
+    <dimen name="question_text_size_x_x_small">24sp</dimen>
+    <dimen name="option_text_size_small">22sp</dimen>
+    <dimen name="option_text_size_x_small">22sp</dimen>
+    <dimen name="option_text_size_x_x_small">22sp</dimen>
+    <dimen name="news_card_padding">12dp</dimen>
+    <dimen name="news_title_text_size">28sp</dimen>
+    <dimen name="toggle_size">36dp</dimen>
+    <dimen name="news_bar_padding">12dp</dimen>
+    <dimen name="share_news_size">36dp</dimen>
+    <dimen name="news_card_padding_side">24dp</dimen>
+    <dimen name="news_image_height">288dp</dimen>
+    <dimen name="news_bar_padding_side">18dp</dimen>
+    <dimen name="news_list_top_padding">16dp</dimen>
+    <dimen name="news_description_size">19sp</dimen>
 </resources>

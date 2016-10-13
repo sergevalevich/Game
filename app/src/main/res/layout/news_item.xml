@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:expandableTextView="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical"
+              android:paddingTop="@dimen/news_card_padding"
+              android:paddingLeft="@dimen/news_card_padding_side"
+              android:paddingRight="@dimen/news_card_padding_side"
+              android:background="@drawable/card_bg">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLength="20"
+        android:maxLines="1"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/news_title_text_size"
+        android:textStyle="bold"
+        android:paddingBottom="@dimen/news_card_padding"
+        tools:text="Обновление игры"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/news_image_height"
+            tools:background="@color/colorPrimary"
+            android:scaleType="fitXY"
+            tools:src="@drawable/logoclever"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@color/transparent_tour"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingTop="@dimen/news_bar_padding"
+            android:paddingBottom="@dimen/news_bar_padding"
+            android:paddingLeft="@dimen/news_bar_padding_side"
+            android:paddingRight="@dimen/news_bar_padding_side">
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/primary_text_size"
+                tools:text="10.02.2016"/>
+
+            <ImageView
+                android:id="@+id/share"
+                android:layout_width="@dimen/share_news_size"
+                android:layout_height="@dimen/share_news_size"
+                android:src="@drawable/export"/>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <com.ms.square.android.expandabletextview.ExpandableTextView
+        android:id="@+id/expand_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/news_card_padding"
+        expandableTextView:animDuration="200"
+        expandableTextView:maxCollapsedLines="3"
+        expandableTextView:expandDrawable="@drawable/ic_toggle"
+        expandableTextView:collapseDrawable="@drawable/ic_toggle_up">
+
+        <TextView
+            android:id="@id/expandable_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            tools:text = "azazazazaadasas"
+            android:textSize="@dimen/news_description_size"/>
+
+        <ImageButton
+            android:id="@id/expand_collapse"
+            android:layout_width="@dimen/toggle_size"
+            android:layout_height="@dimen/toggle_size"
+            android:layout_gravity="center_horizontal|bottom"
+            android:background="@android:color/transparent"/>
+    </com.ms.square.android.expandabletextview.ExpandableTextView>
+
+
+</LinearLayout>

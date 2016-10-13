@@ -1,9 +1,7 @@
 package com.balinasoft.clever.ui.activities;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -37,9 +35,6 @@ import timber.log.Timber;
 
 import static com.balinasoft.clever.GameApplication.getCurrentTime;
 import static com.balinasoft.clever.GameApplication.getLaunchTime;
-import static com.balinasoft.clever.GameApplication.getOnlineCoins;
-import static com.balinasoft.clever.GameApplication.getOnlineName;
-import static com.balinasoft.clever.GameApplication.getOnlineScore;
 import static com.balinasoft.clever.GameApplication.getUserCoins;
 import static com.balinasoft.clever.GameApplication.getUserImage;
 import static com.balinasoft.clever.GameApplication.getUserName;
@@ -85,9 +80,6 @@ public class EnterActivity extends BaseActivity {
 
     @Bean
     AnimationHelper mAnimationHelper;
-
-    @Extra
-    boolean isAfterOfflineGame;
 
     @Extra
     String message;
@@ -174,31 +166,24 @@ public class EnterActivity extends BaseActivity {
     private void showDialog() {
         if(mDialog == null)
             mDialog = createDialog();
-        mDialog.setCurrentName(!isAuthTokenExists() || isAfterOfflineGame ? getUserName() : getOnlineName());
-        mDialog.setAfterOffline(isAfterOfflineGame);
+        mDialog.setCurrentName(getUserName());
         mDialog.show(getSupportFragmentManager(), ConstantsManager.AVATAR_DIALOG_TAG);
     }
 
     private AvatarDialog createDialog() {
-        return AvatarDialog_.builder().build();
+        return AvatarDialog_.builder().isOfflineMode(true).build();
     }
 
     private void setUpUserPoints() {
-        mPointsLabel.setText(!isAuthTokenExists() || isAfterOfflineGame
-                ? String.valueOf(getUserScore())
-                : String.valueOf(getOnlineScore()));
+        mPointsLabel.setText(String.valueOf(getUserScore()));
     }
 
     private void setUpUserCoins() {
-        mCoinsLabel.setText(!isAuthTokenExists() || isAfterOfflineGame
-                ? String.valueOf(getUserCoins())
-                : String.valueOf(getOnlineCoins()));
+        mCoinsLabel.setText(String.valueOf(getUserCoins()));
     }
 
     private void setUpUserName() {
-        mUserNameLabel.setText(!isAuthTokenExists() || isAfterOfflineGame
-                ? getUserName()
-                : getOnlineName());
+        mUserNameLabel.setText(getUserName());
     }
 
     private void setUpUserImage() {
@@ -233,7 +218,6 @@ public class EnterActivity extends BaseActivity {
 
     private void playOffline() {
         OfflineGameConfigActivity_.intent(this).start().withAnimation(R.anim.enter_pull_in, R.anim.exit_fade_out);
-        finish();
     }
 
     private void playOnline() {

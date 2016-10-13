@@ -2,10 +2,12 @@ package com.balinasoft.clever.ui.activities;
 
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.model.Player;
 import com.balinasoft.clever.util.ConstantsManager;
+import com.crashlytics.android.Crashlytics;
 
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Extra;
@@ -49,6 +51,8 @@ public class TourActivityOnline extends TourActivityBase {
 
     private int mAnswersSum = 0;
 
+    private String mLastLeftId = "";
+
     @Extra
     int room;
 
@@ -62,8 +66,13 @@ public class TourActivityOnline extends TourActivityBase {
 
     @UiThread
     void onDisconnect() {
-        Timber.e("Disconnecting");
-        //Toast.makeText(this,mSocketErrorMessage,Toast.LENGTH_LONG).show();
+        Timber.e("TourActivity DISCONNECT");
+        Toast.makeText(this,mSocketErrorMessage, Toast.LENGTH_SHORT).show();
+    }
+
+    @UiThread
+    void onConnectionLost() {
+        Timber.e("ConnectionLost...");
         finish();
     }
 
@@ -88,11 +97,13 @@ public class TourActivityOnline extends TourActivityBase {
     @UiThread
     public void onRoundResultReceived(Object... args) {
         JSONObject data = (JSONObject) args[0];
-        Timber.d("Round results --- %s",data.toString());
-        try {
-            showResults(data,false);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        Timber.d("Round results --- %s", data.toString());
+        if(mCurrentTour < 3) {
+            try {
+                showResults(data, false);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -110,17 +121,18 @@ public class TourActivityOnline extends TourActivityBase {
     @UiThread
     public void onUserAnswered(Object... args) {
         JSONObject data = (JSONObject) args[0];
+        Timber.d("Message in tour %s",data.toString());
         try {
             String message = data.getString("message");
-            Timber.d("Message in tour");
-            if(message.equals(mUserLeftMessage)) {
+            String id = data.getString("id");
+            if(message.equals(mUserLeftMessage) && !id.equals(mLastLeftId)) {
+                mLastLeftId = id;
                 mEnemiesCount--;
             }
-            int success = data.getInt("success");
-            if(success == 1 && haveAllAnswered()) boostTimer();
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (JSONException ignored) {
+
         }
+        if(haveAllAnswered()) boostTimer();
     }
 
     @Override
@@ -170,9 +182,9 @@ public class TourActivityOnline extends TourActivityBase {
     }
 
     @Override
-    protected void onPause() {//////
-        super.onPause();
+    protected void onDestroy() {
         stopSocketListening();
+        super.onDestroy();
     }
 
     private void answer(String answer) {
@@ -202,6 +214,9 @@ public class TourActivityOnline extends TourActivityBase {
         mSocket.on(ConstantsManager.GAME_FINISHED_EVENT,this::onGameResultReceived);
         mSocket.on(ConstantsManager.ROOM_MESSAGE_EVENT,this::onUserAnswered);
         mSocket.on(Socket.EVENT_DISCONNECT, args -> onDisconnect());
+        mSocket.on(Socket.EVENT_RECONNECT_ERROR, args -> onConnectionLost());
+        mSocket.on(Socket.EVENT_RECONNECT_FAILED, args -> onConnectionLost());
+        mSocket.on(Socket.EVENT_CONNECT_ERROR, args -> onConnectionLost());
     }
 
     private void stopSocketListening() {
@@ -210,11 +225,16 @@ public class TourActivityOnline extends TourActivityBase {
         mSocket.off(ConstantsManager.GAME_FINISHED_EVENT,this::onGameResultReceived);
         mSocket.off(ConstantsManager.ROOM_MESSAGE_EVENT,this::onUserAnswered);
         mSocket.off(Socket.EVENT_DISCONNECT, args -> onDisconnect());
+        mSocket.off(Socket.EVENT_RECONNECT_ERROR, args -> onConnectionLost());
+        mSocket.off(Socket.EVENT_RECONNECT_FAILED, args -> onConnectionLost());
+        mSocket.off(Socket.EVENT_CONNECT_ERROR, args -> onConnectionLost());
     }
 
     private void updateAnswersRatio(String answer) {
         for(int i = 0; i < mOptionLabels.size(); i++) {
             TextView option = mOptionLabels.get(i);
+            Timber.d("ratio %s %s",option.getText().toString(),answer);
+            Crashlytics.log(option.getText().toString() + answer);
             if(answer.equals(option.getText().toString())) {
                 mAnswers.set(i, mAnswers.get(i) + 1);
                 mAnswersSum++;
@@ -254,18 +274,18 @@ public class TourActivityOnline extends TourActivityBase {
         }
     }
 
-    private List<Player> getPlayersCopy() {
-        List<Player> copy = new ArrayList<>();
-        for (Player enemy : mEnemies) {
-            Player player = new Player(enemy);
-            copy.add(player);
-        }
-        Player player = new Player(mUser);
-        copy.add(player);
-        return copy;
-    }
+//    private List<Player> getPlayersCopy() {
+//        List<Player> copy = new ArrayList<>();
+//        for (Player enemy : mEnemies) {
+//            Player player = new Player(enemy);
+//            copy.add(player);
+//        }
+//        Player player = new Player(mUser);
+//        copy.add(player);
+//        return copy;
+//    }
 
-    private void setPlayersScores(JSONObject data, boolean hasGameFinished) throws JSONException {
+    private List<Player> applyResults(JSONObject data, boolean hasGameFinished) throws JSONException {
         List<Player> players = new ArrayList<>(mEnemies);
         players.add(mUser);
         JSONArray results = data.getJSONArray("result");
@@ -274,9 +294,8 @@ public class TourActivityOnline extends TourActivityBase {
             for(Player player : players) {
                 if(player.getId().equals(playerResult.getString("id"))) {
                     int score = playerResult.getInt("score");
-                    int answers = playerResult.getInt("answers");
                     player.setTotalScore(score);
-                    player.setRightAnswersCount(answers);
+                    player.setRightAnswersCount(playerResult.getInt("answers"));
                     if(hasGameFinished) {
                         int coins = playerResult.getInt("coins");
                         player.setCoinsPortion(coins);
@@ -289,6 +308,8 @@ public class TourActivityOnline extends TourActivityBase {
                 }
             }
         }
+        sortPlayersByScore(players);
+        return players;
     }
 
     private void sortPlayersByScore(List<Player> players) {
@@ -309,10 +330,7 @@ public class TourActivityOnline extends TourActivityBase {
     }
 
     private void showResults(JSONObject data, boolean hasGameFinished) throws JSONException {
-        setPlayersScores(data,hasGameFinished);
-        List<Player> players = getPlayersCopy();
-        sortPlayersByScore(players);
-        mPlayersWithResults = getPlayersArray(players);
+        mPlayersWithResults = getPlayersArray(applyResults(data,hasGameFinished));
     }
 
 }

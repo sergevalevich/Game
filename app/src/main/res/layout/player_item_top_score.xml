@@ -48,12 +48,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorAccent"
-        android:textSize="@dimen/place_text_size"
+        android:textSize="@dimen/primary_text_size"
         android:layout_marginEnd="@dimen/players_end_margin_default"
         android:layout_marginRight="@dimen/players_end_margin_default"
         android:maxLength="6"
+        android:ellipsize="end"
         android:textStyle="bold"
-        tools:text="4878"/>
+        tools:text="487888"/>
 
 
     <ImageView

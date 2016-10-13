@@ -10,6 +10,7 @@ import com.balinasoft.clever.network.model.QuestionApiModel;
 import com.balinasoft.clever.network.model.QuestionsStatsModel;
 import com.balinasoft.clever.network.model.RatingModel;
 import com.balinasoft.clever.network.model.RegisterModel;
+import com.balinasoft.clever.storage.model.News;
 import com.balinasoft.clever.storage.model.Question;
 import com.balinasoft.clever.util.ConstantsManager;
 import com.balinasoft.clever.util.NetworkStateChecker;
@@ -242,6 +243,12 @@ public class DataManager {
         } catch (IOException e) {
             return Observable.empty();
         }
+    }
+
+    ////////////////////News/////////////////////////
+
+    public Observable<List<News>> getNews() {
+        return News.getNews();
     }
 
     ///////////////////AUTH///////////////////////

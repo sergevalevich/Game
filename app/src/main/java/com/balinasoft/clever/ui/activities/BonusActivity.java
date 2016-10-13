@@ -21,6 +21,7 @@ import org.androidannotations.annotations.ViewById;
 import java.util.Locale;
 
 import static com.balinasoft.clever.GameApplication.getBonus;
+import static com.balinasoft.clever.GameApplication.isAuthTokenExists;
 
 @EActivity(R.layout.activity_bonus)
 public class BonusActivity extends BaseActivity {
@@ -51,7 +52,8 @@ public class BonusActivity extends BaseActivity {
 
     @Click(R.id.root)
     void enter() {
-        EnterActivity_.intent(this).start();
+        if(isAuthTokenExists()) MainActivity_.intent(this).start();
+        else EnterActivity_.intent(this).start();
         finish();
     }
 

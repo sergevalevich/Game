@@ -267,10 +267,11 @@
                 android:padding="@dimen/question_text_padding"
                 android:textColor="@color/white"
                 android:textSize="@dimen/primary_text_size"
+                android:layout_marginTop="@dimen/category_label_height"
                 android:textStyle="italic"
                 android:visibility="gone"
-                android:maxLength="214"
-                tools:text=""/>
+                android:maxLength="360"
+                tools:text="sadasd"/>
 
             <ImageView
                 android:id="@+id/question_image"
@@ -330,7 +331,7 @@
                     android:id="@+id/option_one"
                     style="@style/OptionStyle"
                     android:visibility="invisible"
-                    tools:text="Девяносто"/>
+                    tools:text="Фонд социальной защиты населения"/>
 
                 <TextView
                     android:id="@+id/option_one_percent"

@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.balinasoft.clever.DataManager;
 import com.balinasoft.clever.R;
@@ -85,7 +86,7 @@ public abstract class ConfigFragmentBase extends Fragment {
     @Click(R.id.create_game_button)
     void onCreateGamePressed() {
         if (areEnoughCoins()) createGame();
-        else if(getActivity()!=null) notifyUserWith(mNotEnoughCoinsMessage);
+        else notifyUserWith(mNotEnoughCoinsMessage);
     }
 
     abstract boolean areEnoughCoins();
@@ -183,13 +184,21 @@ public abstract class ConfigFragmentBase extends Fragment {
     }
 
     void notifyUserWith(String message) {
-        Snackbar snackbar = Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG);
+        if(getContext()!=null) {
+            Snackbar snackbar = Snackbar.make(mRootView, message, Snackbar.LENGTH_LONG);
 
-        View view = snackbar.getView();
-        TextView tv = (TextView) view.findViewById(android.support.design.R.id.snackbar_text);
-        tv.setTextColor(Color.WHITE);
+            View view = snackbar.getView();
+            TextView tv = (TextView) view.findViewById(android.support.design.R.id.snackbar_text);
+            tv.setTextColor(Color.WHITE);
 
-        snackbar.show();
+            snackbar.show();
+        }
+    }
+
+    void toastNotifyUserWith(String message) {
+        if(getContext() != null) {
+            Toast.makeText(getContext(),message,Toast.LENGTH_LONG).show();
+        }
     }
 
     void notifyLoading(int visibility) {

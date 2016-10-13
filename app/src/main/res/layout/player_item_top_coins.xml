@@ -49,11 +49,12 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/players_end_margin_default"
         android:layout_marginRight="@dimen/players_end_margin_default"
-        android:maxLength="3"
+        android:maxLength="6"
+        android:ellipsize="end"
         android:textColor="@color/colorAccentDark"
-        android:textSize="@dimen/place_text_size"
+        android:textSize="@dimen/primary_text_size"
         android:textStyle="bold"
-        tools:text="100"/>
+        tools:text="100000111"/>
 
     <ImageView
         android:id="@+id/coin"

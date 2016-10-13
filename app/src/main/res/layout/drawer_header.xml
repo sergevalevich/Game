@@ -52,10 +52,11 @@
             android:layout_marginRight="@dimen/players_end_margin_default"
             android:maxLength="6"
             android:textColor="@color/colorAccent"
-            android:textSize="@dimen/place_text_size"
+            android:textSize="@dimen/primary_text_size"
             android:textStyle="bold"
+            android:ellipsize="end"
             android:text="@string/_0"
-            tools:text = "1234"/>
+            tools:text = "123456"/>
 
 
         <ImageView
@@ -72,9 +73,10 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/players_end_margin_default"
             android:layout_marginRight="@dimen/players_end_margin_default"
-            android:maxLength="5"
+            android:maxLength="6"
+            android:ellipsize="end"
             android:textColor="@color/colorAccentDark"
-            android:textSize="@dimen/place_text_size"
+            android:textSize="@dimen/primary_text_size"
             android:textStyle="bold"
             android:text="@string/_0"
             tools:text = "12345"/>

@@ -66,6 +66,7 @@ public class PlayersAdapterTopScore extends RecyclerView.Adapter<PlayersAdapterT
             mPlayerName.setText(player.getName());
             mPointsLabel.setText(String.valueOf(player.getTotalScore()));
             if (player.getId().equals(getUserId())) mPlaceLabel.setBackgroundResource(R.drawable.place2);
+            else mPlaceLabel.setBackgroundResource(R.drawable.place);
         }
 
     }

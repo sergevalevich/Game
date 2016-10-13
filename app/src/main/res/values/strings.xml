@@ -85,4 +85,12 @@
     <string name="player_left">Игрок отключился от комнаты.</string>
     <string name="connected_start">Подключилось</string>
     <string name="connected_end">из 6</string>
+    <string name="in_lobby">Вы в лобби.</string>
+    <string name="unauthorized">Проверьте подключение к сети либо немного подождите</string>
+    <string name="not_enough_players">Недостаточно участников</string>
+    <string name="connection_success">Соединение установлено</string>
+    <string name="unstable_connection">Проблемы с соединением</string>
+    <string name="share">Поделиться новостью</string>
+    <string name="clever_news">Хорошая новость от Clever!</string>
+    <string name="more">Подробнее</string>
 </resources>

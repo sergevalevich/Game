@@ -3,6 +3,7 @@ package com.balinasoft.clever.ui.activities;
 import android.content.res.Resources;
 import android.os.Parcelable;
 import android.util.SparseBooleanArray;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -200,11 +201,11 @@ public abstract class TourActivityBase extends BaseActivity {
         mEnemies = createEnemies();/////////////
         mEnemiesPositions = getEnemiesPositions();////////////////
         mQuestions = createQuestions();///////////////
+        takeCoins();
     }
 
     @AfterViews
     void setUpViews() {
-        takeCoins();
         setUpEnemiesBar();////////
         showEnemiesBar();////////
         setUpOptions();/////////
@@ -389,6 +390,7 @@ public abstract class TourActivityBase extends BaseActivity {
     }
 
     private void showQuestion() {
+        Timber.d("SHOW_QUESTION");
         Animation slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
         mAnimationHelper.setAnimationListener(slideDownAnimation, this::showOptions, null, null);
         toggleQuestion(slideDownAnimation, View.VISIBLE);
@@ -500,6 +502,7 @@ public abstract class TourActivityBase extends BaseActivity {
             Player enemy = mEnemies.get(i);
             TextView indicator = mEnemyAnswerIndicators.get(mEnemiesPositions[i]);
             indicator.setText("");
+            Timber.d("enemy answer %d rightanswer %d",enemy.getAnswerOption(),mRightAnswerPosition);
             indicator.setBackgroundResource(enemy.getAnswerOption() == mRightAnswerPosition
                     ? R.drawable.green
                     : R.drawable.red);
@@ -617,8 +620,21 @@ public abstract class TourActivityBase extends BaseActivity {
     }
 
     private void setUpTextQuestion() {/////////////////
-        mQuestionLabel.setText(mCurrentQuestion.getTextQuest());
+        String questionText = mCurrentQuestion.getTextQuest();
+        int questionLength = questionText.length();
+        mQuestionLabel.setTextSize(TypedValue.COMPLEX_UNIT_PX, getQuestionTextSize(questionLength));
+        mQuestionLabel.setText(questionText);
         mQuestionLabel.setVisibility(View.VISIBLE);
+    }
+
+    private float getQuestionTextSize(int length) {
+        if (length < ConstantsManager.QUESTION_MAX_LENGTH)
+            return getResources().getDimension(R.dimen.primary_text_size);
+        else if (length < ConstantsManager.QUESTION_MAX_LENGTH_BIG)
+            return getResources().getDimension(R.dimen.question_text_size_small);
+        else if (length < ConstantsManager.QUESTION_MAX_LENGTH_LARGE)
+            return getResources().getDimension(R.dimen.question_text_size_x_small);
+        else return getResources().getDimension(R.dimen.question_text_size_x_x_small);
     }
 
     private void setQuestionCategory() {//////////////////
@@ -630,13 +646,29 @@ public abstract class TourActivityBase extends BaseActivity {
         Collections.shuffle(positions);
         String[] answers = mCurrentQuestion.getOptions();
         for (int i = 0; i < mOptionLabels.size() - 1; i++) {
+            String answer = answers[i];
             TextView option = mOptionLabels.get(positions.remove(0));
-            option.setText(answers[i]);
+            Timber.d("textSize before %f",option.getTextSize());
+            option.setTextSize(TypedValue.COMPLEX_UNIT_PX,getOptionTextSize(answer.length()));
+            Timber.d("textSize after %f",option.getTextSize());
+            option.setText(answer);
         }
 
         mRightAnswerPosition = positions.remove(0);
+        String rightAnswer = mCurrentQuestion.getRightAnswer();
         TextView rightOption = mOptionLabels.get(mRightAnswerPosition);
-        rightOption.setText(mCurrentQuestion.getRightAnswer());
+        rightOption.setTextSize(TypedValue.COMPLEX_UNIT_PX,getOptionTextSize(rightAnswer.length()));
+        rightOption.setText(rightAnswer);
+    }
+
+    private float getOptionTextSize(int length) {
+        if(length < ConstantsManager.OPTION_MAX_LENGTH)
+            return getResources().getDimension(R.dimen.secondary_text_size);
+        else if(length < ConstantsManager.OPTION_MAX_LENGTH_BIG)
+            return getResources().getDimension(R.dimen.option_text_size_small);
+        else if(length < ConstantsManager.OPTION_MAX_LENGTH_LARGE)
+            return getResources().getDimension(R.dimen.option_text_size_x_small);
+        else return getResources().getDimension(R.dimen.option_text_size_x_x_small);
     }
 
     private void setUpOptions() {//////////////////////////
@@ -734,7 +766,7 @@ public abstract class TourActivityBase extends BaseActivity {
             case 5:
                 return ConstantsManager.ENEMY_FIVE;
             default:
-                throw new RuntimeException("Wrong enemies count!");
+                throw new RuntimeException("Wrong enemies count!" + String.valueOf(mEnemies.size()));
         }
     }
 

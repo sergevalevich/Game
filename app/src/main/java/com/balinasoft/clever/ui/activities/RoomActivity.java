@@ -1,6 +1,5 @@
 package com.balinasoft.clever.ui.activities;
 
-import android.content.Intent;
 import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
@@ -93,6 +92,9 @@ public class RoomActivity extends BaseActivity {
     @StringRes(R.string.socket_error)
     String mSocketErrorMessage;
 
+    @StringRes(R.string.not_enough_players)
+    String mNotEnoughPlayersMessage;
+
     @Bean
     AnimationHelper mAnimationHelper;
 
@@ -112,7 +114,7 @@ public class RoomActivity extends BaseActivity {
 
     private Socket mSocket = getSocket();
 
-    private int mSecondsLeft = 3;
+    private int mSecondsLeft = 5;
 
     @AfterExtras
     void initExtras() {
@@ -132,6 +134,7 @@ public class RoomActivity extends BaseActivity {
     @Click(R.id.start_game_button)
     void onStartGameClicked() {
         if (mPlayers.size() > 1) startGame();
+        else Toast.makeText(this,mNotEnoughPlayersMessage,Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -192,18 +195,29 @@ public class RoomActivity extends BaseActivity {
         mSocket.on(ConstantsManager.ROOM_MESSAGE_EVENT, this::onPlayersCountChanged);
         mSocket.on(ConstantsManager.START_GAME_EVENT, this::onGameStarted);
         mSocket.on(Socket.EVENT_DISCONNECT, args -> onDisconnect());
+        mSocket.on(Socket.EVENT_RECONNECT_ERROR, args -> onConnectionLost());
+        mSocket.on(Socket.EVENT_RECONNECT_FAILED, args -> onConnectionLost());
+        mSocket.on(Socket.EVENT_CONNECT_ERROR, args -> onConnectionLost());
     }
 
     private void stopSocketListening() {
         mSocket.off(ConstantsManager.ROOM_MESSAGE_EVENT, this::onPlayersCountChanged);
         mSocket.off(ConstantsManager.START_GAME_EVENT, this::onGameStarted);
         mSocket.off(Socket.EVENT_DISCONNECT, args -> onDisconnect());
+        mSocket.off(Socket.EVENT_RECONNECT_ERROR, args -> onConnectionLost());
+        mSocket.off(Socket.EVENT_RECONNECT_FAILED, args -> onConnectionLost());
+        mSocket.off(Socket.EVENT_CONNECT_ERROR, args -> onConnectionLost());
     }
 
     @UiThread
     void onDisconnect() {
         Timber.e("Disconnecting");
-        //Toast.makeText(this,mSocketErrorMessage,Toast.LENGTH_LONG).show();
+        Toast.makeText(this,mSocketErrorMessage,Toast.LENGTH_SHORT).show();
+    }
+
+    @UiThread
+    void onConnectionLost() {
+        Timber.e("ConnectionLost...");
         finish();
     }
 
@@ -240,7 +254,7 @@ public class RoomActivity extends BaseActivity {
         try {
             JSONArray jsonQuestions = data.getJSONArray("quests");
             List<QuestionApiModel> questions = getQuestions(jsonQuestions);
-            navigateToRound(questions);
+            startRound(questions);
         } catch (JSONException ignored) {
 
         }
@@ -248,27 +262,29 @@ public class RoomActivity extends BaseActivity {
     }
 
     private void startRound(List<QuestionApiModel> questions) {
-        Animation scale = AnimationUtils.loadAnimation(this, R.anim.scale);
+        Animation fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in_timer);
 
-        mAnimationHelper.setAnimationListener(scale,
+        mAnimationHelper.setAnimationListener(fadeIn,
                 () -> {
-                    mCountDownLabel.setVisibility(View.GONE);
-                    if(mSecondsLeft == 0) navigateToRound(questions);
-                    else scale.start();
-                },
-                () -> {
-                    String text;
-                    if(mSecondsLeft == 0) {
-                        text = "Игра началась!";
-                        mCountDownLabel.setTextSize(mConnectedLabel.getTextSize() - 2);
+                    if (--mSecondsLeft == -1) {
+                        navigateToRound(questions);
                     } else {
-                        text = String.valueOf(mSecondsLeft--);
+                        String text;
+                        if (mSecondsLeft == 0) {
+                            text = "Старт!";
+                            mCountDownLabel.setTextSize(mConnectedLabel.getTextSize() - 4);
+                        } else {
+                            text = String.valueOf(mSecondsLeft);
+                        }
+                        mCountDownLabel.setText(text);
+                        mCountDownLabel.startAnimation(fadeIn);
                     }
-                    mCountDownLabel.setText(text);
-                    mContent.setVisibility(View.GONE);
-                    mCountDownLabel.setVisibility(View.VISIBLE);
-                }, null);
-        mCountDownLabel.startAnimation(scale);
+                }, null, null);
+
+        mCountDownLabel.setText(String.valueOf(mSecondsLeft));
+        mContent.setVisibility(View.GONE);
+        mCountDownLabel.setVisibility(View.VISIBLE);
+        mCountDownLabel.startAnimation(fadeIn);
 }
 
     private void navigateToRound(List<QuestionApiModel> questions) {
@@ -276,6 +292,7 @@ public class RoomActivity extends BaseActivity {
         pls = mPlayers.toArray(pls);
         QuestionApiModel[] q = new QuestionApiModel[questions.size()];
         q = questions.toArray(q);
+        Timber.d("players count %d",pls.length);
         TourActivityOnline_.intent(this)
                 .parcelablePlayers(pls)
                 .bet(bet)

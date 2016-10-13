@@ -1,33 +1,42 @@
 package com.balinasoft.clever.services;
 
 
+import android.content.Intent;
+
+import com.balinasoft.clever.ui.activities.MainActivity_;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.androidannotations.annotations.EService;
+
+import java.util.Map;
+
 import timber.log.Timber;
 
-
+@EService
 public class MessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        // ...
 
-        // TODO(developer): Handle FCM messages here.
-        // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
-        Timber.d("From: %s",remoteMessage.getFrom());
+        Map<String,String> data = remoteMessage.getData();
 
-        // Check if message contains a data payload.
-        if (remoteMessage.getData().size() > 0) {
+        if (data.size() > 0) {
             Timber.d("Message data payload: %s",remoteMessage.getData());
         }
 
-        // Check if message contains a notification payload.
-        if (remoteMessage.getNotification() != null) {
-            Timber.d("Message Notification Body: %s",remoteMessage.getNotification().getBody());
+        RemoteMessage.Notification notification = remoteMessage.getNotification();
+
+        if (notification != null) {
+            String clickAction = notification.getClickAction();
+            Timber.d("Message Notification Body: %s Click action: %s",
+                    remoteMessage.getNotification().getBody(),clickAction);
+            MainActivity_.intent(this)
+                    .action(clickAction)
+                    .fromNotification(true)
+                    .flags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                    .start();
         }
 
-        // Also if you intend on generating your own notifications as a result of a received FCM
-        // message, here is where that should be initiated. See sendNotification method below.
     }
 
 }

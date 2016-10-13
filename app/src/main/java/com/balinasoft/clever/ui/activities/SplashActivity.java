@@ -14,6 +14,8 @@ import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
+import static com.balinasoft.clever.GameApplication.isAuthTokenExists;
+
 @EActivity(R.layout.activity_splash)
 public class SplashActivity extends BaseActivity implements BonusHelper.BonusListener {
 
@@ -51,7 +53,8 @@ public class SplashActivity extends BaseActivity implements BonusHelper.BonusLis
     }
 
     private void enter() {
-        EnterActivity_.intent(this).start();
+        if(isAuthTokenExists()) MainActivity_.intent(this).start();
+        else EnterActivity_.intent(this).start();
         finish();
     }
 
