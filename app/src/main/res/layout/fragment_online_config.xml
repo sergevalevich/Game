@@ -241,42 +241,42 @@
 
             </android.support.v7.widget.Toolbar>
 
-            <FrameLayout
-                android:id="@+id/empty_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/config_area"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/empty_rooms_top_margin"
-                    android:gravity="center"
-                    android:text="@string/rooms_empty"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/primary_text_size"/>
-
-            </FrameLayout>
-
-
         </android.support.design.widget.AppBarLayout>
 
-        <android.support.v4.widget.SwipeRefreshLayout
-            android:id="@+id/swipe"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rooms_list"
+            <TextView
+                android:id="@+id/empty_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/empty_rooms_top_margin"
+                android:gravity="center"
+                android:visibility="visible"
+                android:text="@string/rooms_empty"
+                android:textColor="@color/white"
+                android:textSize="@dimen/primary_text_size"/>
+
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:id="@+id/swipe"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/config_area"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
-            </android.support.v7.widget.RecyclerView>
 
-        </android.support.v4.widget.SwipeRefreshLayout>
+                <android.support.v7.widget.RecyclerView
+                    android:visibility="gone"
+                    android:id="@+id/rooms_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@+id/config_area"
+                    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+                </android.support.v7.widget.RecyclerView>
+
+            </android.support.v4.widget.SwipeRefreshLayout>
+
+        </FrameLayout>
 
 
     </android.support.design.widget.CoordinatorLayout>

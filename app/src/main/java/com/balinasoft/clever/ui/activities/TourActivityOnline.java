@@ -53,6 +53,8 @@ public class TourActivityOnline extends TourActivityBase {
 
     private String mLastLeftId = "";
 
+    private boolean mHasResultsReceived = false;
+
     @Extra
     int room;
 
@@ -68,11 +70,6 @@ public class TourActivityOnline extends TourActivityBase {
     void onDisconnect() {
         Timber.e("TourActivity DISCONNECT");
         Toast.makeText(this,mSocketErrorMessage, Toast.LENGTH_SHORT).show();
-    }
-
-    @UiThread
-    void onConnectionLost() {
-        Timber.e("ConnectionLost...");
         finish();
     }
 
@@ -96,25 +93,31 @@ public class TourActivityOnline extends TourActivityBase {
 
     @UiThread
     public void onRoundResultReceived(Object... args) {
-        JSONObject data = (JSONObject) args[0];
-        Timber.d("Round results --- %s", data.toString());
-        if(mCurrentTour < 3) {
+        if (!mHasResultsReceived && mCurrentTour < 3) {
+            mHasResultsReceived = true;
+            JSONObject data = (JSONObject) args[0];
+            Timber.d("Round results --- %s", data.toString());
             try {
-                showResults(data, false);
+                setResults(data, false);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
         }
     }
 
     @UiThread
     public void onGameResultReceived(Object... args) {
-        JSONObject data = (JSONObject) args[0];
-        Timber.d("Game results --- %s",data.toString());
-        try {
-            showResults(data,true);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        Timber.d("game results/should be false, actually %s", String.valueOf(mHasResultsReceived));
+        if (!mHasResultsReceived) {
+            mHasResultsReceived = true;
+            JSONObject data = (JSONObject) args[0];
+            Timber.d("Game results --- %s", data.toString());
+            try {
+                setResults(data, true);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -127,7 +130,9 @@ public class TourActivityOnline extends TourActivityBase {
             String id = data.getString("id");
             if(message.equals(mUserLeftMessage) && !id.equals(mLastLeftId)) {
                 mLastLeftId = id;
-                mEnemiesCount--;
+                Player player = new Player();
+                player.setId(mLastLeftId);
+                mEnemies.remove(player);
             }
         } catch (JSONException ignored) {
 
@@ -164,7 +169,10 @@ public class TourActivityOnline extends TourActivityBase {
 
     @Override
     void onRoundReset() {
-        navigateToResults(mPlayersWithResults);
+        Timber.d("round resetting start/should be true, actually %s", String.valueOf(mHasResultsReceived));
+        navigateToResults();
+        mHasResultsReceived = false;
+        Timber.d("round resetting finished");
     }
 
     void resetQuestion() {
@@ -214,9 +222,6 @@ public class TourActivityOnline extends TourActivityBase {
         mSocket.on(ConstantsManager.GAME_FINISHED_EVENT,this::onGameResultReceived);
         mSocket.on(ConstantsManager.ROOM_MESSAGE_EVENT,this::onUserAnswered);
         mSocket.on(Socket.EVENT_DISCONNECT, args -> onDisconnect());
-        mSocket.on(Socket.EVENT_RECONNECT_ERROR, args -> onConnectionLost());
-        mSocket.on(Socket.EVENT_RECONNECT_FAILED, args -> onConnectionLost());
-        mSocket.on(Socket.EVENT_CONNECT_ERROR, args -> onConnectionLost());
     }
 
     private void stopSocketListening() {
@@ -225,9 +230,18 @@ public class TourActivityOnline extends TourActivityBase {
         mSocket.off(ConstantsManager.GAME_FINISHED_EVENT,this::onGameResultReceived);
         mSocket.off(ConstantsManager.ROOM_MESSAGE_EVENT,this::onUserAnswered);
         mSocket.off(Socket.EVENT_DISCONNECT, args -> onDisconnect());
-        mSocket.off(Socket.EVENT_RECONNECT_ERROR, args -> onConnectionLost());
-        mSocket.off(Socket.EVENT_RECONNECT_FAILED, args -> onConnectionLost());
-        mSocket.off(Socket.EVENT_CONNECT_ERROR, args -> onConnectionLost());
+    }
+
+    private void leave() {
+        JSONObject roomInfo = new JSONObject();
+        try {
+            roomInfo.put("room", room);
+            Timber.d("leaving.........%s", roomInfo.toString());
+            mSocket.emit(ConstantsManager.ROOM_LEAVING_EVENT, roomInfo);
+            finish();
+        } catch (JSONException ignored) {
+
+        }
     }
 
     private void updateAnswersRatio(String answer) {
@@ -243,8 +257,12 @@ public class TourActivityOnline extends TourActivityBase {
         }
 
         for(int i = 0; i < mOptionPercents.size(); i++) {
-            TextView percentLabel = mOptionPercents.get(i);
-            percentLabel.setText(String.format(Locale.getDefault(), "%d%s", (mAnswers.get(i)*100)/mAnswersSum, "%"));
+            if (mAnswersSum != 0) {
+                TextView percentLabel = mOptionPercents.get(i);
+                percentLabel.setText(String.format(Locale.getDefault(), "%d%s", (mAnswers.get(i) * 100) / mAnswersSum, "%"));
+            } else {
+                Timber.e("answer was %s", answer);
+            }
         }
 
     }
@@ -273,17 +291,6 @@ public class TourActivityOnline extends TourActivityBase {
             mAnswers.set(i,0);
         }
     }
-
-//    private List<Player> getPlayersCopy() {
-//        List<Player> copy = new ArrayList<>();
-//        for (Player enemy : mEnemies) {
-//            Player player = new Player(enemy);
-//            copy.add(player);
-//        }
-//        Player player = new Player(mUser);
-//        copy.add(player);
-//        return copy;
-//    }
 
     private List<Player> applyResults(JSONObject data, boolean hasGameFinished) throws JSONException {
         List<Player> players = new ArrayList<>(mEnemies);
@@ -321,15 +328,16 @@ public class TourActivityOnline extends TourActivityBase {
         return players.toArray(pls);
     }
 
-    private void navigateToResults(Player[] players) {
+    private void navigateToResults() {
         ResultsActivity_.intent(this)
-                .parcelablePlayers(players)
+                .parcelablePlayers(mPlayersWithResults)
                 .tourNumber(mCurrentTour - 1)
                 .isOnline(true)
                 .start();
+        if (mCurrentTour == 4) leave();
     }
 
-    private void showResults(JSONObject data, boolean hasGameFinished) throws JSONException {
+    private void setResults(JSONObject data, boolean hasGameFinished) throws JSONException {
         mPlayersWithResults = getPlayersArray(applyResults(data,hasGameFinished));
     }
 

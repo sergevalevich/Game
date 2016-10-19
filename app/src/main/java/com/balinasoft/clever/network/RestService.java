@@ -79,8 +79,9 @@ public class RestService {
                                                                     long sessionTime,
                                                                     int userCoins,
                                                                     int userScore,
-                                                                    String launchTime) {
-        return mGameApi.sendUserStats(email, userName, sessionTime, userCoins, userScore, launchTime);
+                                                                    String launchTime,
+                                                                    int avatar) {
+        return mGameApi.sendUserStats(email, userName, sessionTime, userCoins, userScore, launchTime,avatar);
     }
 
     public Observable<LogInModel> logIn(String email, String password, String token) {

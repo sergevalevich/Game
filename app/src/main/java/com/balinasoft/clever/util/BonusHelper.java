@@ -7,6 +7,7 @@ import java.util.GregorianCalendar;
 
 import static com.balinasoft.clever.GameApplication.getBonus;
 import static com.balinasoft.clever.GameApplication.getLastAppLaunchDay;
+import static com.balinasoft.clever.GameApplication.getOnlineCoins;
 import static com.balinasoft.clever.GameApplication.getUserCoins;
 import static com.balinasoft.clever.GameApplication.isAuthTokenExists;
 import static com.balinasoft.clever.GameApplication.isFirstLaunch;
@@ -41,7 +42,8 @@ public class BonusHelper {
 
             int currentBonus = getBonus();
             if (!isMaxBonus(currentBonus)) setBonus(++currentBonus);
-            int newCoinsCount = getUserCoins() + currentBonus;
+            int userCoins = isAuthTokenExists() ? getOnlineCoins() : getUserCoins();
+            int newCoinsCount = userCoins + currentBonus;
             if(isAuthTokenExists()) setOnlineCoins(newCoinsCount);
             else setUserCoins(newCoinsCount);
             setLastAppLaunchDay(mCurrentDay);

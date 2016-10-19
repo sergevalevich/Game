@@ -162,8 +162,6 @@ public abstract class TourActivityBase extends BaseActivity {
 
     List<Player> mEnemies; ////////////
 
-    int mEnemiesCount;////////
-
     Player mUser; //////////////////
 
     List<IQuestion> mQuestions;///////////
@@ -261,7 +259,7 @@ public abstract class TourActivityBase extends BaseActivity {
     }
 
     boolean haveAllAnswered() {
-        return (mPlayersAnsweredCount == mEnemies.size() + 1) || (mPlayersAnsweredCount == 1 && mEnemiesCount == 0);
+        return mPlayersAnsweredCount == mEnemies.size() + 1;
     }
 
     void boostTimer() {
@@ -747,11 +745,8 @@ public abstract class TourActivityBase extends BaseActivity {
             if (!player.getId().equals(getUserId()))
                 players.add(player);
         }
-        mEnemiesCount = players.size();
         return players;
     }
-
-
 
     private int[] getEnemiesPositions() {///////////////
         switch (mEnemies.size()) {

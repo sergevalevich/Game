@@ -101,7 +101,10 @@ public class TourActivityOffline extends TourActivityBase {
         Player[] pls = new Player[players.size()];
         pls = players.toArray(pls);
 
-        ResultsActivity_.intent(this).parcelablePlayers(pls).tourNumber(mCurrentTour - 1).start();
+        ResultsActivity_.intent(this).parcelablePlayers(pls)
+                .tourNumber(mCurrentTour - 1)
+                .start();
+        if (mCurrentTour == 4) finish();
     }
 
     void resetQuestion() {

@@ -13,6 +13,7 @@ import com.balinasoft.clever.DataManager;
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.model.Player;
 import com.balinasoft.clever.network.model.RatingModel;
+import com.balinasoft.clever.util.AvatarMapper;
 import com.balinasoft.clever.util.NetworkStateChecker;
 
 import org.androidannotations.annotations.AfterViews;
@@ -59,6 +60,9 @@ public abstract class TopFragmentBase extends Fragment {
 
     @Bean
     NetworkStateChecker mNetworkStateChecker;
+
+    @Bean
+    AvatarMapper mAvatarMapper;
 
     @StringRes(R.string.network_unavailbale_message)
     String mNetworkUnavailableMessage;
@@ -130,7 +134,6 @@ public abstract class TopFragmentBase extends Fragment {
         return mDataManager.getRatings(getFilter())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doAfterTerminate(() -> toggleSwipe(false))
                 .subscribe(this::handleResult,this::handleError);
     }
 
@@ -139,6 +142,7 @@ public abstract class TopFragmentBase extends Fragment {
     }
 
     private void handleResult(RatingModel ratingModel) {
+        toggleSwipe(false);
         if(ratingModel.getSuccess() == 1) {
             List<Player> players = getPlayers(ratingModel.getUsers());
             mRecyclerView.setAdapter(getAdapter(players));
@@ -149,6 +153,7 @@ public abstract class TopFragmentBase extends Fragment {
     }
 
     private void handleError(Throwable throwable) {
+        toggleSwipe(false);
         String message = throwable.getLocalizedMessage();
         notifyUserWith(message == null || message.isEmpty()
                 ? mNetworkErrorMessage
@@ -169,7 +174,7 @@ public abstract class TopFragmentBase extends Fragment {
             if(id.equals(getUserId())) {
                 mUserPlace = i + 1;
                 player.setImageResId(getUserImage());
-            } else player.setImageResId(Player.getRandomImage());
+            } else player.setImageResId(mAvatarMapper.getAvatar(apiPlayer.getAvatar()));
             players.add(player);
         }
 

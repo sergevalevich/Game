@@ -11,10 +11,13 @@ public class Room {
 
     private int mNumber;
 
-    public Room(List<Player> players, int bet,int number) {
+    private int mMaxPlayers;
+
+    public Room(List<Player> players, int bet,int number, int maxPlayers) {
         mPlayers = players;
         mBet = bet;
         mNumber = number;
+        mMaxPlayers = maxPlayers;
     }
 
     public List<Player> getPlayers() {
@@ -27,5 +30,9 @@ public class Room {
 
     public int getNumber() {
         return mNumber;
+    }
+
+    public int getMaxPlayers() {
+        return mMaxPlayers;
     }
 }

@@ -45,8 +45,6 @@ public class Player implements Comparable<Player> , Parcelable{
 
     private String mId;
 
-    private String mIdInRoom;
-
     private String mTextAnswer;
 
     private static Random mAnswerOptionRandom = new Random();
@@ -127,14 +125,6 @@ public class Player implements Comparable<Player> , Parcelable{
 
     public void setTextAnswer(String textAnswer) {
         mTextAnswer = textAnswer;
-    }
-
-    public String getIdInRoom() {
-        return mIdInRoom;
-    }
-
-    public void setIdInRoom(String idInRoom) {
-        mIdInRoom = idInRoom;
     }
 
     public String getId() {
@@ -250,10 +240,6 @@ public class Player implements Comparable<Player> , Parcelable{
             }
             player.setCoinsPortion(portion);
         }
-    }
-
-    public static int getRandomImage() {
-        return IMAGES_BY_NAME.get(new Random().nextInt(5)).getValue();
     }
 
     @Override

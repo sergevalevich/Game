@@ -31,9 +31,9 @@
             android:textColor="@color/white"
             android:textSize="@dimen/primary_text_size"
             android:maxLines="1"
-            android:maxLength="11"
+            android:maxLength="19"
             android:ellipsize="end"
-            tools:text="Новичок1222"/>
+            tools:text="Новичок12222345678911"/>
 
         <TextView
             android:id="@+id/bet"

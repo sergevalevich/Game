@@ -18,6 +18,10 @@ public class MessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
+        Timber.d("Message received %s",remoteMessage.toString());
+
+        Timber.d("body %s", remoteMessage.getNotification().getBody());
+
         Map<String,String> data = remoteMessage.getData();
 
         if (data.size() > 0) {

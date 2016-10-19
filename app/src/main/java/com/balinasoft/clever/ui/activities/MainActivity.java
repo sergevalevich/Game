@@ -38,6 +38,8 @@ import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.StringRes;
 
+import timber.log.Timber;
+
 import static com.balinasoft.clever.GameApplication.getOnlineCoins;
 import static com.balinasoft.clever.GameApplication.getOnlineName;
 import static com.balinasoft.clever.GameApplication.getOnlineScore;
@@ -111,6 +113,12 @@ public class MainActivity extends BaseActivity implements
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        updateScore();
+    }
+
+    @Override
     protected void onStop() {
         super.onStop();
         unSubscribeBus();
@@ -165,7 +173,10 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     public void onSocketError(String message) {
-        Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
+        if(RESUMED_ACTIVITIES_COUNT > 0) {
+            Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
+            Timber.d("toast main");
+        }
     }
 
     private void exit() {
@@ -219,11 +230,15 @@ public class MainActivity extends BaseActivity implements
         View headerView = mNavigationView.getHeaderView(0);
         headerView.setOnClickListener(view -> showDialog());
         ImageView profileImage = (ImageView) headerView.findViewById(R.id.image);
-        TextView coins = (TextView) headerView.findViewById(R.id.coins);
-        TextView points = (TextView) headerView.findViewById(R.id.points);
         TextView nameField = (TextView) headerView.findViewById(R.id.name);
         nameField.setText(getOnlineName());
         profileImage.setImageResource(getUserImage());
+    }
+
+    private void updateScore() {
+        View headerView = mNavigationView.getHeaderView(0);
+        TextView coins = (TextView) headerView.findViewById(R.id.coins);
+        TextView points = (TextView) headerView.findViewById(R.id.points);
         coins.setText(String.valueOf(getOnlineCoins()));
         points.setText(String.valueOf(getOnlineScore()));
     }

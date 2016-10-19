@@ -81,12 +81,14 @@ public class ResultsActivity extends BaseActivity {
 
     @AfterExtras
     void setAdapter() {
-        mPlayers = new Player[parcelablePlayers.length];
-        for (int i = 0; i < parcelablePlayers.length; i++) {
-            mPlayers[i] = (Player) parcelablePlayers[i];
+        if(parcelablePlayers != null) {
+            mPlayers = new Player[parcelablePlayers.length];
+            for (int i = 0; i < parcelablePlayers.length; i++) {
+                mPlayers[i] = (Player) parcelablePlayers[i];
+            }
+            mPlayersAdapterResults = new PlayersAdapterResults(mPlayers, tourNumber);
+            //if(isOnline) mSocket = getSocket();
         }
-        mPlayersAdapterResults = new PlayersAdapterResults(mPlayers,tourNumber);
-        //if(isOnline) mSocket = getSocket();
     }
 
     @Override
@@ -143,8 +145,9 @@ public class ResultsActivity extends BaseActivity {
 //    }
 
     private void exit() {
-        if(isOnline) navigateToLobby();
-        else navigateToEnter();
+//        if(isOnline) navigateToLobby();
+//        else navigateToEnter();
+        finish();
     }
 
     private void navigateToEnter() {

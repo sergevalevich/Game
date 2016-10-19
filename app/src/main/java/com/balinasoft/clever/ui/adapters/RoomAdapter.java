@@ -82,11 +82,12 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.RoomHolder> {
             mHostName.setText(host.getName());
             mBetLabel.setText(String.valueOf(room.getBet()));
             for (int i = 0; i < mPlayersImages.size(); i++) {
-                if(i >= players.size() - 1) {
-                    mPlayersImages.get(i).setImageResource(R.drawable.newgamer);
-                } else {
-                    mPlayersImages.get(i).setImageResource(players.get(i+1).getImageResId());
-                }
+                int visibility = View.VISIBLE;
+                ImageView imageView = mPlayersImages.get(i);
+                if (i > room.getMaxPlayers() - 2) visibility = View.INVISIBLE;
+                else if (i >= players.size() - 1) imageView.setImageResource(R.drawable.newgamer);
+                else imageView.setImageResource(players.get(i + 1).getImageResId());
+                imageView.setVisibility(visibility);
             }
             mPlayButton.setOnClickListener(view -> mRoomsClickListener.onRoomClicked(
                     room.getNumber(),

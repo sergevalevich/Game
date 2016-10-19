@@ -16,7 +16,7 @@ import org.androidannotations.annotations.res.StringRes;
 
 import rx.Observable;
 
-import static com.balinasoft.clever.GameApplication.getDeviceToken;
+import static com.balinasoft.clever.GameApplication.getFireBaseToken;
 
 @EActivity(R.layout.activity_login)
 public class LoginActivity extends AuthActivity {
@@ -70,7 +70,7 @@ public class LoginActivity extends AuthActivity {
     Observable<LogInModel> getAuthStream() {
         return mDataManager.logIn(mEmailField.getText().toString(),
                 mPasswordField.getText().toString(),
-                getDeviceToken());
+                getFireBaseToken());
     }
 
     private void setUpActionBar() {

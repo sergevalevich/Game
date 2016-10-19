@@ -84,7 +84,7 @@
     <string name="new_player">К комнате присоединился новый игрок.</string>
     <string name="player_left">Игрок отключился от комнаты.</string>
     <string name="connected_start">Подключилось</string>
-    <string name="connected_end">из 6</string>
+    <string name="connected_end">из</string>
     <string name="in_lobby">Вы в лобби.</string>
     <string name="unauthorized">Проверьте подключение к сети либо немного подождите</string>
     <string name="not_enough_players">Недостаточно участников</string>
@@ -93,4 +93,5 @@
     <string name="share">Поделиться новостью</string>
     <string name="clever_news">Хорошая новость от Clever!</string>
     <string name="more">Подробнее</string>
+    <string name="auth_failed">Не удалось авторизоваться</string>
 </resources>

@@ -43,7 +43,8 @@ interface GameApi {
                                                              @Field("time_session") long sessionTime,
                                                              @Field("coins") int userCoins,
                                                              @Field("score") int userScore,
-                                                             @Field("entry_time") String launchTime);
+                                                             @Field("entry_time") String launchTime,
+                                                             @Field("avatar") int avatar);
 
     @FormUrlEncoded
     @POST("users/mobile_login")

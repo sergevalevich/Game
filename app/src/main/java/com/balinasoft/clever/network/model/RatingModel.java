@@ -44,6 +44,9 @@ public class RatingModel {
         @SerializedName("score")
         private int mScore;
 
+        @SerializedName("avatar")
+        private int mAvatar;
+
         public int getCoins() {
             return mCoins;
         }
@@ -60,23 +63,9 @@ public class RatingModel {
             return mId;
         }
 
+        public int getAvatar() {
+            return mAvatar;
+        }
     }
 
-//    private class UserModelScore extends UserModel {
-//        @SerializedName("coins")
-//        private int mCoins;
-//
-//        public int getCoins() {
-//            return mCoins;
-//        }
-//    }
-//
-//    private class UserModelScore extends UserModel {
-//        @SerializedName("coins")
-//        private int mCoins;
-//
-//        public int getCoins() {
-//            return mCoins;
-//        }
-//    }
 }

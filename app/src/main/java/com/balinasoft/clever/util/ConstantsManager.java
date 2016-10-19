@@ -8,7 +8,7 @@ import java.util.List;
 public interface ConstantsManager {
     //String BASE_URL = "https://clever.balinasoft.com/";
     String BASE_URL = "http://91.107.105.245:3000/";
-    int CONNECTION_TIME_OUT = 30;
+    int CONNECTION_TIME_OUT = 20;
     int READ_TIME_OUT = 50;
 
     int [] ENEMY_ONE = new int[]{2}; //center image

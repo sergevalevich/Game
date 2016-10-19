@@ -12,6 +12,7 @@ import com.balinasoft.clever.util.Preferences_;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.vk.sdk.VKAccessToken;
@@ -94,15 +95,8 @@ public class GameApplication extends Application {
                 }
             });
         }
-
         saveDeviceToken();
-
         if(isFirstLaunch()) setUserCoins(ConstantsManager.INIT_COINS);
-    }
-
-    private void saveDeviceToken() {
-        mPreferences.deviceToken().put(Settings.Secure.getString(getContentResolver(),
-                Settings.Secure.ANDROID_ID));
     }
 
     public static String getUserName() {
@@ -205,8 +199,12 @@ public class GameApplication extends Application {
         return mPreferences.vkToken().get();
     }
 
-    public static String getDeviceToken() {
-        return mPreferences.deviceToken().get();
+    public static String getFireBaseToken() {
+        String token = FirebaseInstanceId.getInstance().getToken();
+        Timber.e("FIRE TOKEN %s",token);
+        return token == null || token.isEmpty()
+                ? getDeviceToken()
+                : token;
     }
 
     public static boolean isAuthTokenExists() {
@@ -275,5 +273,15 @@ public class GameApplication extends Application {
 
     public static int getOnlineCoins() {
         return mPreferences.userCoinsOnline().get();
+    }
+
+    private static String getDeviceToken() {
+        return mPreferences.deviceToken().get();
+    }
+
+    private void saveDeviceToken() {
+        mPreferences.deviceToken().put(
+                Settings.Secure.getString(getContentResolver(),
+                Settings.Secure.ANDROID_ID));
     }
 }

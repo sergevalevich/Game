@@ -19,6 +19,7 @@ import com.balinasoft.clever.model.Player;
 import com.balinasoft.clever.network.model.QuestionApiModel;
 import com.balinasoft.clever.ui.adapters.PlayersAdapterRoom;
 import com.balinasoft.clever.util.AnimationHelper;
+import com.balinasoft.clever.util.AvatarMapper;
 import com.balinasoft.clever.util.ConstantsManager;
 import com.balinasoft.clever.util.UrlFormatter;
 
@@ -98,6 +99,9 @@ public class RoomActivity extends BaseActivity {
     @Bean
     AnimationHelper mAnimationHelper;
 
+    @Bean
+    AvatarMapper mAvatarMapper;
+
     @Extra
     Parcelable[] parcelablePlayers;
 
@@ -106,6 +110,9 @@ public class RoomActivity extends BaseActivity {
 
     @Extra
     int bet;
+
+    @Extra
+    int maxPlayers;
 
     @Extra
     String idInRoom;
@@ -157,10 +164,11 @@ public class RoomActivity extends BaseActivity {
 
     private void showHowManyConnected() {
         String connectedString = String.format(Locale.getDefault(),
-                "%s %d %s",
+                "%s %d %s %d",
                 mConnectedStart,
                 mPlayers.size(),
-                mConnectedEnd);
+                mConnectedEnd,
+                maxPlayers);
         mConnectedLabel.setText(connectedString);
     }
 
@@ -195,46 +203,38 @@ public class RoomActivity extends BaseActivity {
         mSocket.on(ConstantsManager.ROOM_MESSAGE_EVENT, this::onPlayersCountChanged);
         mSocket.on(ConstantsManager.START_GAME_EVENT, this::onGameStarted);
         mSocket.on(Socket.EVENT_DISCONNECT, args -> onDisconnect());
-        mSocket.on(Socket.EVENT_RECONNECT_ERROR, args -> onConnectionLost());
-        mSocket.on(Socket.EVENT_RECONNECT_FAILED, args -> onConnectionLost());
-        mSocket.on(Socket.EVENT_CONNECT_ERROR, args -> onConnectionLost());
     }
 
     private void stopSocketListening() {
         mSocket.off(ConstantsManager.ROOM_MESSAGE_EVENT, this::onPlayersCountChanged);
         mSocket.off(ConstantsManager.START_GAME_EVENT, this::onGameStarted);
         mSocket.off(Socket.EVENT_DISCONNECT, args -> onDisconnect());
-        mSocket.off(Socket.EVENT_RECONNECT_ERROR, args -> onConnectionLost());
-        mSocket.off(Socket.EVENT_RECONNECT_FAILED, args -> onConnectionLost());
-        mSocket.off(Socket.EVENT_CONNECT_ERROR, args -> onConnectionLost());
     }
 
     @UiThread
     void onDisconnect() {
-        Timber.e("Disconnecting");
-        Toast.makeText(this,mSocketErrorMessage,Toast.LENGTH_SHORT).show();
-    }
-
-    @UiThread
-    void onConnectionLost() {
-        Timber.e("ConnectionLost...");
+        Timber.i("Disconnecting");
+        if(RESUMED_ACTIVITIES_COUNT > 0) {
+            Toast.makeText(this,mSocketErrorMessage,Toast.LENGTH_LONG).show();
+            Timber.d("toast room");
+        }
         finish();
     }
 
     @UiThread
     void onPlayersCountChanged(Object... args) {
-        Timber.d("RoomMessage");
         JSONObject data = (JSONObject) args[0];
-        Timber.d(data.toString());
+        Timber.d("RoomMessage %s",data.toString());
         try {
             String name = data.getString("name");
             String id = data.getString("id");
             String message = data.getString("message");
+            int avatarId = data.getInt("avatar");
 
             Player player = new Player();
             player.setName(name);
             player.setId(id);
-            player.setImageResId(Player.getRandomImage());
+            player.setImageResId(mAvatarMapper.getAvatar(avatarId));
 
             if (message.equals(mNewPlayerMessage)) {
                 mPlayers.add(player);

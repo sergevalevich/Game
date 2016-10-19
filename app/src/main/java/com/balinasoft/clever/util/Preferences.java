@@ -14,7 +14,7 @@ public interface Preferences {
     @DefaultString(value = ConstantsManager.DEFAULT_USER_NAME)
     String userName();
 
-    @DefaultInt(value = R.drawable.first_man_profile_flat_icon_med)
+    @DefaultInt(value = R.drawable.first_man_profile_flat_icon_game)
     int userImage();
 
     @DefaultInt(value = 0)

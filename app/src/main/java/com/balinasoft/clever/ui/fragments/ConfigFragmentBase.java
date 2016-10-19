@@ -1,5 +1,6 @@
 package com.balinasoft.clever.ui.fragments;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 import com.balinasoft.clever.DataManager;
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.storage.model.Question;
+import com.balinasoft.clever.ui.activities.BaseActivity;
 import com.balinasoft.clever.util.ConstantsManager;
 
 import org.androidannotations.annotations.AfterViews;
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
+import timber.log.Timber;
 
 @EFragment
 public abstract class ConfigFragmentBase extends Fragment {
@@ -196,8 +199,10 @@ public abstract class ConfigFragmentBase extends Fragment {
     }
 
     void toastNotifyUserWith(String message) {
-        if(getContext() != null) {
-            Toast.makeText(getContext(),message,Toast.LENGTH_LONG).show();
+        Context context = getContext();
+        if (context != null && BaseActivity.RESUMED_ACTIVITIES_COUNT > 0) {
+            Timber.d("Toast from config fragment");
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
         }
     }
 

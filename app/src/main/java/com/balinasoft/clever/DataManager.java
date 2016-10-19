@@ -12,6 +12,7 @@ import com.balinasoft.clever.network.model.RatingModel;
 import com.balinasoft.clever.network.model.RegisterModel;
 import com.balinasoft.clever.storage.model.News;
 import com.balinasoft.clever.storage.model.Question;
+import com.balinasoft.clever.util.AvatarMapper;
 import com.balinasoft.clever.util.ConstantsManager;
 import com.balinasoft.clever.util.NetworkStateChecker;
 import com.balinasoft.clever.util.TimeFormatter;
@@ -36,13 +37,14 @@ import okhttp3.ResponseBody;
 import retrofit2.Response;
 import rx.Observable;
 
-import static com.balinasoft.clever.GameApplication.getDeviceToken;
+import static com.balinasoft.clever.GameApplication.getFireBaseToken;
 import static com.balinasoft.clever.GameApplication.getLaunchTime;
 import static com.balinasoft.clever.GameApplication.getOnlineCoins;
 import static com.balinasoft.clever.GameApplication.getOnlineName;
 import static com.balinasoft.clever.GameApplication.getOnlineScore;
 import static com.balinasoft.clever.GameApplication.getSessionLength;
 import static com.balinasoft.clever.GameApplication.getUserEmail;
+import static com.balinasoft.clever.GameApplication.getUserImage;
 import static com.balinasoft.clever.GameApplication.isNewAccount;
 import static com.balinasoft.clever.GameApplication.saveCleverToken;
 import static com.balinasoft.clever.GameApplication.saveUserId;
@@ -66,6 +68,9 @@ public class DataManager {
 
     @Bean
     TimeFormatter mTimeFormatter;
+
+    @Bean
+    AvatarMapper mAvatarMapper;
 
     @StringRes(R.string.network_unavailbale_message)
     String mNetworkUnavailableMessage;
@@ -99,7 +104,8 @@ public class DataManager {
                 getSessionLength(),
                 getOnlineCoins(),
                 getOnlineScore(),
-                mTimeFormatter.formatTime(getLaunchTime()));
+                mTimeFormatter.formatTime(getLaunchTime()),
+                mAvatarMapper.getAvatarId(getUserImage()));
     }
 
     public Observable<RatingModel> getRatings(String filter) {
@@ -288,7 +294,7 @@ public class DataManager {
 
     private Observable<LogInModel> onRegister(RegisterModel registerModel, String email, String password) {
         return registerModel.getSuccess() == 1
-                ? Observable.just(registerModel).doOnNext(model -> setNewAccount(true)).flatMap(regModel -> logIn(email, password, getDeviceToken()))
+                ? Observable.just(registerModel).doOnNext(model -> setNewAccount(true)).flatMap(regModel -> logIn(email, password, getFireBaseToken()))
                 : Observable.error(new RuntimeException(registerModel.getMessage()));
     }
 

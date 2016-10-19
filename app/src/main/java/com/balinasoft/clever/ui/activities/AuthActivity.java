@@ -43,7 +43,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
-import static com.balinasoft.clever.GameApplication.getDeviceToken;
+import static com.balinasoft.clever.GameApplication.getFireBaseToken;
 import static com.balinasoft.clever.GameApplication.getFacebookToken;
 import static com.balinasoft.clever.GameApplication.getUserEmail;
 import static com.balinasoft.clever.GameApplication.getVKToken;
@@ -201,11 +201,11 @@ public abstract class AuthActivity extends InputActivity {
     }
 
     private Observable<LogInModel> logInWithFB(String firstName) {
-        return mDataManager.logInWithFB(getDeviceToken(), getFacebookToken(), getUserEmail(),firstName);
+        return mDataManager.logInWithFB(getFireBaseToken(), getFacebookToken(), getUserEmail(),firstName);
     }
 
     private Observable<LogInModel> logInWithVK(String firstName) {
-        return mDataManager.logInWithVK(getDeviceToken(), getVKToken(), getUserEmail(),firstName);
+        return mDataManager.logInWithVK(getFireBaseToken(), getVKToken(), getUserEmail(),firstName);
     }
 
     private void configureFacebookLogIn() {
