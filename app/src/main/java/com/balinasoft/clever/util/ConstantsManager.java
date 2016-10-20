@@ -39,7 +39,9 @@ public interface ConstantsManager {
 
     String AVATAR_DIALOG_TAG = "choose_image";
 
-    String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    String SERVER_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+
+    String CLIENT_DATE_FORMAT = "dd-MM-yyyy";
 
     String DEFAULT_USER_ID = "user_id";
 
@@ -73,8 +75,7 @@ public interface ConstantsManager {
     int OPTION_MAX_LENGTH_BIG = 30;
     int OPTION_MAX_LENGTH_LARGE = 40;
 
-    String LOREM = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
-    String CAT = "http://www.unionsnobs.com/assets/images/cat-image2.png";
+    String NOTIFICATION_ACTION = "com.balinasoft.clever.TARGET_NOTIFICATION";
 
     String GOOGLE_PLAY_LINK = "https://play.google.com/store/apps/details?id=com.balinasoft.clever";
 }

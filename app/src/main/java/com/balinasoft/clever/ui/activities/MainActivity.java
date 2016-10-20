@@ -29,15 +29,19 @@ import com.balinasoft.clever.ui.fragments.OnlineConfigFragment_;
 import com.balinasoft.clever.ui.fragments.StatsFragment_;
 import com.balinasoft.clever.util.ConstantsManager;
 import com.balinasoft.clever.util.SocketErrorListener;
+import com.balinasoft.clever.util.TimeFormatter;
 import com.squareup.otto.Subscribe;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.Extra;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.StringRes;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static com.balinasoft.clever.GameApplication.getOnlineCoins;
@@ -77,11 +81,11 @@ public class MainActivity extends BaseActivity implements
     @StringRes(R.string.unknown_error_message)
     String mUnknownErrorMessage;
 
-    @Extra
-    boolean fromNotification;
-
     @Bean
     DataManager mDataManager;
+
+    @Bean
+    TimeFormatter mTimeFormatter;
 
     @Bean
     EventBus mEventBus;
@@ -94,14 +98,16 @@ public class MainActivity extends BaseActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        News news = new News();
-        news.setDate("11.11.2011");
-        news.setDescription(ConstantsManager.LOREM);
-        news.setTopic("Обновление игры");
-        news.setImageUrl(ConstantsManager.CAT);
-        news.save();
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        if(action != null && action.equals(ConstantsManager.NOTIFICATION_ACTION) && intent.hasExtra("new"))
+            try {
+                saveNews(createNews(intent));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         if (savedInstanceState == null) {
-            replaceFragment(fromNotification ? new NewsFragment_() : new OnlineConfigFragment_());
+            replaceFragment(new OnlineConfigFragment_());
         }
 
     }
@@ -309,6 +315,29 @@ public class MainActivity extends BaseActivity implements
     private void setupFragmentManager() {
         mFragmentManager = getSupportFragmentManager();
         mFragmentManager.addOnBackStackChangedListener(this);
+    }
+
+    private News createNews(Intent intent) throws JSONException {
+        JSONObject apiNews = new JSONObject(intent.getStringExtra("new"));
+        Timber.d("news %s",apiNews.toString());
+        News news = new News();
+        news.setDate(mTimeFormatter.formatServerTime(apiNews.getString("date")));
+        news.setDescription(apiNews.getString("text"));
+        news.setTopic(apiNews.getString("title"));
+        news.setImageUrl(apiNews.getString("image"));
+        return news;
+    }
+
+    private void saveNews(News news) {
+        mDataManager.insertNews(news)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe((n) -> {
+                    replaceFragment(new NewsFragment_());
+                }, throwable ->
+                {
+                    Timber.d("error saving news %s", throwable.getLocalizedMessage());
+                });
     }
 
 //    private void notifyUserWith(String message) {

@@ -312,7 +312,7 @@ public class RoomActivity extends BaseActivity {
             question.setAnswers(jsonQuestion.getString("answers"));
             String media = jsonQuestion.getString("media");
             if (media != null && !media.equals("null"))
-                question.setMedia(UrlFormatter.getUrlFrom(media));
+                question.setMedia(UrlFormatter.getQuestionUrlFrom(media));
             question.setMediaType(jsonQuestion.getString("media_type"));
             question.setRightAnswer(jsonQuestion.getString("right_answer"));
             question.setTextQuest(jsonQuestion.getString("text_quest"));

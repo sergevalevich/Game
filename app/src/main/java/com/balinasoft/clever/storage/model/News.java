@@ -70,7 +70,10 @@ public class News extends BaseModel {
     }
 
     public static Observable<List<News>> getNews() {
-        return Observable.defer(() -> Observable.just(SQLite.select().from(News.class).queryList()));
+        return Observable.defer(() -> Observable.just(SQLite.select()
+                .from(News.class)
+                .orderBy(News_Table.date,false)
+                .queryList()));
     }
 
     public static Observable<News> insertNews(News news) {

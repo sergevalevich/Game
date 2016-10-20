@@ -1,46 +1,64 @@
 package com.balinasoft.clever.services;
 
 
-import android.content.Intent;
-
-import com.balinasoft.clever.ui.activities.MainActivity_;
+import com.balinasoft.clever.DataManager;
+import com.balinasoft.clever.storage.model.News;
+import com.balinasoft.clever.util.TimeFormatter;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EService;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.util.Map;
-
+import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 @EService
 public class MessagingService extends FirebaseMessagingService {
+
+    @Bean
+    DataManager mDataManager;
+
+    @Bean
+    TimeFormatter mTimeFormatter;
+
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-
-        Timber.d("Message received %s",remoteMessage.toString());
-
-        Timber.d("body %s", remoteMessage.getNotification().getBody());
-
-        Map<String,String> data = remoteMessage.getData();
-
-        if (data.size() > 0) {
-            Timber.d("Message data payload: %s",remoteMessage.getData());
-        }
 
         RemoteMessage.Notification notification = remoteMessage.getNotification();
 
         if (notification != null) {
-            String clickAction = notification.getClickAction();
-            Timber.d("Message Notification Body: %s Click action: %s",
-                    remoteMessage.getNotification().getBody(),clickAction);
-            MainActivity_.intent(this)
-                    .action(clickAction)
-                    .fromNotification(true)
-                    .flags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                    .start();
+            String body = notification.getBody();
+            Timber.d("MESSAGE_RECEIVED %s", body);
+            //String clickAction = notification.getClickAction();
+            try {
+                saveNews(createNews(body));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
     }
 
+    private News createNews(String newsBody) throws JSONException {
+        News news = new News();
+        JSONObject apiNews = new JSONObject(newsBody);
+        news.setDate(mTimeFormatter.formatServerTime(apiNews.getString("date")));
+        news.setDescription(apiNews.getString("text"));
+        news.setTopic(apiNews.getString("title"));
+        news.setImageUrl(apiNews.getString("image"));
+        return news;
+    }
+
+    private void saveNews(News news) {
+        mDataManager.insertNews(news)
+                .subscribeOn(Schedulers.io())
+                .subscribe((n) -> {
+                }, throwable ->
+                {
+                    Timber.d("error saving news %s", throwable.getLocalizedMessage());
+                });
+    }
 }

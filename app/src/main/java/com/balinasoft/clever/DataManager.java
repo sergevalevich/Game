@@ -257,6 +257,10 @@ public class DataManager {
         return News.getNews();
     }
 
+    public Observable<News> insertNews(News news) {
+        return News.insertNews(news);
+    }
+
     ///////////////////AUTH///////////////////////
 
     public Observable<LogInModel> logIn(String email, String password, String token) {
