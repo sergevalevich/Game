@@ -49,6 +49,7 @@ import static com.balinasoft.clever.GameApplication.getUserEmail;
 import static com.balinasoft.clever.GameApplication.getVKToken;
 import static com.balinasoft.clever.GameApplication.saveFacebookToken;
 import static com.balinasoft.clever.GameApplication.saveVkToken;
+import static com.balinasoft.clever.GameApplication.setOnlineMode;
 import static com.balinasoft.clever.GameApplication.setUserEmail;
 import static com.facebook.Profile.getCurrentProfile;
 
@@ -284,6 +285,7 @@ public abstract class AuthActivity extends InputActivity {
 
     private void enter() {
         Toast.makeText(this,mAuthSuccessMessage,Toast.LENGTH_LONG).show();
+        setOnlineMode(true);
         MainActivity_.intent(AuthActivity.this)
                 .flags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 .start();

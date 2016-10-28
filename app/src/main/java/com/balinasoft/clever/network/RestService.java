@@ -3,6 +3,7 @@ package com.balinasoft.clever.network;
 
 import com.balinasoft.clever.network.model.LastUpdateModel;
 import com.balinasoft.clever.network.model.LogInModel;
+import com.balinasoft.clever.network.model.NewsModel;
 import com.balinasoft.clever.network.model.QuestionApiModel;
 import com.balinasoft.clever.network.model.DefaultResponseModel;
 import com.balinasoft.clever.network.model.RatingModel;
@@ -106,5 +107,9 @@ public class RestService {
 
     public Observable<RatingModel> getRating(String filter) {
         return mGameApi.getRating(filter);
+    }
+
+    public Observable<NewsModel> getNews() {
+        return mGameApi.getNews();
     }
 }

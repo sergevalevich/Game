@@ -21,6 +21,7 @@ import java.util.List;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 @EFragment(R.layout.fragment_news)
 public class NewsFragment extends Fragment {
@@ -49,7 +50,7 @@ public class NewsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         toggleSwipe(true);
-        mSubscription = getNews();
+        getNews();
     }
 
     @Override
@@ -72,12 +73,12 @@ public class NewsFragment extends Fragment {
         mSwipe.setColorSchemeResources(R.color.colorPrimary);
         mSwipe.setOnRefreshListener(() -> {
             unSubscribe();
-            mSubscription = getNews();
+            getNews();
         });
     }
 
-    private Subscription getNews() {
-        return mDataManager.getNews()
+    private void getNews() {
+        mSubscription = mDataManager.getNews()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doAfterTerminate(() -> toggleSwipe(false))
@@ -86,6 +87,7 @@ public class NewsFragment extends Fragment {
     }
 
     private void setAdapter(List<News> newsList) {
+        Timber.d("setting adapter");
         mNewsAdapter.setData(newsList);
         mNewsList.setAdapter(mNewsAdapter);
     }

@@ -151,6 +151,7 @@ public class OnlineConfigFragment extends ConfigFragmentBase implements RoomsCli
         super.onDestroy();
         Timber.e("disabling socket connection");
         disableSocketConnection();
+        stopSocketListening();
     }
 
     @Override

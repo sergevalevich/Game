@@ -57,9 +57,6 @@ public class ResultsActivity extends BaseActivity {
     @StringRes(R.string.exit)
     String mExitMessage;
 
-    @StringRes(R.string.socket_error)
-    String mSocketErrorMessage;
-
     @Extra
     Parcelable[] parcelablePlayers;
 

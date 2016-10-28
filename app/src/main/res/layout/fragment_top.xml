@@ -21,6 +21,7 @@
     </android.support.v4.widget.SwipeRefreshLayout>
 
     <LinearLayout
+        android:id="@+id/user_info_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/start_game_button_size"
         android:layout_gravity="bottom"

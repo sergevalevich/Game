@@ -201,7 +201,7 @@ public abstract class ConfigFragmentBase extends Fragment {
     void toastNotifyUserWith(String message) {
         Context context = getContext();
         if (context != null && BaseActivity.RESUMED_ACTIVITIES_COUNT > 0) {
-            Timber.d("Toast from config fragment");
+            Timber.d("Toast from config fragment %s",message);
             Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
         }
     }

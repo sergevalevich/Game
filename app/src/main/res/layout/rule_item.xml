@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@drawable/card_bg"
+              android:orientation="vertical"
+              tools:background="@drawable/back">
+
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableEnd="@drawable/ic_toggle"
+        android:drawableRight="@drawable/ic_toggle"
+        android:gravity="center_vertical"
+        android:paddingBottom="@dimen/rule_title_vertical_padding"
+        android:paddingLeft="@dimen/rule_title_side_padding"
+        android:paddingRight="@dimen/rule_title_side_padding"
+        android:paddingTop="@dimen/rule_title_vertical_padding"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/rule_title_size"
+        android:textStyle="bold|italic"
+        tools:text="Награды и достижения"/>
+
+
+    <com.github.aakira.expandablelayout.ExpandableLinearLayout
+        android:id="@+id/expandableLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ael_duration="250"
+        app:ael_expanded="false"
+        app:ael_interpolator="linear"
+        app:ael_orientation = "vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="@dimen/secondary_text_size"
+            tools:text="asdasdadasdasdasdasdasasdasdasdasdasdasdasdadasdasdasasdasd"/>
+
+    </com.github.aakira.expandablelayout.ExpandableLinearLayout>
+
+</LinearLayout>

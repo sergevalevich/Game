@@ -8,13 +8,28 @@
               android:padding="@dimen/player_item_room_padding"
               tools:background="@drawable/back">
 
-    <ImageView
-        android:id="@+id/image"
-        android:layout_width="@dimen/results_image_size"
-        android:layout_height="@dimen/results_image_size"
-        android:layout_marginEnd="@dimen/players_image_end_margin_default"
-        android:layout_marginRight="@dimen/players_image_end_margin_default"
-        tools:src="@drawable/first_man_profile_flat_icon_game"/>
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="@dimen/results_image_size"
+            android:layout_height="@dimen/results_image_size"
+            android:layout_marginEnd="@dimen/players_image_end_margin_default"
+            android:layout_marginRight="@dimen/players_image_end_margin_default"
+            tools:src="@drawable/first_man_profile_flat_icon_game"/>
+
+        <ImageView
+            android:layout_width="@dimen/player_status_size"
+            android:layout_height="@dimen/player_status_size"
+            android:layout_marginRight="@dimen/player_status_end_margin"
+            android:layout_marginEnd="@dimen/player_status_end_margin"
+            android:layout_marginBottom="@dimen/player_status_bottom_margin"
+            android:layout_gravity="bottom|end"
+            android:src="@drawable/online"/>
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/name"

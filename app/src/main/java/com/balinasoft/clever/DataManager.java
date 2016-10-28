@@ -12,6 +12,7 @@ import com.balinasoft.clever.network.model.RatingModel;
 import com.balinasoft.clever.network.model.RegisterModel;
 import com.balinasoft.clever.storage.model.News;
 import com.balinasoft.clever.storage.model.Question;
+import com.balinasoft.clever.storage.model.Rule;
 import com.balinasoft.clever.util.AvatarMapper;
 import com.balinasoft.clever.util.ConstantsManager;
 import com.balinasoft.clever.util.NetworkStateChecker;
@@ -36,6 +37,7 @@ import java.util.List;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 import rx.Observable;
+import rx.Subscription;
 
 import static com.balinasoft.clever.GameApplication.getFireBaseToken;
 import static com.balinasoft.clever.GameApplication.getLaunchTime;
@@ -254,11 +256,22 @@ public class DataManager {
     ////////////////////News/////////////////////////
 
     public Observable<List<News>> getNews() {
-        return News.getNews();
+        return Observable.merge(News.getNews(),
+                mNetworkStateChecker.isNetworkAvailable() ? mRestService.getNews().flatMap(newsModel -> News.insertNewsList(newsModel.getNews()).flatMap(newsItemModels -> News.getNews())):Observable.empty());
     }
 
     public Observable<News> insertNews(News news) {
         return News.insertNews(news);
+    }
+
+    ///////////////////Rules/////////////////////
+
+    public Observable<List<Rule>> getRules() {
+        return Rule.getRules();
+    }
+
+    public Observable<List<Rule>> saveRules(List<Rule> rules) {
+        return Rule.insertRules(rules);
     }
 
     ///////////////////AUTH///////////////////////

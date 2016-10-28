@@ -10,7 +10,7 @@
                 android:width="@dimen/default_border_width"
                 android:color="@color/colorPrimary" />
 
-            <solid android:color="@color/round_fill" />
+            <solid android:color="@color/transparent_tab" />
 
         </shape>
     </item>

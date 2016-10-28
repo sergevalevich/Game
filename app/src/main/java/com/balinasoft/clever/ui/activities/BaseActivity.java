@@ -8,8 +8,6 @@ import com.balinasoft.clever.util.NetworkStateChecker;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EActivity;
 
-import timber.log.Timber;
-
 import static com.balinasoft.clever.GameApplication.getCurrentTime;
 import static com.balinasoft.clever.GameApplication.getLaunchTime;
 import static com.balinasoft.clever.GameApplication.isAuthTokenExists;

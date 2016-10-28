@@ -7,7 +7,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.balinasoft.clever.GameApplication;
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.util.AnimationHelper;
 import com.balinasoft.clever.util.ConstantsManager;
@@ -21,7 +20,6 @@ import org.androidannotations.annotations.ViewById;
 import java.util.Locale;
 
 import static com.balinasoft.clever.GameApplication.getBonus;
-import static com.balinasoft.clever.GameApplication.isAuthTokenExists;
 
 @EActivity(R.layout.activity_bonus)
 public class BonusActivity extends BaseActivity {
@@ -52,8 +50,7 @@ public class BonusActivity extends BaseActivity {
 
     @Click(R.id.root)
     void enter() {
-        if(isAuthTokenExists()) MainActivity_.intent(this).start();
-        else EnterActivity_.intent(this).start();
+        EnterActivity_.intent(this).start();
         finish();
     }
 

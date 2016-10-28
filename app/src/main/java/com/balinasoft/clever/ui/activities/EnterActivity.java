@@ -35,11 +35,16 @@ import timber.log.Timber;
 
 import static com.balinasoft.clever.GameApplication.getCurrentTime;
 import static com.balinasoft.clever.GameApplication.getLaunchTime;
+import static com.balinasoft.clever.GameApplication.getOnlineCoins;
+import static com.balinasoft.clever.GameApplication.getOnlineName;
+import static com.balinasoft.clever.GameApplication.getOnlineScore;
 import static com.balinasoft.clever.GameApplication.getUserCoins;
 import static com.balinasoft.clever.GameApplication.getUserImage;
 import static com.balinasoft.clever.GameApplication.getUserName;
 import static com.balinasoft.clever.GameApplication.getUserScore;
 import static com.balinasoft.clever.GameApplication.isAuthTokenExists;
+import static com.balinasoft.clever.GameApplication.isOnlineMode;
+import static com.balinasoft.clever.GameApplication.setOnlineMode;
 import static com.balinasoft.clever.GameApplication.setSessionTime;
 
 @EActivity
@@ -97,18 +102,31 @@ public class EnterActivity extends BaseActivity {
     void setUpViews() {
         if(message != null && !message.isEmpty()) notifyUserWith(message);
         setUpUserImage();
-        setUpUserName();
+        showViews();
     }
 
     @Click(R.id.offline_game_btn)
     void onOfflinePicked() {
-        playOffline();
+        if(isOnlineMode()) {
+            setOnlineMode(false);
+            changeHeader();
+        } else {
+            playOffline();
+        }
     }
 
     @Click(R.id.online_game_btn)
     void onOnlinePicked() {
-        if (isAuthTokenExists()) playOnline();
-        else navigateToLogin();
+        if (isAuthTokenExists()) {
+            if(!isOnlineMode()) {
+                setOnlineMode(true);
+                changeHeader();
+            } else {
+                playOnline();
+            }
+        } else {
+            navigateToLogin();
+        }
     }
 
     @Click(R.id.user_image)
@@ -125,18 +143,13 @@ public class EnterActivity extends BaseActivity {
     protected void onStart() {
         super.onStart();
         subscribeBus();
-        setUpUserCoins();
-        setUpUserPoints();
-        showViews();
+        setUserInfo();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         unSubscribeBus();
-        mLogo.setVisibility(View.INVISIBLE);
-        mOfflineGameButton.setVisibility(View.INVISIBLE);
-        mOnlineGameButton.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -163,27 +176,59 @@ public class EnterActivity extends BaseActivity {
         mEventBus.unregister(this);
     }
 
+    private void changeHeader() {
+        Animation slideUpAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_up_header);
+        Animation slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down);
+        mAnimationHelper.setAnimationListener(slideUpAnimation, () -> {
+            mToolbar.setVisibility(View.INVISIBLE);
+            setUserInfo();
+            mToolbar.startAnimation(slideDownAnimation);
+        },null,null);
+        mAnimationHelper.setAnimationListener(slideDownAnimation, () -> {
+            mToolbar.setVisibility(View.VISIBLE);
+            play();
+        },null,null);
+        mToolbar.startAnimation(slideUpAnimation);
+    }
+
+    private void setUserInfo() {
+        if(isOnlineMode() && isAuthTokenExists()) showOnlineInfo();
+        else showOfflineInfo();
+    }
+
+    private void showOnlineInfo() {
+        setUpUserName(getOnlineName());
+        setUpUserCoins(getOnlineCoins());
+        setUpUserPoints(getOnlineScore());
+    }
+
+    private void showOfflineInfo() {
+        setUpUserName(getUserName());
+        setUpUserCoins(getUserCoins());
+        setUpUserPoints(getUserScore());
+    }
+
     private void showDialog() {
-        if(mDialog == null)
-            mDialog = createDialog();
-        mDialog.setCurrentName(getUserName());
+        if(mDialog == null) mDialog = createDialog();
         mDialog.show(getSupportFragmentManager(), ConstantsManager.AVATAR_DIALOG_TAG);
     }
 
     private AvatarDialog createDialog() {
-        return AvatarDialog_.builder().isOfflineMode(true).build();
+        return AvatarDialog_.builder()
+                .isOfflineMode(!(isOnlineMode() && isAuthTokenExists()))
+                .build();
     }
 
-    private void setUpUserPoints() {
-        mPointsLabel.setText(String.valueOf(getUserScore()));
+    private void setUpUserPoints(int points) {
+        mPointsLabel.setText(String.valueOf(points));
     }
 
-    private void setUpUserCoins() {
-        mCoinsLabel.setText(String.valueOf(getUserCoins()));
+    private void setUpUserCoins(int coins) {
+        mCoinsLabel.setText(String.valueOf(coins));
     }
 
-    private void setUpUserName() {
-        mUserNameLabel.setText(getUserName());
+    private void setUpUserName(String username) {
+        mUserNameLabel.setText(username);
     }
 
     private void setUpUserImage() {
@@ -216,13 +261,17 @@ public class EnterActivity extends BaseActivity {
         mToolbar.startAnimation(slideDownAnimation);
     }
 
+    private void play() {
+        if (isOnlineMode()) playOnline();
+        else playOffline();
+    }
+
     private void playOffline() {
         OfflineGameConfigActivity_.intent(this).start().withAnimation(R.anim.enter_pull_in, R.anim.exit_fade_out);
     }
 
     private void playOnline() {
         MainActivity_.intent(this).start().withAnimation(R.anim.enter_pull_in, R.anim.exit_fade_out);
-        finish();
     }
 
     private void navigateToLogin() {

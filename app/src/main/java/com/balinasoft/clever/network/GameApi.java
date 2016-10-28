@@ -3,6 +3,7 @@ package com.balinasoft.clever.network;
 
 import com.balinasoft.clever.network.model.LastUpdateModel;
 import com.balinasoft.clever.network.model.LogInModel;
+import com.balinasoft.clever.network.model.NewsModel;
 import com.balinasoft.clever.network.model.QuestionApiModel;
 import com.balinasoft.clever.network.model.DefaultResponseModel;
 import com.balinasoft.clever.network.model.RatingModel;
@@ -82,4 +83,7 @@ interface GameApi {
 
     @GET("users/rating")
     Observable<RatingModel> getRating(@Query("filter") String filter);
+
+    @GET("news")
+    Observable<NewsModel> getNews();
 }

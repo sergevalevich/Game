@@ -6,8 +6,8 @@ import android.os.Build;
 import android.provider.Settings;
 import android.support.multidex.MultiDex;
 
+import com.balinasoft.clever.storage.model.Rule;
 import com.balinasoft.clever.util.ConstantsManager;
-import com.balinasoft.clever.util.NetworkStateChecker;
 import com.balinasoft.clever.util.Preferences_;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookSdk;
@@ -21,13 +21,17 @@ import com.vk.sdk.VKSdk;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EApplication;
+import org.androidannotations.annotations.res.StringArrayRes;
 import org.androidannotations.annotations.sharedpreferences.Pref;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.fabric.sdk.android.Fabric;
 import io.socket.client.IO;
 import io.socket.client.Socket;
+import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
 @EApplication
@@ -37,7 +41,16 @@ public class GameApplication extends Application {
     static Preferences_ mPreferences;
 
     @Bean
-    NetworkStateChecker mNetworkStateChecker;
+    DataManager mDataManager;
+
+    @StringArrayRes(R.array.rules_descriptions)
+    String[] mRulesDescriptions;
+
+    @StringArrayRes(R.array.rules_titles)
+    String[] mRulesTitles;
+
+    @StringArrayRes(R.array.rules_ids)
+    String[] mRulesIds;
 
     private static Socket mSocket;
 
@@ -96,6 +109,7 @@ public class GameApplication extends Application {
             });
         }
         saveDeviceToken();
+        saveRules();
         if(isFirstLaunch()) setUserCoins(ConstantsManager.INIT_COINS);
     }
 
@@ -275,6 +289,14 @@ public class GameApplication extends Application {
         return mPreferences.userCoinsOnline().get();
     }
 
+    public static void setOnlineMode(boolean isOnline) {
+        mPreferences.isOnlineMode().put(isOnline);
+    }
+
+    public static boolean isOnlineMode() {
+        return mPreferences.isOnlineMode().get();
+    }
+
     private static String getDeviceToken() {
         return mPreferences.deviceToken().get();
     }
@@ -283,5 +305,24 @@ public class GameApplication extends Application {
         mPreferences.deviceToken().put(
                 Settings.Secure.getString(getContentResolver(),
                 Settings.Secure.ANDROID_ID));
+    }
+
+    private void saveRules() {
+        mDataManager.saveRules(createDefaultRules())
+                .subscribeOn(Schedulers.io())
+                .subscribe(rules -> {},throwable -> {});
+    }
+
+    private List<Rule> createDefaultRules() {
+        List<Rule> rules = new ArrayList<>();
+        for(int i = 0; i<mRulesTitles.length; i++) {
+            Rule rule = new Rule(
+                    mRulesDescriptions[i],
+                    mRulesTitles[i],
+                    ConstantsManager.RULES_IMAGES[i],
+                    mRulesIds[i]);
+            rules.add(rule);
+        }
+        return rules;
     }
 }

@@ -26,12 +26,12 @@
         android:layout_marginTop="@dimen/players_name_vertical_margin"
         android:layout_toEndOf="@+id/image"
         android:layout_toRightOf="@+id/image"
-        android:ellipsize="end"
-        android:maxLength="11"
+        android:maxLength="17"
         android:maxLines="1"
         android:textColor="@color/white"
         android:textSize="@dimen/primary_text_size"
-        tools:text="Новичок1222"/>
+        android:ellipsize="end"
+        tools:text="Новичок1222345678"/>
 
     <LinearLayout
         android:id="@+id/score_board"

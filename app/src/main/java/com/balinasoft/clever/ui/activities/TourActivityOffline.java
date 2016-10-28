@@ -8,10 +8,10 @@ import com.balinasoft.clever.R;
 import com.balinasoft.clever.model.Player;
 import com.balinasoft.clever.storage.model.Question;
 import com.balinasoft.clever.util.ConstantsManager;
+import com.balinasoft.clever.util.UrlFormatter;
 
 import org.androidannotations.annotations.EActivity;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,7 +42,7 @@ public class TourActivityOffline extends TourActivityBase {
 
     @Override
     String getMediaLocation() {
-        return getFilesDir() + File.separator + mCurrentQuestion.getMediaPath();
+        return UrlFormatter.getLocalFilePath(mCurrentQuestion.getMediaPath(),this);
     }
 
     @Override

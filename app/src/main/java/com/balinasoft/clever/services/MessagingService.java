@@ -45,7 +45,7 @@ public class MessagingService extends FirebaseMessagingService {
     private News createNews(String newsBody) throws JSONException {
         News news = new News();
         JSONObject apiNews = new JSONObject(newsBody);
-        news.setDate(mTimeFormatter.formatServerTime(apiNews.getString("date")));
+        news.setDate(apiNews.getString("date"));
         news.setDescription(apiNews.getString("text"));
         news.setTopic(apiNews.getString("title"));
         news.setImageUrl(apiNews.getString("image"));

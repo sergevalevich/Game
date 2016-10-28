@@ -1,6 +1,7 @@
 package com.balinasoft.clever.ui.dialogs;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,7 +17,9 @@ import com.balinasoft.clever.R;
 import com.balinasoft.clever.eventbus.EventBus;
 import com.balinasoft.clever.eventbus.events.AvatarSelectedEvent;
 import com.balinasoft.clever.eventbus.events.UserNameSelectedEvent;
+import com.balinasoft.clever.services.UserStatsService_;
 import com.balinasoft.clever.util.ConstantsManager;
+import com.balinasoft.clever.util.NetworkStateChecker;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
@@ -25,6 +28,9 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.FragmentArg;
 import org.androidannotations.annotations.ViewById;
 
+import static com.balinasoft.clever.GameApplication.getOnlineName;
+import static com.balinasoft.clever.GameApplication.getUserName;
+import static com.balinasoft.clever.GameApplication.isAuthTokenExists;
 import static com.balinasoft.clever.GameApplication.setOnlineName;
 import static com.balinasoft.clever.GameApplication.setUserImage;
 import static com.balinasoft.clever.GameApplication.setUserName;
@@ -41,9 +47,10 @@ public class AvatarDialog extends DialogFragment implements DialogInterface.OnDi
     @Bean
     EventBus mEventBus;
 
-    private int mCurrentSelection;
+    @Bean
+    NetworkStateChecker mNetworkStateChecker;
 
-    private String mCurrentName;
+    private int mCurrentSelection;
 
     @Click(R.id.avatar_one)
     void onFirstAvatarSelected() {
@@ -72,7 +79,7 @@ public class AvatarDialog extends DialogFragment implements DialogInterface.OnDi
 
     @AfterViews
     void setUpDialog() {
-        mUserNameField.setText(mCurrentName);
+        mUserNameField.setText(isOfflineMode ? getUserName() : getOnlineName());
     }
 
     @Nullable
@@ -93,6 +100,10 @@ public class AvatarDialog extends DialogFragment implements DialogInterface.OnDi
     @Override
     public void onDismiss(DialogInterface dialogInterface) {
         saveSelections();
+        Context context = getContext();
+        if (context != null && mNetworkStateChecker.isNetworkAvailable() && isAuthTokenExists() && !isOfflineMode) {
+            UserStatsService_.intent(context).start();
+        }
         super.onDismiss(dialogInterface);
     }
 
@@ -110,9 +121,5 @@ public class AvatarDialog extends DialogFragment implements DialogInterface.OnDi
     private void onAvatarSelected(int selectedResId) {
         mCurrentSelection = selectedResId;
         mEventBus.post(new AvatarSelectedEvent(mCurrentSelection));
-    }
-
-    public void setCurrentName(String userName) {
-        mCurrentName = userName;
     }
 }

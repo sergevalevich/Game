@@ -1,5 +1,6 @@
 package com.balinasoft.clever.storage.model;
 
+import com.balinasoft.clever.network.model.NewsItemModel;
 import com.balinasoft.clever.storage.GameDatabase;
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.ConflictAction;
@@ -8,6 +9,7 @@ import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
 import com.raizlabs.android.dbflow.annotation.Unique;
 import com.raizlabs.android.dbflow.annotation.UniqueGroup;
+import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
@@ -80,6 +82,26 @@ public class News extends BaseModel {
         return Observable.defer(() -> {
             news.save();
             return Observable.just(news);
+        });
+    }
+
+    public static Observable<List<NewsItemModel>> insertNewsList(List<NewsItemModel> newsList) {
+        return Observable.defer(() -> {
+
+            FlowManager.getDatabase(GameDatabase.class).executeTransaction(databaseWrapper -> {
+                for (NewsItemModel newsItem: newsList) {
+                    String text = newsItem.getText();
+                    if(text != null && !text.equals("")) {
+                        News news = new News();
+                        news.setDate(newsItem.getDate());
+                        news.setImageUrl(newsItem.getImage());
+                        news.setTopic(newsItem.getTitle());
+                        news.setDescription(text);
+                        news.save(databaseWrapper);
+                    }
+                }
+            });
+            return Observable.just(newsList);
         });
     }
 }

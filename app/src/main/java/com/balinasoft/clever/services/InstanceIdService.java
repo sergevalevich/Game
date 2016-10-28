@@ -19,7 +19,7 @@ public class InstanceIdService extends FirebaseInstanceIdService {
     }
 
     private void sendRegistrationToServer(String token) {
-
+        // TODO: 24.10.2016 send token
     }
 
 }

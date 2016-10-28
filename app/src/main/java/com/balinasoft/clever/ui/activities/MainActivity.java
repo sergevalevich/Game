@@ -3,6 +3,7 @@ package com.balinasoft.clever.ui.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -26,6 +27,7 @@ import com.balinasoft.clever.ui.dialogs.AvatarDialog;
 import com.balinasoft.clever.ui.dialogs.AvatarDialog_;
 import com.balinasoft.clever.ui.fragments.NewsFragment_;
 import com.balinasoft.clever.ui.fragments.OnlineConfigFragment_;
+import com.balinasoft.clever.ui.fragments.RulesFragment_;
 import com.balinasoft.clever.ui.fragments.StatsFragment_;
 import com.balinasoft.clever.util.ConstantsManager;
 import com.balinasoft.clever.util.SocketErrorListener;
@@ -44,10 +46,21 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
 
+import static com.balinasoft.clever.GameApplication.getCurrentTime;
+import static com.balinasoft.clever.GameApplication.getLaunchTime;
 import static com.balinasoft.clever.GameApplication.getOnlineCoins;
 import static com.balinasoft.clever.GameApplication.getOnlineName;
 import static com.balinasoft.clever.GameApplication.getOnlineScore;
 import static com.balinasoft.clever.GameApplication.getUserImage;
+import static com.balinasoft.clever.GameApplication.saveCleverToken;
+import static com.balinasoft.clever.GameApplication.saveFacebookToken;
+import static com.balinasoft.clever.GameApplication.saveVkToken;
+import static com.balinasoft.clever.GameApplication.setOnlineCoins;
+import static com.balinasoft.clever.GameApplication.setOnlineMode;
+import static com.balinasoft.clever.GameApplication.setOnlineName;
+import static com.balinasoft.clever.GameApplication.setOnlineScore;
+import static com.balinasoft.clever.GameApplication.setSessionTime;
+import static com.balinasoft.clever.GameApplication.setUserEmail;
 
 @EActivity
 public class MainActivity extends BaseActivity implements
@@ -181,20 +194,9 @@ public class MainActivity extends BaseActivity implements
     public void onSocketError(String message) {
         if(RESUMED_ACTIVITIES_COUNT > 0) {
             Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
-            Timber.d("toast main");
+            Timber.d("toast main %s",message);
         }
     }
-
-    private void exit() {
-        EnterActivity_.intent(this)
-                .flags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                .start();
-    }
-
-//    private void prepareLogout() {
-//        if (mNetworkStateChecker.isNetworkAvailable()) sendUserStatsImmediately();
-//        else notifyUserWith(mNetworkUnavailableMessage);
-//    }
 
     private void subscribeBus() {
         mEventBus.register(this);
@@ -218,13 +220,13 @@ public class MainActivity extends BaseActivity implements
                     replaceFragment(new NewsFragment_());
                     break;
                 case R.id.drawer_rules:
-                    Toast.makeText(this, mRulesTitle, Toast.LENGTH_SHORT).show();
+                    replaceFragment(new RulesFragment_());
                     break;
                 case R.id.drawer_stats:
                     replaceFragment(new StatsFragment_());
                     break;
                 case R.id.drawer_exit:
-                    exit();
+                    prepareLogout();
                     break;
             }
             return true;
@@ -250,14 +252,14 @@ public class MainActivity extends BaseActivity implements
     }
 
     private void showDialog() {
-        if(mDialog == null)
-            mDialog = createDialog();
-        mDialog.setCurrentName(getOnlineName());
+        if(mDialog == null) mDialog = createDialog();
         mDialog.show(getSupportFragmentManager(), ConstantsManager.AVATAR_DIALOG_TAG);
     }
 
     private AvatarDialog createDialog() {
-        return AvatarDialog_.builder().isOfflineMode(false).build();
+        return AvatarDialog_.builder()
+                .isOfflineMode(false)
+                .build();
     }
 
     private void changeToolbarTitle(String backStackEntryName) {
@@ -270,11 +272,10 @@ public class MainActivity extends BaseActivity implements
         } else if (backStackEntryName.equals(NewsFragment_.class.getName())) {
             setTitle(mNewsTitle);
             mNavigationView.setCheckedItem(R.id.drawer_news);
+        } else if (backStackEntryName.equals(RulesFragment_.class.getName())) {
+            setTitle(mRulesTitle);
+            mNavigationView.setCheckedItem(R.id.drawer_rules);
         }
-//        else {
-//            setTitle(mStatisticsTitle);
-//            mNavigationView.setCheckedItem(R.id.drawer_statistics);
-//        }
     }
 
     private void setupDrawerLayout() {
@@ -321,7 +322,7 @@ public class MainActivity extends BaseActivity implements
         JSONObject apiNews = new JSONObject(intent.getStringExtra("new"));
         Timber.d("news %s",apiNews.toString());
         News news = new News();
-        news.setDate(mTimeFormatter.formatServerTime(apiNews.getString("date")));
+        news.setDate(apiNews.getString("date"));
         news.setDescription(apiNews.getString("text"));
         news.setTopic(apiNews.getString("title"));
         news.setImageUrl(apiNews.getString("image"));
@@ -340,33 +341,45 @@ public class MainActivity extends BaseActivity implements
                 });
     }
 
-//    private void notifyUserWith(String message) {
-//        Snackbar.make(mDrawerLayout, message, Snackbar.LENGTH_LONG).show();
-//    }
+    private void notifyUserWith(String message) {
+        Snackbar.make(mDrawerLayout, message, Snackbar.LENGTH_LONG).show();
+    }
 
-//    private void sendUserStatsImmediately() {
-//        setSessionTime(getCurrentTime() - getLaunchTime());
-//        mDataManager.sendUserStats()
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(response -> {
-//                    if (response.body().getSuccess() == 1) {
-//                        clearAccountData();
-//                        exit();
-//                    } else notifyUserWith(response.body().getMessage());
-//                }, throwable -> {
-//                    notifyUserWith(mUnknownErrorMessage);
-//                });
-//    }
+    private void exit() {
+        EnterActivity_.intent(this)
+                .flags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                .start();
+    }
 
-//    private void clearAccountData() {
-//        saveCleverToken("");
-//        saveFacebookToken("");
-//        saveVkToken("");
-//        setUserEmail("");
-//        setOnlineName("");
-//        setOnlineCoins(0);
-//        setOnlineScore(0);
-//        Toast.makeText(this, "Вы вышли из учётной записи", Toast.LENGTH_SHORT).show();
-//    }
+    private void prepareLogout() {
+        if (mNetworkStateChecker.isNetworkAvailable()) sendUserStatsImmediately();
+        else notifyUserWith(mNetworkUnavailableMessage);
+    }
+
+    private void sendUserStatsImmediately() {
+        setSessionTime(getCurrentTime() - getLaunchTime());
+        mDataManager.sendUserStats()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(response -> {
+                    if (response.body().getSuccess() == 1) {
+                        clearAccountData();
+                        exit();
+                    } else notifyUserWith(response.body().getMessage());
+                }, throwable -> {
+                    notifyUserWith(mUnknownErrorMessage);
+                });
+    }
+
+    private void clearAccountData() {
+        setOnlineMode(false);
+        saveCleverToken("");
+        saveFacebookToken("");
+        saveVkToken("");
+        setUserEmail("");
+        setOnlineName("");
+        setOnlineCoins(0);
+        setOnlineScore(0);
+        Toast.makeText(this, "Вы вышли из учётной записи", Toast.LENGTH_SHORT).show();
+    }
 }

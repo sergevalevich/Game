@@ -79,4 +79,14 @@
     <dimen name="news_image_height">356dp</dimen>
     <dimen name="news_bar_padding_side">24dp</dimen>
     <dimen name="news_description_size">19sp</dimen>
+    <dimen name="player_status_size">28dp</dimen>
+    <dimen name="player_status_end_margin">24dp</dimen>
+    <dimen name="player_status_bottom_margin">12dp</dimen>
+    <dimen name="rule_title_vertical_padding">28dp</dimen>
+    <dimen name="rule_title_size">36sp</dimen>
+    <dimen name="rule_title_side_padding">64dp</dimen>
+    <dimen name="rule_side_padding">72dp</dimen>
+    <dimen name="rule_image_height">358dp</dimen>
+    <dimen name="rule_image_bottom_margin">24dp</dimen>
+    <dimen name="rule_bottom_padding">24dp</dimen>
 </resources>

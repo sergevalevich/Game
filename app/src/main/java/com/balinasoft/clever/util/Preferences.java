@@ -8,6 +8,8 @@ import org.androidannotations.annotations.sharedpreferences.DefaultLong;
 import org.androidannotations.annotations.sharedpreferences.DefaultString;
 import org.androidannotations.annotations.sharedpreferences.SharedPref;
 
+import static android.R.attr.value;
+
 @SharedPref(value=SharedPref.Scope.UNIQUE)
 public interface Preferences {
 
@@ -70,4 +72,7 @@ public interface Preferences {
 
     @DefaultBoolean(value = false)
     boolean isNewAccount();
+
+    @DefaultBoolean(value = false)
+    boolean isOnlineMode();
 }

@@ -12,6 +12,7 @@ import com.balinasoft.clever.R;
 import com.balinasoft.clever.storage.model.News;
 import com.balinasoft.clever.util.ConstantsManager;
 import com.balinasoft.clever.util.SharingHelper;
+import com.balinasoft.clever.util.TimeFormatter;
 import com.balinasoft.clever.util.UrlFormatter;
 import com.bumptech.glide.Glide;
 import com.ms.square.android.expandabletextview.ExpandableTextView;
@@ -42,6 +43,9 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsHolder> {
 
     @Bean
     SharingHelper mSharingHelper;
+
+    @Bean
+    TimeFormatter mTimeFormatter;
 
     private List<News> nNews;
 
@@ -111,7 +115,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsHolder> {
         private void bind(News news) {
             Glide.with(mContext).load(UrlFormatter.getNewsUrlFrom(news.getImageUrl())).into(mImage);
             mTitle.setText(news.getTopic());
-            mDateLabel.setText(news.getDate());
+            mDateLabel.setText(mTimeFormatter.formatServerTime(news.getDate()));
             mDescription.setText(news.getDescription());
         }
 

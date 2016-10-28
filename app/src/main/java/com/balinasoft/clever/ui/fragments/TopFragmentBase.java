@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.balinasoft.clever.DataManager;
@@ -18,6 +19,7 @@ import com.balinasoft.clever.util.NetworkStateChecker;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.StringRes;
@@ -39,6 +41,9 @@ public abstract class TopFragmentBase extends Fragment {
 
     @ViewById(R.id.root)
     FrameLayout mRootView;
+
+    @ViewById(R.id.user_info_bar)
+    LinearLayout mUserInfoBar;
 
     @ViewById(R.id.players_list)
     RecyclerView mRecyclerView;
@@ -72,13 +77,18 @@ public abstract class TopFragmentBase extends Fragment {
 
     private Subscription mSubscription;
 
-    private int mUserPlace;
+    private int mUserPlace = 0;
 
     @AfterViews
     void setUpViews() {
         setUpList();
         setUpSwipe();
         setUpBottomBar();
+    }
+
+    @Click(R.id.user_info_bar)
+    void scrollToUser() {
+        if(mUserPlace != 0) mRecyclerView.getLayoutManager().scrollToPosition(mUserPlace-1);
     }
 
     @Override

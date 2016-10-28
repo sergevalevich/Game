@@ -1,6 +1,8 @@
 package com.balinasoft.clever.util;
 
 
+import com.balinasoft.clever.R;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -78,4 +80,22 @@ public interface ConstantsManager {
     String NOTIFICATION_ACTION = "com.balinasoft.clever.TARGET_NOTIFICATION";
 
     String GOOGLE_PLAY_LINK = "https://play.google.com/store/apps/details?id=com.balinasoft.clever";
+
+    int[] RULES_IMAGES = new int[] {
+            R.drawable.rule_pic_one,
+            R.drawable.rule_pic_two,
+            R.drawable.rule_pic_three,
+            R.drawable.rule_pic_four,
+            R.drawable.rule_pic_five,
+            R.drawable.rule_pic_six,
+            R.drawable.rule_pic_seven,
+            R.drawable.rule_pic_eight,
+            R.drawable.rule_pic_nine,
+            R.drawable.rule_pic_ten,
+            R.drawable.rule_pic_eleven,
+            R.drawable.rule_pic_twelve,
+            R.drawable.rule_pic_13,
+            R.drawable.rule_pic_14,
+            R.drawable.rule_pic_15
+    };
 }

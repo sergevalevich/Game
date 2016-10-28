@@ -53,8 +53,7 @@ public class SplashActivity extends BaseActivity implements BonusHelper.BonusLis
     }
 
     private void enter() {
-        if(isAuthTokenExists()) MainActivity_.intent(this).start();
-        else EnterActivity_.intent(this).start();
+        EnterActivity_.intent(this).start();
         finish();
     }
 
