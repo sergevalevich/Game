@@ -2,16 +2,7 @@ package com.balinasoft.clever.network.model;
 
 import com.google.gson.annotations.SerializedName;
 
-public class LogInModel {
-
-    @SerializedName("success")
-    private int mSuccess;
-
-    @SerializedName("error")
-    private int mError;
-
-    @SerializedName("message")
-    private String mMessage;
+public class LogInModel extends DefaultResponseModel {
 
     @SerializedName("token")
     private String mToken;
@@ -27,14 +18,6 @@ public class LogInModel {
 
     @SerializedName("score")
     private int mScore;
-
-    public int getSuccess() {
-        return mSuccess;
-    }
-
-    public String getMessage() {
-        return mMessage;
-    }
 
     public int getCoins() {
         return mCoins;

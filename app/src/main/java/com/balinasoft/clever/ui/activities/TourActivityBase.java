@@ -11,6 +11,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.balinasoft.clever.R;
@@ -97,6 +98,9 @@ public abstract class TourActivityBase extends BaseActivity {
             R.id.audience_help_hint,
             R.id.fifty_fifty_hint})
     List<ImageView> mHints;
+
+    @ViewById(R.id.root)
+    RelativeLayout mRootView;
 
     @ViewById(R.id.score_label)
     TextView mScoreLabel;

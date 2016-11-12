@@ -41,14 +41,38 @@ public class Rule extends BaseModel {
     @Column
     private String description;
 
+    @Column
+    private String descriptionLow;
+
+    @Column
+    private String titleLow;
+
     public Rule(String description, String title, int imageResId, String serverId) {
         this.description = description;
+        this.descriptionLow = description.toLowerCase();
         this.title = title;
+        this.titleLow = title.toLowerCase();
         this.imageResId = imageResId;
         this.serverId = serverId;
     }
 
     public Rule() {}
+
+    public String getDescriptionLow() {
+        return descriptionLow;
+    }
+
+    public void setDescriptionLow(String descriptionLow) {
+        this.descriptionLow = descriptionLow;
+    }
+
+    public String getTitleLow() {
+        return titleLow;
+    }
+
+    public void setTitleLow(String titleLow) {
+        this.titleLow = titleLow;
+    }
 
     public long getId() {
         return id;
@@ -98,8 +122,12 @@ public class Rule extends BaseModel {
         this.imageResId = imageResId;
     }
 
-    public static Observable<List<Rule>> getRules() {
-        return Observable.defer(() -> Observable.just(SQLite.select().from(Rule.class).queryList()));
+    public static Observable<List<Rule>> getRules(String filter) {
+        return Observable.defer(() -> Observable.just(SQLite.select()
+                .from(Rule.class)
+                .where(Rule_Table.descriptionLow.like("%" + filter.toLowerCase() + "%"))
+                .or(Rule_Table.titleLow.like("%" + filter.toLowerCase() + "%"))
+                .queryList()));
     }
 
     public static Observable<List<Rule>> insertRules(List<Rule> rules) {

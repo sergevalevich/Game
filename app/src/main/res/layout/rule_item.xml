@@ -26,24 +26,40 @@
         tools:text="Награды и достижения"/>
 
 
-    <com.github.aakira.expandablelayout.ExpandableLinearLayout
-        android:id="@+id/expandableLayout"
+    <net.cachapa.expandablelayout.ExpandableLayout
+        android:id="@+id/expandable_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:ael_duration="250"
-        app:ael_expanded="false"
-        app:ael_interpolator="linear"
-        app:ael_orientation = "vertical"
-        android:orientation="vertical">
+        app:el_duration="500"
+        app:el_expanded="false"
+        app:el_translate_children="true">
 
-        <TextView
-            android:id="@+id/description"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="@dimen/secondary_text_size"
-            tools:text="asdasdadasdasdasdasdasasdasdasdasdasdasdasdadasdasdasasdasd"/>
+            android:paddingLeft="@dimen/rule_side_padding"
+            android:paddingRight="@dimen/rule_side_padding"
+            android:paddingBottom="@dimen/rule_bottom_padding"
+            android:orientation="vertical">
 
-    </com.github.aakira.expandablelayout.ExpandableLinearLayout>
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/rule_image_height"
+                android:layout_marginBottom="@dimen/rule_image_bottom_margin"
+                android:scaleType="fitXY"
+                tools:src="@drawable/rule_pic_15"/>
+
+            <TextView
+                android:id="@+id/description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="@dimen/secondary_text_size"
+                tools:text="asdasdadasdasdasdasdasasdasdasdasdasdasdasdadasdasdasasdasd"/>
+
+        </LinearLayout>
+
+    </net.cachapa.expandablelayout.ExpandableLayout>
 
 </LinearLayout>

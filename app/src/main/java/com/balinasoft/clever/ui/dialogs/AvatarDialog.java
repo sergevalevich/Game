@@ -113,9 +113,9 @@ public class AvatarDialog extends DialogFragment implements DialogInterface.OnDi
         if(userName.isEmpty()) userName = isOfflineMode
                 ? ConstantsManager.DEFAULT_USER_NAME
                 : ConstantsManager.DEFAULT_USER_NAME_ONLINE;
-        mEventBus.post(new UserNameSelectedEvent(userName));
         if(isOfflineMode) setUserName(userName);
         else setOnlineName(userName);
+        mEventBus.post(new UserNameSelectedEvent(userName));
     }
 
     private void onAvatarSelected(int selectedResId) {

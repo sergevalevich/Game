@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.balinasoft.clever.network.RestService;
 import com.balinasoft.clever.network.model.DefaultResponseModel;
+import com.balinasoft.clever.network.model.HelpModel;
 import com.balinasoft.clever.network.model.LastUpdateModel;
 import com.balinasoft.clever.network.model.LogInModel;
 import com.balinasoft.clever.network.model.QuestionApiModel;
@@ -37,7 +38,6 @@ import java.util.List;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
 import rx.Observable;
-import rx.Subscription;
 
 import static com.balinasoft.clever.GameApplication.getFireBaseToken;
 import static com.balinasoft.clever.GameApplication.getLaunchTime;
@@ -266,12 +266,18 @@ public class DataManager {
 
     ///////////////////Rules/////////////////////
 
-    public Observable<List<Rule>> getRules() {
-        return Rule.getRules();
+    public Observable<List<Rule>> getRules(String filter) {
+        return Rule.getRules(filter);
     }
 
     public Observable<List<Rule>> saveRules(List<Rule> rules) {
         return Rule.insertRules(rules);
+    }
+
+    //////////////////Help//////////////////////////
+
+    public Observable<HelpModel> getHelp(int id) {
+        return mRestService.getHelp(id);
     }
 
     ///////////////////AUTH///////////////////////

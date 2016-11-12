@@ -30,7 +30,6 @@ import com.balinasoft.clever.ui.fragments.OnlineConfigFragment_;
 import com.balinasoft.clever.ui.fragments.RulesFragment_;
 import com.balinasoft.clever.ui.fragments.StatsFragment_;
 import com.balinasoft.clever.util.ConstantsManager;
-import com.balinasoft.clever.util.SocketErrorListener;
 import com.balinasoft.clever.util.TimeFormatter;
 import com.squareup.otto.Subscribe;
 
@@ -64,8 +63,7 @@ import static com.balinasoft.clever.GameApplication.setUserEmail;
 
 @EActivity
 public class MainActivity extends BaseActivity implements
-        FragmentManager.OnBackStackChangedListener,
-        SocketErrorListener {
+        FragmentManager.OnBackStackChangedListener {
 
     @ViewById(R.id.drawer_layout)
     DrawerLayout mDrawerLayout;
@@ -188,14 +186,6 @@ public class MainActivity extends BaseActivity implements
             changeToolbarTitle(f.getClass().getName());
         }
 
-    }
-
-    @Override
-    public void onSocketError(String message) {
-        if(RESUMED_ACTIVITIES_COUNT > 0) {
-            Toast.makeText(this,message,Toast.LENGTH_SHORT).show();
-            Timber.d("toast main %s",message);
-        }
     }
 
     private void subscribeBus() {

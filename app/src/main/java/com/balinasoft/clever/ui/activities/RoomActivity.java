@@ -12,7 +12,6 @@ import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.model.Player;
@@ -141,7 +140,8 @@ public class RoomActivity extends BaseActivity {
     @Click(R.id.start_game_button)
     void onStartGameClicked() {
         if (mPlayers.size() > 1) startGame();
-        else Toast.makeText(this,mNotEnoughPlayersMessage,Toast.LENGTH_SHORT).show();
+        else if (mRootView != null)
+            Snackbar.make(mRootView, mNotEnoughPlayersMessage, Snackbar.LENGTH_SHORT).show();
     }
 
     @Override
@@ -214,11 +214,16 @@ public class RoomActivity extends BaseActivity {
     @UiThread
     void onDisconnect() {
         Timber.i("Disconnecting");
-        if(RESUMED_ACTIVITIES_COUNT > 0) {
-            Toast.makeText(this,mSocketErrorMessage,Toast.LENGTH_LONG).show();
-            Timber.d("toast room");
+        if (RESUMED_ACTIVITIES_COUNT > 0 && mRootView != null) {
+            Snackbar.make(mRootView, mSocketErrorMessage, Snackbar.LENGTH_SHORT)
+                    .setCallback(new Snackbar.Callback() {
+                        @Override
+                        public void onDismissed(Snackbar snackbar, int event) {
+                            finish();
+                        }
+                    })
+                    .show();
         }
-        finish();
     }
 
     @UiThread

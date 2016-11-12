@@ -1,6 +1,7 @@
 package com.balinasoft.clever.network;
 
 
+import com.balinasoft.clever.network.model.HelpModel;
 import com.balinasoft.clever.network.model.LastUpdateModel;
 import com.balinasoft.clever.network.model.LogInModel;
 import com.balinasoft.clever.network.model.NewsModel;
@@ -86,4 +87,7 @@ interface GameApi {
 
     @GET("news")
     Observable<NewsModel> getNews();
+
+    @GET("help/one")
+    Observable<HelpModel> getHelp(@Query("id") int id);
 }

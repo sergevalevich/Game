@@ -2,6 +2,8 @@ package com.balinasoft.clever.ui.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.style.BackgroundColorSpan;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +15,8 @@ import com.balinasoft.clever.R;
 import com.balinasoft.clever.storage.model.Rule;
 import com.balinasoft.clever.util.UrlFormatter;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
-import com.github.aakira.expandablelayout.ExpandableLayoutListenerAdapter;
-import com.github.aakira.expandablelayout.ExpandableLinearLayout;
+
+import net.cachapa.expandablelayout.ExpandableLayout;
 
 import org.androidannotations.annotations.EBean;
 import org.androidannotations.annotations.RootContext;
@@ -27,7 +26,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import timber.log.Timber;
 
 @EBean
 public class RulesAdapter extends RecyclerView.Adapter<RulesAdapter.RulesHolder> {
@@ -37,7 +35,9 @@ public class RulesAdapter extends RecyclerView.Adapter<RulesAdapter.RulesHolder>
 
     private List<Rule> mRules;
 
-    private SparseBooleanArray mExpandState = new SparseBooleanArray();
+    private String mSearchQuery;
+
+    private SparseBooleanArray mOpenedItems = new SparseBooleanArray();
 
     @Override
     public RulesHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -60,20 +60,48 @@ public class RulesAdapter extends RecyclerView.Adapter<RulesAdapter.RulesHolder>
     public void setData(List<Rule> rules) {
         if (mRules == null) mRules = rules;
         else refresh(rules);
-        setExpandState(rules.size());
     }
 
-    private void setExpandState(int dataSize) {
-        mExpandState.clear();
-        for (int i = 0; i < dataSize; i++) {
-            mExpandState.append(i, false);
-        }
+    public void setSearchQuery(String searchQuery) {
+        mSearchQuery = searchQuery.toLowerCase();
     }
 
     private void refresh(List<Rule> rules) {
+        //items count is bigger|less
+        SparseBooleanArray openedItems = new SparseBooleanArray(rules.size());
+        for(int i = 0; i<rules.size(); i++) {
+            boolean isOpened = false;
+            Rule rule = rules.get(i);
+            for(int j = 0; j<mRules.size(); j++) {
+                if(rule.getServerId().equals(mRules.get(j).getServerId())) {
+                    isOpened = mOpenedItems.get(j);
+                    break;
+                }
+            }
+            openedItems.put(i,isOpened);
+        }
+        mOpenedItems = openedItems;
         mRules.clear();
         mRules.addAll(rules);
         notifyDataSetChanged();
+    }
+
+    private Spannable getSpannableString(String original) {
+        Spannable spanText = Spannable.Factory.getInstance().newSpannable(original);
+        if(mSearchQuery != null && !mSearchQuery.isEmpty()) {
+            int lastIndex = 0;
+
+            while (lastIndex != -1) {
+
+                lastIndex = original.toLowerCase().indexOf(mSearchQuery, lastIndex);
+
+                if (lastIndex != -1) {
+                    spanText.setSpan(new BackgroundColorSpan(0xBFFFDE76), lastIndex, lastIndex + mSearchQuery.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    lastIndex += mSearchQuery.length();
+                }
+            }
+        }
+        return spanText;
     }
 
     class RulesHolder extends RecyclerView.ViewHolder {
@@ -81,14 +109,14 @@ public class RulesAdapter extends RecyclerView.Adapter<RulesAdapter.RulesHolder>
         @BindView(R.id.title)
         TextView mTitle;
 
-        @BindView(R.id.expandableLayout)
-        ExpandableLinearLayout mExpandableLayout;
+        @BindView(R.id.expandable_layout)
+        ExpandableLayout mExpandableLayout;
 
         @BindView(R.id.description)
         TextView mDescription;
 
-//        @BindView(R.id.image)
-//        ImageView mImage;
+        @BindView(R.id.image)
+        ImageView mImage;
 
         private boolean mIsExpanded = false;
 
@@ -104,55 +132,17 @@ public class RulesAdapter extends RecyclerView.Adapter<RulesAdapter.RulesHolder>
         }
 
         private void bind(Rule rule) {
-            setUpExpandableView();
-            mTitle.setText(rule.getTitle());
-            mDescription.setText(rule.getDescription());
-//            String imagePath = rule.getImagePath();
-//            if (imagePath == null || imagePath.isEmpty())
-//                Glide.with(mContext).load(rule.getImageResId()).listener(new RequestListener<Integer, GlideDrawable>() {
-//                    @Override
-//                    public boolean onException(Exception e, Integer model, Target<GlideDrawable> target, boolean isFirstResource) {
-//                        return false;
-//                    }
-//
-//                    @Override
-//                    public boolean onResourceReady(GlideDrawable resource, Integer model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-//                        return false;
-//                    }
-//                }).into(mImage);
-//            else
-//                Glide.with(mContext).load(UrlFormatter.getLocalFilePath(imagePath, mContext)).listener(new RequestListener<String, GlideDrawable>() {
-//                    @Override
-//                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-//                        return false;
-//                    }
-//
-//                    @Override
-//                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-//                        return false;
-//                    }
-//                }).into(mImage);
-        }
-
-        private void setUpExpandableView() {
-            mExpandableLayout.setInRecyclerView(true);
-            boolean isExp = mExpandState.get(getAdapterPosition());
-            Timber.d("set item expanded %s",String.valueOf(isExp));
-            mExpandableLayout.setExpanded(isExp);
-            Timber.d("item now is expanded %s",String.valueOf(mExpandableLayout.isExpanded()));
-            mExpandableLayout.setListener(new ExpandableLayoutListenerAdapter() {
-                @Override
-                public void onPreOpen() {
-                    Timber.d("preOpen");
-                    mExpandState.put(getAdapterPosition(), true);
-                }
-
-                @Override
-                public void onPreClose() {
-                    Timber.d("preClose");
-                    mExpandState.put(getAdapterPosition(), false);
-                }
-            });
+            if(wasExpanded()) {
+                toggleArrow();
+                mExpandableLayout.expand(false);
+            }
+            mTitle.setText(getSpannableString(rule.getTitle()));
+            mDescription.setText(getSpannableString(rule.getDescription()));
+            String imagePath = rule.getImagePath();
+            if (imagePath == null || imagePath.isEmpty())
+                Glide.with(mContext).load(rule.getImageResId()).into(mImage);
+            else
+                Glide.with(mContext).load(UrlFormatter.getLocalFilePath(imagePath, mContext)).into(mImage);
         }
 
         private void toggleArrow() {
@@ -165,8 +155,18 @@ public class RulesAdapter extends RecyclerView.Adapter<RulesAdapter.RulesHolder>
             }
         }
 
+        private boolean wasExpanded() {
+            return mOpenedItems.get(getAdapterPosition());
+        }
+
         private void toggleLayout() {
-            mExpandableLayout.toggle();
+            if(mExpandableLayout.isExpanded()) {
+                mOpenedItems.put(getAdapterPosition(),false);
+                mExpandableLayout.collapse();
+            } else {
+                mOpenedItems.put(getAdapterPosition(),true);
+                mExpandableLayout.expand();
+            }
         }
     }
 }

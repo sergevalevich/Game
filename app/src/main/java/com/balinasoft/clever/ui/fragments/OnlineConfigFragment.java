@@ -1,8 +1,6 @@
 package com.balinasoft.clever.ui.fragments;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,6 +9,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.balinasoft.clever.R;
+import com.balinasoft.clever.eventbus.EventBus;
+import com.balinasoft.clever.eventbus.events.UserNameSelectedEvent;
 import com.balinasoft.clever.model.Player;
 import com.balinasoft.clever.model.Room;
 import com.balinasoft.clever.ui.activities.RoomActivity_;
@@ -19,8 +19,8 @@ import com.balinasoft.clever.util.AvatarMapper;
 import com.balinasoft.clever.util.ConstantsManager;
 import com.balinasoft.clever.util.NetworkStateChecker;
 import com.balinasoft.clever.util.RoomsClickListener;
-import com.balinasoft.clever.util.SocketErrorListener;
 import com.jakewharton.rxbinding.widget.RxTextView;
+import com.squareup.otto.Subscribe;
 
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.EFragment;
@@ -62,29 +62,14 @@ public class OnlineConfigFragment extends ConfigFragmentBase implements RoomsCli
     @ViewById(R.id.swipe)
     SwipeRefreshLayout mSwipe;
 
-    @StringRes(R.string.unstable_connection)
-    String mSocketConnectErrorMessage;
-
-    @StringRes(R.string.auth_failed)
-    String mAuthFailedMessage;
-
     @StringRes(R.string.room_creation_error)
     String mErrorCreatingRoomMessage;
-
-    @StringRes(R.string.room_connection_success)
-    String mRoomConnectionSuccessfulMessage;
-
-    @StringRes(R.string.room_creation_success)
-    String mRoomCreationSuccessfulMessage;
 
     @StringRes(R.string.in_lobby)
     String mInLobbyMessage;
 
-    @StringRes(R.string.room_connection_fail)
-    String mRoomConnectionFailedMessage;
-
-    @StringRes(R.string.unauthorized)
-    String mUnAuthorizedMessage;
+    @StringRes(R.string.network_unavailbale_message)
+    String mNetworkUnavailableMessage;
 
     @Bean
     NetworkStateChecker mNetworkStateChecker;
@@ -92,7 +77,8 @@ public class OnlineConfigFragment extends ConfigFragmentBase implements RoomsCli
     @Bean
     AvatarMapper mAvatarMapper;
 
-    private SocketErrorListener mSocketErrorListener;
+    @Bean
+    EventBus mEventBus;
 
     private Socket mSocket = getSocket();
 
@@ -109,20 +95,9 @@ public class OnlineConfigFragment extends ConfigFragmentBase implements RoomsCli
     private Subscription mFilterSub;
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        FragmentActivity activity = getActivity();
-        try {
-            mSocketErrorListener = (SocketErrorListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement SocketErrorListener");
-        }
-    }
-
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        register();
         establishSocketConnection();
         Timber.e("starting socket connection");
     }
@@ -150,8 +125,15 @@ public class OnlineConfigFragment extends ConfigFragmentBase implements RoomsCli
     public void onDestroy() {
         super.onDestroy();
         Timber.e("disabling socket connection");
+        unRegister();
+        Timber.e("unregister");
         disableSocketConnection();
         stopSocketListening();
+    }
+
+    @Subscribe
+    public void onUserDataChanged(UserNameSelectedEvent event) {
+        auth();
     }
 
     @Override
@@ -167,8 +149,19 @@ public class OnlineConfigFragment extends ConfigFragmentBase implements RoomsCli
 
     @Override
     void createGame() {
-        if (mIsAuthorized) createRoom();
-        else toastNotifyUserWith(mUnAuthorizedMessage);
+        if(mNetworkStateChecker.isNetworkAvailable()) {
+            if (mIsAuthorized) createRoom();
+        } else {
+            notifyUserWith(mNetworkUnavailableMessage);
+        }
+    }
+
+    private void register() {
+        mEventBus.register(this);
+    }
+
+    private void unRegister() {
+        mEventBus.unregister(this);
     }
 
     private void listenToFilter() {
@@ -237,7 +230,6 @@ public class OnlineConfigFragment extends ConfigFragmentBase implements RoomsCli
     private void startSocketListening() {
         mSocket.on(Socket.EVENT_CONNECT, args -> onConnect());//
         mSocket.on(Socket.EVENT_DISCONNECT, args -> onDisconnect());//
-        mSocket.on(Socket.EVENT_RECONNECT_ATTEMPT, this::onReconnectAttempt);//
         mSocket.on(ConstantsManager.AUTH_EVENT, this::onAuth);//
         mSocket.on(ConstantsManager.JOIN_ROOM_EVENT, this::onJoinRoom);//
         mSocket.on(ConstantsManager.ROOM_MESSAGE_EVENT, this::onRoomCreated);//
@@ -248,7 +240,6 @@ public class OnlineConfigFragment extends ConfigFragmentBase implements RoomsCli
     private void stopSocketListening() {
         mSocket.off(Socket.EVENT_CONNECT, args -> onConnect());
         mSocket.off(Socket.EVENT_DISCONNECT, args -> onDisconnect());
-        mSocket.off(Socket.EVENT_RECONNECT_ATTEMPT,this::onReconnectAttempt);
         mSocket.off(ConstantsManager.AUTH_EVENT, this::onAuth);
         mSocket.off(ConstantsManager.JOIN_ROOM_EVENT, this::onJoinRoom);
         mSocket.off(ConstantsManager.ROOM_MESSAGE_EVENT, this::onRoomCreated);
@@ -270,13 +261,6 @@ public class OnlineConfigFragment extends ConfigFragmentBase implements RoomsCli
         mIsConnected = false;
         mIsAuthorized = false;
         Timber.e("Disconnecting");
-    }
-
-    @UiThread
-    void onReconnectAttempt(Object... args) {
-        Timber.e("onReconnectAttempt");
-        Integer attempts = (Integer) args[0];
-        if(attempts < 4) mSocketErrorListener.onSocketError(mSocketConnectErrorMessage);
     }
 
     @UiThread
@@ -310,8 +294,6 @@ public class OnlineConfigFragment extends ConfigFragmentBase implements RoomsCli
         }
         if (success == 0) {
             Timber.e("auth error %s", message);
-            //Crashlytics.log(message);
-            mSocketErrorListener.onSocketError(mAuthFailedMessage);
             return;
         }
         Timber.e("socket auth successful");
@@ -326,12 +308,13 @@ public class OnlineConfigFragment extends ConfigFragmentBase implements RoomsCli
             message = data.getString("message");
             mIdInRoom = data.getString("idInRoom");
             Timber.d("roomId is %s",mIdInRoom);
-        } catch (JSONException ignored) {
-        }
+        } catch (JSONException ignored) {}
         Timber.e("onJoinRoom %s", message);
         if (message.equals(mInLobbyMessage)) {
             mIsAuthorized = true;
-        } else toastNotifyUserWith(message);
+        } else {
+            notifyUserWith(message);
+        }
     }
 
     @UiThread
@@ -357,7 +340,6 @@ public class OnlineConfigFragment extends ConfigFragmentBase implements RoomsCli
             int roomNumber = roomInfo.getInt("numRoom");
             int maxPlayers = roomInfo.getInt("maxPlayers");
             if (getOnlineCoins() >= bet) {
-
                 JSONArray jsonPlayers = roomInfo.getJSONArray("players");
                 List<Player> players = getPlayersList(jsonPlayers);
                 Player[] pls = new Player[players.size()];
@@ -365,7 +347,7 @@ public class OnlineConfigFragment extends ConfigFragmentBase implements RoomsCli
                 moveToRoom(pls,roomNumber,maxPlayers,bet);
             } else notifyUserWith(mNotEnoughCoinsMessage);
         } catch (JSONException ignored) {
-
+            Timber.e(ignored.getLocalizedMessage());
         }
     }
 
@@ -397,7 +379,7 @@ public class OnlineConfigFragment extends ConfigFragmentBase implements RoomsCli
                 int bet = jsonRoom.getInt("bet");
                 int number = jsonRoom.getInt("numRoom");
                 int maxPlayers = jsonRoom.getInt("maxPlayers");
-                if (bet <= mBet && maxPlayers-1 <= mPlayersCount + 1) {// FIXME: 19.10.2016
+                if (bet <= mBet && maxPlayers-1 <= mPlayersCount + 1) {
                     Room room = new Room(getPlayersList(jsonPlayers), bet, number, maxPlayers);
                     rooms.add(room);
                 }

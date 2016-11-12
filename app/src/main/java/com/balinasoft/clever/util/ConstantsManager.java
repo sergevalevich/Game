@@ -98,4 +98,6 @@ public interface ConstantsManager {
             R.drawable.rule_pic_14,
             R.drawable.rule_pic_15
     };
+
+    String SEARCH_ID = "search_id";
 }

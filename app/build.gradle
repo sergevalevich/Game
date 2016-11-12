@@ -91,7 +91,7 @@ dependencies {
     }
     compile 'com.jakewharton.rxbinding:rxbinding:0.4.0'
     compile 'com.ms-square:expandableTextView:0.1.4'
-    compile 'com.github.aakira:expandable-layout:1.6.0@aar'
+    compile 'net.cachapa.expandablelayout:expandablelayout:2.3'
 }
 
 apt {

@@ -1,8 +1,8 @@
 package com.balinasoft.clever.ui.activities;
 
+import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.balinasoft.clever.R;
 import com.balinasoft.clever.model.Player;
@@ -69,8 +69,16 @@ public class TourActivityOnline extends TourActivityBase {
     @UiThread
     void onDisconnect() {
         Timber.e("TourActivity DISCONNECT");
-        Toast.makeText(this,mSocketErrorMessage, Toast.LENGTH_SHORT).show();
-        finish();
+        if (RESUMED_ACTIVITIES_COUNT > 0 && mRootView != null) {
+            Snackbar.make(mRootView, mSocketErrorMessage, Snackbar.LENGTH_SHORT)
+                    .setCallback(new Snackbar.Callback() {
+                        @Override
+                        public void onDismissed(Snackbar snackbar, int event) {
+                            finish();
+                        }
+                    })
+                    .show();
+        }
     }
 
     @UiThread

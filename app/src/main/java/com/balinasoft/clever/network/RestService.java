@@ -1,6 +1,7 @@
 package com.balinasoft.clever.network;
 
 
+import com.balinasoft.clever.network.model.HelpModel;
 import com.balinasoft.clever.network.model.LastUpdateModel;
 import com.balinasoft.clever.network.model.LogInModel;
 import com.balinasoft.clever.network.model.NewsModel;
@@ -111,5 +112,9 @@ public class RestService {
 
     public Observable<NewsModel> getNews() {
         return mGameApi.getNews();
+    }
+
+    public Observable<HelpModel> getHelp(int id) {
+        return mGameApi.getHelp(id);
     }
 }

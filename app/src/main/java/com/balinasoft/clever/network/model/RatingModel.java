@@ -5,27 +5,10 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class RatingModel {
-
-    @SerializedName("success")
-    private int mSuccess;
-
-    @SerializedName("error")
-    private int mError;
-
-    @SerializedName("message")
-    private String mMessage;
+public class RatingModel extends DefaultResponseModel{
 
     @SerializedName("users")
     private List<UserModel> mUsers;
-
-    public int getSuccess() {
-        return mSuccess;
-    }
-
-    public String getMessage() {
-        return mMessage;
-    }
 
     public List<UserModel> getUsers() {
         return mUsers;
